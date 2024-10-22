@@ -16,12 +16,6 @@ const config: Config = {
         foreground: "var(--foreground)",
       },
     },
-    fontFamily: {
-      // Headings
-      sans: ["Inter", "sans-serif"],
-      // Base text
-      monospace: ["Inconsolata", "monospace"],
-    },
   },
   plugins: [tailwindTypography],
 };
