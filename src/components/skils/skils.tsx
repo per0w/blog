@@ -29,7 +29,7 @@ export const Skils = () => {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="flex flex-col justify-center">
-        <div className="flex flex-wrap items-center justify-center gap-10 mt-2 md:justify-around">
+        <div className="flex flex-wrap items-center justify-center gap-10 mt-2">
           <AnsibleIcon />
 
           <AstroIcon />

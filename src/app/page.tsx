@@ -2,7 +2,7 @@ import { About } from "@/components/about/about";
 import { ContactUs } from "@/components/contact-us/contact-us";
 import { Experience } from "@/components/experience/experience";
 import { Hero } from "@/components/hero/hero";
-import { LastArticles } from "@/components/last-articles/last-articles";
+import { Posts } from "@/components/posts/posts";
 import { Projects } from "@/components/projects/projects";
 
 export default function Home() {
@@ -17,7 +17,7 @@ export default function Home() {
 
         <Projects />
 
-        <LastArticles />
+        <Posts />
 
         <ContactUs />
       </div>

@@ -9,7 +9,7 @@ export const Header = () => {
           <div className="relative flex items-center">
             <Link
               className="text-sm leading-6 font-semibold text-slate-700 dark:text-slate-200"
-              href="#"
+              href="/"
             >
               PEROV.DEV
             </Link>
@@ -18,7 +18,7 @@ export const Header = () => {
                 <ul className="flex space-x-8">
                   <li>
                     <Link
-                      href={`#${SECTIONS_IDS.about}`}
+                      href={`/#${SECTIONS_IDS.about}`}
                       className="hover:text-sky-500 dark:hover:text-sky-400"
                     >
                       Обо мне
