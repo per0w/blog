@@ -10,7 +10,7 @@ export const Hero = () => {
       <div className="relative flex flex-col items-center max-w-screen-xl px-4 mx-auto md:flex-row sm:px-6 p-8">
         <div className="flex items-center">
           <div className="relative p-3 rounded  md:p-8">
-            <div className="rounded-lg bg-white text-black">
+            <div className="rounded-lg">
               <Image
                 className="float-left rounded mr-4 mb-2"
                 src={photo}
@@ -27,7 +27,7 @@ export const Hero = () => {
           <div className="text-left">
             <p className="max-w-md mx-auto mt-3 text-base sm:text-lg md:mt-5 md:text-xl md:max-w-3xl font-monospace">
               Привет! Меня зовут{" "}
-              <span className="text-indigo-800 font-semibold">
+              <span className="font-semibold text-blue-500">
                 Владимир Перов
               </span>
             </p>

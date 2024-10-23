@@ -17,7 +17,7 @@ export const Card = ({ url, alt = "", description, title, tags, image }: Props) 
     <section className="w-full p-4 md:w-1/2 lg:w-1/3">
       <article
 
-        className="rounded-xl bg-white p-3 shadow-lg duration-100 hover:scale-105 hover:transform hover:shadow-xl"
+        className="rounded-xl dark:bg-slate-800 p-3 shadow-lg duration-100 hover:scale-105 hover:transform hover:shadow-xl"
       >
         <a href={url} aria-label="link to project" target="_blank">
           <div className="relative flex items-end overflow-hidden rounded-xl">
@@ -30,8 +30,8 @@ export const Card = ({ url, alt = "", description, title, tags, image }: Props) 
             />
           </div>
           <div className="mt-1 p-2">
-            <h3 className="text-xl text-orange lg:text-2xl">{title}</h3>
-            <p className="text-s text-black">{description}</p>
+            <h3 className="text-xl lg:text-2xl">{title}</h3>
+            <p className="text-s">{description}</p>
             <Tags tags={tags} />
           </div>
         </a>
