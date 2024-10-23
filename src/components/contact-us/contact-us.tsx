@@ -5,18 +5,18 @@ export const ContactUs = () => {
   return (
     <Section id={SECTIONS_IDS.contactUs} title="Контакты:">
       <div className="mt-6">
-        <div className="grid sm:grid-cols-2 items-start gap-14 p-8 mx-auto max-w-4xl bg-white  rounded-md">
+        <div className="grid sm:grid-cols-2 items-start gap-14 p-8 mx-auto max-w-4xl rounded-md">
           <div>
             <div className="mt-12">
-              <h2 className="text-gray-800 text-base font-bold">Email</h2>
+              <h2 className="text-base font-bold">Email</h2>
               <ul className="mt-4">
                 <li className="flex items-center">
-                  <div className="bg-[#e6e6e6cf] h-10 w-10 rounded-full flex items-center justify-center shrink-0">
+                  <div className="h-10 w-10 rounded-full flex items-center justify-center shrink-0">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="20px"
                       height="20px"
-                      fill="#007bff"
+                      fill="currentColor"
                       viewBox="0 0 479.058 479.058"
                     >
                       <path
@@ -25,7 +25,7 @@ export const ContactUs = () => {
                       />
                     </svg>
                   </div>
-                  <a href="#" className="text-[#007bff] text-sm ml-4">
+                  <a href="#" className="text-sm ml-4">
                     <small className="block">Mail</small>
                     <strong>per0w@yandex.ru</strong>
                   </a>
@@ -34,14 +34,14 @@ export const ContactUs = () => {
             </div>
 
             <div className="mt-12">
-              <h2 className="text-gray-800 text-base font-bold">Socials</h2>
+              <h2 className="text-base font-bold">Socials</h2>
 
               <ul className="flex mt-4 space-x-4">
-                <li className="bg-[#e6e6e6cf] h-10 w-10 rounded-full flex items-center justify-center shrink-0">
+                <li className="h-10 w-10 rounded-full flex items-center justify-center shrink-0">
                   <a
                     href="https://github.com/per0w"
                     target="blank"
-                    className="block  hover:text-slate-500 dark:hover:text-slate-300"
+                    className="block hover:text-slate-500 dark:hover:text-slate-300"
                   >
                     <span className="sr-only">perov githubs</span>
                     <svg
@@ -58,7 +58,7 @@ export const ContactUs = () => {
                   <a
                     href="https://t.me/per0w/"
                     target="blank"
-                    className="block  hover:text-slate-500 dark:hover:text-slate-300"
+                    className="block hover:text-slate-500 dark:hover:text-slate-300"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

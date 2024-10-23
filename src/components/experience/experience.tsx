@@ -69,7 +69,7 @@ const DEFAULT_JOBS: ExperienceItemProps[] = [
 export const Experience = ({ jobs = DEFAULT_JOBS }: ExperienceProps) => {
   return (
     <Section id={SECTIONS_IDS.experience} title="Опыт:">
-      <div className="flex items-center justify-center bg-white px-6 md:px-60">
+      <div className="flex items-center justify-center px-6 md:px-60">
         <div className="space-y-6 border-l-2 border-dashed">
           {jobs.map((job) => {
             return <ExperienceItem key={job.title} {...job} />;
