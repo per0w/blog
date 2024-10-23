@@ -17,7 +17,7 @@ export const Hero = () => {
                 alt="main photo"
                 width={370}
                 height={490}
-                style={{ width: "auto", height: "auto" }}
+                style={{ width: "370px", height: "auto" }}
                 priority
               />
             </div>
@@ -35,7 +35,7 @@ export const Hero = () => {
             <div className="mt-5 sm:flex md:mt-8">
               <div className="rounded-md shadow">
                 <a
-                  href={"/cv.pdf"}
+                  href={"/blog/cv.pdf"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-full px-8 py-3 text-base font-medium leading-6 text-white transition duration-150 ease-in-out bg-blue-500 border border-transparent rounded-md hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue md:py-4 md:text-lg md:px-10"
