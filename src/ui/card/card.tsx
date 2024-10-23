@@ -1,6 +1,5 @@
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 
-import projectImage from "@/public/image.png";
 import { Tags } from "../tags/tags";
 
 interface Props {
@@ -10,19 +9,20 @@ interface Props {
   description: string;
   tags: string[];
   children?: HTMLElement | HTMLElement[];
+  image: StaticImageData;
 }
 
-export const Card = ({ url, alt = "", description, title, tags }: Props) => {
+export const Card = ({ url, alt = "", description, title, tags, image }: Props) => {
   return (
     <section className="w-full p-4 md:w-1/2 lg:w-1/3">
       <article
 
         className="rounded-xl bg-white p-3 shadow-lg duration-100 hover:scale-105 hover:transform hover:shadow-xl"
       >
-        <a href={url} aria-label="link to project">
+        <a href={url} aria-label="link to project" target="_blank">
           <div className="relative flex items-end overflow-hidden rounded-xl">
             <Image
-              src={projectImage}
+              src={image}
               alt={alt}
               width={400}
               height={400}

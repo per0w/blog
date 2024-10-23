@@ -1,8 +1,7 @@
 import Image from "next/image";
 
-import photo from "@/public/photo-main.png";
+import photo from "./photo-main.png";
 import { SECTIONS_IDS } from "@/constants/common";
-import Link from "next/link";
 import { Section } from "@/ui/section/section";
 
 export const Hero = () => {
@@ -35,14 +34,14 @@ export const Hero = () => {
             <p className="font-monospace">Я веб-разработчик.</p>
             <div className="mt-5 sm:flex md:mt-8">
               <div className="rounded-md shadow">
-                <Link
-                  href="cv.pdf"
-                  target="blank"
-                  locale={false}
+                <a
+                  href={"/cv.pdf"}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center justify-center w-full px-8 py-3 text-base font-medium leading-6 text-white transition duration-150 ease-in-out bg-blue-500 border border-transparent rounded-md hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue md:py-4 md:text-lg md:px-10"
                 >
                   Открыть CV
-                </Link>
+                </a>
               </div>
             </div>
           </div>

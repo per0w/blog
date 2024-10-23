@@ -2,13 +2,16 @@ import { SECTIONS_IDS } from "@/constants/common";
 import { Card } from "@/ui/card/card";
 import { Section } from "@/ui/section/section";
 
-const DEFAULT_PROJECTS = Array(3).fill({
-  link: "#",
-  title: "Project title",
-  description: "Project description",
-  img_alt: "project image alt text",
-  tags: ["React", "CSS", "Typescript"],
-});
+import projectImage from "./blog-post-preview.png";
+
+const DEFAULT_PROJECTS = [{
+  link: "https://github.com/per0w/blog",
+  title: "Мой блог",
+  description: "Моя личная страница",
+  img_alt: "Превью сайта визитки",
+  image: projectImage,
+  tags: ["Next.JS", "Tailwind", "Typescript"],
+}];
 
 export const Projects = ({ projects = DEFAULT_PROJECTS }) => {
   return (
@@ -22,6 +25,7 @@ export const Projects = ({ projects = DEFAULT_PROJECTS }) => {
             description={project.description}
             alt={project.img_alt}
             tags={project.tags}
+            image={project.image}
           />
         ))}
       </div>
