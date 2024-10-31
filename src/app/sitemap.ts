@@ -1,6 +1,8 @@
 import { getBlogPosts } from "@/app/blog/utils";
 
-export const baseUrl = "https:/localhost";
+export const baseUrl = "https://per0w.github.io/blog/";
+
+export const dynamic = 'force-static'
 
 export default async function sitemap() {
   const blogs = getBlogPosts().map((post) => ({
