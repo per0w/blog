@@ -13,14 +13,15 @@ export async function generateStaticParams() {
 }
 
 type Params = {
-  params: {
+  params: Promise<{
     metadata: Metadata;
     slug: string;
     content: string;
-  };
+  }>;
 };
 
-export function generateMetadata({ params }: Params) {
+export async function generateMetadata(props: Params) {
+  const params = await props.params;
   const post = getBlogPosts().find((post) => post.slug === params.slug);
   if (!post) {
     return;
@@ -60,7 +61,8 @@ export function generateMetadata({ params }: Params) {
   };
 }
 
-export default function Blog({ params }: Params) {
+export default async function Blog(props: Params) {
+  const params = await props.params;
   const post = getBlogPosts().find((post) => post.slug === params.slug);
 
   if (!post) {
