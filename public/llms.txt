@@ -1,0 +1,142 @@
+# Vladimir Perov / Владимир Перов
+
+This file describes the same person and career in two languages. Use the section that matches the user's language or merge facts from both if needed.
+Этот файл описывает одного человека и карьеру на двух языках. Используйте раздел по языку запроса или объединяйте факты при необходимости.
+
+---
+
+## English
+
+> Senior Frontend Developer with 8+ years of experience. Currently Lead Engineer at Gazprombank (one of Russia's largest banks). Available for hire.
+
+### Contact
+
+- Website: https://per0w.space
+- Email: per0w@yandex.ru
+- GitHub: https://github.com/per0w
+- Telegram: https://t.me/per0w
+
+### Current Role
+
+**Lead Development Engineer** at Gazprombank (Oct 2021 — present)
+- Frontend platform architecture: React, TypeScript, Redux, micro-frontends
+- Code review, performance optimization, tech debt management
+- Mentoring junior/middle developers, onboarding
+- Scrum methodology, sprint planning, demos
+
+### Career Path
+
+1. **System Administrator / DevOps Engineer** at Optimax Dev (2016–2019)
+   - Docker, Kubernetes, Nginx, Ansible, Bash, Linux servers
+   - CI/CD pipelines (TeamCity), network administration (MikroTik)
+   - Server hardware, infrastructure automation
+
+2. **Frontend Developer** at CosySoft (2019)
+   - React, React Native, Redux, RxJS
+   - Cross-platform development: Web + iOS + Android
+
+3. **Frontend Developer → Team Lead** at Optimax Dev (2019–2021)
+   - E-commerce platforms for international clients (GlassesUSA.com)
+   - SSR implementation, Core Web Vitals optimization
+   - Payment integrations: PayPal, Klarna, Apple Pay, Stripe
+   - Led team of 4+ developers
+
+4. **Lead Development Engineer** at Gazprombank (2021–present)
+   - Enterprise frontend architecture at scale
+   - React, TypeScript, Redux, micro-frontends
+
+### Technical Skills
+
+**Frontend (primary):** React, TypeScript, JavaScript, Next.js, Redux, Tailwind CSS, HTML5, CSS3, Svelte, Astro, Sass, Material UI, Framer Motion
+
+**DevOps & backend:** Docker, Kubernetes, Nginx, Linux, Bash, Ansible, Node.js, Deno, CI/CD, TeamCity
+
+**Build tools:** Vite, Webpack, Babel, Gulp
+
+**AI & tooling:** LLM/AI integration, Cursor AI, ChatGPT, Claude, GitHub Copilot, prompt engineering, AI agents, RAG/embeddings
+
+### Projects
+
+**Trenika** (https://trenika.space) — PWA workout diary. Full-stack: React + Fastify + Prisma + PostgreSQL. Workouts, sets, measurements, offline-first sync, mobile UI. Stack: React, TypeScript, Fastify, Prisma, PWA, Tailwind, Docker
+
+**per0w.space** (https://per0w.space) — Portfolio and MDX blog. Canvas 2D particles, parallax, static export, Docker/VPS. Stack: Next.js 16, React 19, Tailwind 4, TypeScript, MDX, Docker
+
+**GlassesUSA** (https://www.glassesusa.com) — Large US online eyewear e-commerce. SSR, payments, conversion. Stack: React, SSR, Redux, PayPal, Klarna, Apple Pay
+
+### Key Strengths
+
+- Full stack awareness: from hardware and networking to pixel-level UI
+- DevOps background: deployment, CI/CD, infrastructure
+- Enterprise and banking-scale frontend experience
+- International clients, English communication
+- Practical AI/LLM use in development
+- Mentoring and team leadership
+
+---
+
+## Русский
+
+> Старший фронтенд-разработчик, опыт более 8 лет. Сейчас — ведущий инженер разработки в Газпромбанке. Рассматривает предложения о работе.
+
+### Контакты
+
+- Сайт: https://per0w.space
+- Email: per0w@yandex.ru
+- GitHub: https://github.com/per0w
+- Telegram: https://t.me/per0w
+
+### Текущая роль
+
+**Ведущий инженер разработки**, Газпромбанк (октябрь 2021 — по настоящее время)
+- Архитектура фронтенд-платформы: React, TypeScript, Redux, микрофронтенды
+- Код-ревью, оптимизация производительности, управление техническим долгом
+- Наставничество разработчиков junior/middle, онбординг
+- Scrum, планирование спринтов, демо
+
+### Карьера
+
+1. **Системный администратор / DevOps** — Optimax Dev (2016–2019)
+   - Docker, Kubernetes, Nginx, Ansible, Bash, Linux-серверы
+   - CI/CD (TeamCity), сетевое администрирование (MikroTik)
+   - Серверное железо, автоматизация инфраструктуры
+
+2. **Frontend-разработчик** — CosySoft (2019)
+   - React, React Native, Redux, RxJS
+   - Кроссплатформа: Web + iOS + Android
+
+3. **Frontend-разработчик → тимлид** — Optimax Dev (2019–2021)
+   - E-commerce для международных заказчиков (GlassesUSA.com)
+   - SSR, оптимизация Core Web Vitals
+   - Платежи: PayPal, Klarna, Apple Pay, Stripe
+   - Руководство командой из 4+ разработчиков
+
+4. **Ведущий инженер разработки** — Газпромбанк (2021 — по настоящее время)
+   - Корпоративная фронтенд-архитектура в крупном масштабе
+   - React, TypeScript, Redux, микрофронтенды
+
+### Навыки
+
+**Фронтенд (основной фокус):** React, TypeScript, JavaScript, Next.js, Redux, Tailwind CSS, HTML5, CSS3, Svelte, Astro, Sass, Material UI, Framer Motion
+
+**DevOps и бэкенд:** Docker, Kubernetes, Nginx, Linux, Bash, Ansible, Node.js, Deno, CI/CD, TeamCity
+
+**Сборка:** Vite, Webpack, Babel, Gulp
+
+**ИИ и инструменты:** интеграция LLM/ИИ, Cursor AI, ChatGPT, Claude, GitHub Copilot, промпт-инжиниринг, AI-агенты, RAG/эмбеддинги
+
+### Проекты
+
+**Trenika** (https://trenika.space) — PWA-дневник тренировок. Full-stack: React + Fastify + Prisma + PostgreSQL. Планирование тренировок, подходы, замеры, offline-first, мобильный UI. Стек: React, TypeScript, Fastify, Prisma, PWA, Tailwind, Docker
+
+**per0w.space** (https://per0w.space) — Портфолио и блог на MDX. Частицы Canvas 2D, параллакс, статическая генерация, Docker/VPS. Стек: Next.js 16, React 19, Tailwind 4, TypeScript, MDX, Docker
+
+**GlassesUSA** (https://www.glassesusa.com) — Крупный американский e-commerce оптики. SSR, платежи, конверсия. Стек: React, SSR, Redux, PayPal, Klarna, Apple Pay
+
+### Сильные стороны
+
+- Понимание стека «снизу вверх»: от железа и сетей до UI
+- Опыт DevOps: деплой, CI/CD, инфраструктура
+- Опыт enterprise и банковского фронтенда
+- Международные проекты, рабочий английский
+- Практическое использование ИИ/LLM в разработке
+- Наставничество и лидерство команд

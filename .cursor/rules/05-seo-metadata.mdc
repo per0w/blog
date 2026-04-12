@@ -1,0 +1,37 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# SEO и метаданные
+
+## Metadata API
+
+- Использовать Next.js `Metadata` API (`export const metadata` или `generateMetadata()`).
+- Каждая страница должна иметь уникальные `title` и `description`.
+- Для страниц блога: `generateMetadata()` на основе frontmatter поста.
+- Формат title: `Заголовок | perovdev` или `perovdev` для главной.
+
+## Open Graph
+
+- Заполнять `openGraph` для всех публичных страниц: title, description, type.
+- Для постов блога: type `article`, добавить `publishedTime` из frontmatter.
+- По возможности указывать `og:image` (обложка поста или дефолтная).
+
+## SEO-файлы
+
+- `src/app/robots.ts` — генерирует `robots.txt`.
+- `src/app/sitemap.ts` — генерирует `sitemap.xml` со всеми страницами и постами.
+- При добавлении новых страниц — обновить sitemap.
+
+## Семантика
+
+- `<html lang="ru">` — русская локаль.
+- Семантический HTML: `<main>`, `<article>`, `<section>`, `<nav>`, `<header>`, `<footer>`.
+- Заголовки (`h1`–`h6`) в правильной иерархии; один `h1` на страницу.
+- `alt` для всех изображений.
+
+## Ссылки
+
+- Все внутренние ссылки через `<Link>` от Next.js (работают с `basePath`).
+- Внешние ссылки: `target="_blank" rel="noopener noreferrer"`.

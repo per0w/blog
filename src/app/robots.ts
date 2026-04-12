@@ -1,6 +1,6 @@
-import { baseUrl } from "@/app/sitemap";
+const BASE_URL = "https://per0w.space";
 
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 
 export default function robots() {
   return {
@@ -9,6 +9,6 @@ export default function robots() {
         userAgent: "*",
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: `${BASE_URL}/sitemap.xml`,
   };
 }

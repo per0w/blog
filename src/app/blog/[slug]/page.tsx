@@ -1,8 +1,11 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { Metadata } from "next";
+
 import { CustomMDX } from "@/components/mdx/mdx";
 import { formatDate, getBlogPosts } from "@/app/blog/utils";
-import { baseUrl } from "@/app/sitemap";
-import { Metadata } from "next";
+
+const BASE_URL = "https://per0w.space";
 
 export async function generateStaticParams() {
   const posts = getBlogPosts();
@@ -27,30 +30,19 @@ export async function generateMetadata(props: Params) {
     return;
   }
 
-  const {
-    title,
-    publishedAt: publishedTime,
-    description,
-    image,
-  } = post.metadata;
-  const ogImage = image
-    ? image
-    : `${baseUrl}/og?title=${encodeURIComponent(title)}`;
+  const { title, publishedAt: publishedTime, description, image } = post.metadata;
+  const ogImage = image ? image : `${BASE_URL}/og?title=${encodeURIComponent(title)}`;
 
   return {
-    title,
+    title: `${title} | per0w.space`,
     description,
     openGraph: {
       title,
       description,
       type: "article",
       publishedTime,
-      url: `${baseUrl}/blog/${post.slug}`,
-      images: [
-        {
-          url: ogImage,
-        },
-      ],
+      url: `${BASE_URL}/blog/${post.slug}`,
+      images: [{ url: ogImage }],
     },
     twitter: {
       card: "summary_large_image",
@@ -61,7 +53,7 @@ export async function generateMetadata(props: Params) {
   };
 }
 
-export default async function Blog(props: Params) {
+export default async function BlogPost(props: Params) {
   const params = await props.params;
   const post = getBlogPosts().find((post) => post.slug === params.slug);
 
@@ -83,23 +75,27 @@ export default async function Blog(props: Params) {
             dateModified: post.metadata.publishedAt,
             description: post.metadata.description,
             image: post.metadata.image
-              ? `${baseUrl}${post.metadata.image}`
-              : `/og?title=${encodeURIComponent(post.metadata.title)}`,
-            url: `${baseUrl}/blog/${post.slug}`,
+              ? `${BASE_URL}${post.metadata.image}`
+              : `${BASE_URL}/og?title=${encodeURIComponent(post.metadata.title)}`,
+            url: `${BASE_URL}/blog/${post.slug}`,
             author: {
               "@type": "Person",
-              name: "My Portfolio",
+              name: "Владимир Перов",
             },
           }),
         }}
       />
-      <h1 className="title font-semibold text-2xl tracking-tighter">
-        {post.metadata.title}
-      </h1>
-      <div className="flex justify-between items-center mt-2 mb-8 text-sm">
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          {formatDate(post.metadata.publishedAt)}
-        </p>
+
+      <Link
+        href="/blog"
+        className="mb-6 inline-flex items-center gap-1 text-sm text-muted transition-colors hover:text-accent"
+      >
+        ← Назад к блогу
+      </Link>
+
+      <h1 className="title text-2xl font-semibold tracking-tighter">{post.metadata.title}</h1>
+      <div className="mt-2 mb-8 flex items-center justify-between text-sm">
+        <p className="text-sm text-muted">{formatDate(post.metadata.publishedAt)}</p>
       </div>
       <article className="prose">
         <CustomMDX source={post.content} />

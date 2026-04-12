@@ -2,12 +2,7 @@ import Link from "next/link";
 import Image, { ImageProps } from "next/image";
 import { MDXRemote, MDXRemoteProps } from "next-mdx-remote/rsc";
 import { highlight } from "sugar-high";
-import React, {
-  AnchorHTMLAttributes,
-  DetailedHTMLProps,
-  HTMLAttributes,
-  ReactNode,
-} from "react";
+import React, { AnchorHTMLAttributes, DetailedHTMLProps, HTMLAttributes, ReactNode } from "react";
 
 type TablProps = {
   data: {
@@ -17,9 +12,7 @@ type TablProps = {
 };
 
 function Table({ data }: TablProps) {
-  const headers = data.headers.map((header, index) => (
-    <th key={index}>{header}</th>
-  ));
+  const headers = data.headers.map((header, index) => <th key={index}>{header}</th>);
   const rows = data.rows.map((row, index) => (
     <tr key={index}>
       {row.map((cell, cellIndex) => (
@@ -38,12 +31,8 @@ function Table({ data }: TablProps) {
   );
 }
 
-
 function CustomLink(
-  props: DetailedHTMLProps<
-    AnchorHTMLAttributes<HTMLAnchorElement>,
-    HTMLAnchorElement
-  >
+  props: DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>,
 ): ReactNode {
   const href = props.href;
 
@@ -70,7 +59,6 @@ function RoundedImage(props: RoundedImageProps) {
   return <Image className="rounded-lg" {...props} alt={props.alt} />;
 }
 
-
 function Code({
   children,
   ...props
@@ -93,10 +81,7 @@ function slugify(str: string) {
 function createHeading(level: number) {
   const Heading = ({
     children,
-  }: DetailedHTMLProps<
-    HTMLAttributes<HTMLHeadingElement>,
-    HTMLHeadingElement
-  >): ReactNode => {
+  }: DetailedHTMLProps<HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>): ReactNode => {
     const slug = slugify(String(children));
     return React.createElement(
       `h${level}`,
@@ -108,7 +93,7 @@ function createHeading(level: number) {
           className: "anchor",
         }),
       ],
-      children
+      children,
     );
   };
 

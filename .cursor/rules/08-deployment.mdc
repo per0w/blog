@@ -1,0 +1,36 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Деплой
+
+## Основной: Docker + VPS (per0w.space)
+
+- VPS: 212.192.0.241, SSH порт 2222, пользователь root.
+- Docker multi-stage: Node 22 build → nginx:alpine serve.
+- CI/CD: `.github/workflows/deploy-vps.yml` — push to main → build → GHCR → SSH deploy.
+- Директория на VPS: `/opt/per0w-space/`.
+- Secret: `SSH_PRIVATE_KEY` в GitHub repo settings.
+
+## Резервный: GitHub Pages
+
+- CI/CD: `.github/workflows/nextjs.yml` — push to main → static export → GitHub Pages.
+
+## Конфигурация
+
+- `output: 'export'` — статический экспорт в `out/`.
+- Без `basePath` — сайт на корне домена per0w.space.
+- `images.unoptimized: true` — обязательно для static export.
+
+## URL
+
+- Production: `https://per0w.space`
+- Dev: `http://localhost:3000`
+
+## Важно
+
+- Не использовать серверные фичи: middleware, route handlers, ISR, SSR.
+- Все страницы должны корректно экспортироваться статически.
+- Динамические маршруты работают через `generateStaticParams()`.
+- `pnpm build` не должен выдавать ошибок перед деплоем.

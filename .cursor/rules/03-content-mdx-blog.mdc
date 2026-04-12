@@ -1,0 +1,41 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Контент: MDX-блог
+
+## Расположение постов
+
+Посты — MDX-файлы в `src/app/blog/posts/`. Имя файла = slug URL.
+
+## Frontmatter-схема
+
+Каждый `.mdx` файл начинается с YAML-frontmatter:
+
+```yaml
+---
+title: 'Заголовок поста'
+publishedAt: '2025-01-15'
+description: 'Краткое описание для превью и мета-тегов'
+tags: 'react, typescript, nextjs'
+image: '/images/post-cover.jpg'  # опционально
+---
+```
+
+Обязательные поля: `title`, `publishedAt`, `description`, `tags`.
+
+## Конвенции контента
+
+- Дата `publishedAt` в формате `YYYY-MM-DD`.
+- Теги через запятую в одной строке.
+- Slug (имя файла) — kebab-case на английском: `my-first-post.mdx`.
+- Внутри MDX можно использовать кастомные React-компоненты из `src/components/mdx/`.
+- Подсветка синтаксиса — через `sugar-high`, не внешние тяжёлые библиотеки.
+
+## Утилиты блога
+
+- `getBlogPosts()` — читает и парсит все MDX-файлы из `posts/`.
+- `formatDate()` — форматирует дату в русской локали.
+- Обе функции в `src/app/blog/utils.ts`.
+- При добавлении нового функционала блога (поиск, фильтрация, пагинация) — расширять этот файл утилит.
