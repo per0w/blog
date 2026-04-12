@@ -3,5 +3,9 @@ node_modules
 out
 .git
 .cursor
-*.md
 .github
+deploy
+*.md
+!README.md
+.env*
+!.env.production.example

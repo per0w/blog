@@ -1,0 +1,70 @@
+# =============================================================================
+# per0w.space Production — Docker Compose + Traefik (авто-SSL Let's Encrypt)
+#
+# Запуск:  docker compose -f docker-compose.prod.yml --env-file .env.production up -d
+# Деплой:  ./deploy/deploy.sh
+# =============================================================================
+
+services:
+  # ── Traefik — reverse proxy + автоматический SSL ────────────────────
+  traefik:
+    image: traefik:3.4
+    container_name: perow-traefik
+    restart: unless-stopped
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      # HTTP → HTTPS редирект
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      # Let's Encrypt
+      - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
+      - --certificatesresolvers.le.acme.email=${ACME_EMAIL}
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      # Логи
+      - --log.level=WARN
+      - --accesslog=false
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt:/letsencrypt
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.25'
+
+  # ── Blog (Next.js static export, nginx) ─────────────────────────────
+  blog:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: perow-blog
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.blog.rule=Host(`${DOMAIN}`)
+      - traefik.http.routers.blog.entrypoints=websecure
+      - traefik.http.routers.blog.tls.certresolver=le
+      - traefik.http.services.blog.loadbalancer.server.port=80
+      # www → корневой домен
+      - traefik.http.routers.blog-www.rule=Host(`www.${DOMAIN}`)
+      - traefik.http.routers.blog-www.entrypoints=websecure
+      - traefik.http.routers.blog-www.tls.certresolver=le
+      - traefik.http.routers.blog-www.middlewares=www-redirect
+      - traefik.http.middlewares.www-redirect.redirectregex.regex=^https://www\.(.+)
+      - traefik.http.middlewares.www-redirect.redirectregex.replacement=https://$${1}
+      - traefik.http.middlewares.www-redirect.redirectregex.permanent=true
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+          cpus: '0.25'
+
+volumes:
+  letsencrypt:
+    name: perow_letsencrypt
