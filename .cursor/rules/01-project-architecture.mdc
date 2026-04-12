@@ -1,0 +1,46 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Архитектура проекта
+
+Проект — персональный сайт-визитка + MDX-блог. Одно приложение Next.js 15 (App Router), не монорепо.
+
+## Стек
+
+- **Framework:** Next.js 16, App Router (`src/app/`)
+- **UI:** React 19, TypeScript (strict mode)
+- **Стилизация:** Tailwind CSS 4 (CSS-first, `@theme` в globals.css) + `@tailwindcss/typography`
+- **Анимации:** Framer Motion
+- **Иконки:** lucide-react + кастомные SVG для skill-иконок
+- **Контент:** MDX (`@next/mdx`, `next-mdx-remote`, `sugar-high` для подсветки синтаксиса)
+- **Шрифт:** Geist (sans + mono)
+- **Тема:** `next-themes` (dark/light, class-based)
+- **Деплой:** Docker + VPS (per0w.space) + GitHub Pages (резервный)
+- **Линтинг:** ESLint 9 (flat config) + Prettier + prettier-plugin-tailwindcss
+- **Пакетный менеджер:** pnpm
+
+## Структура директорий
+
+```
+src/
+  app/               — App Router: страницы, layout, metadata
+    blog/            — Блог: список постов, [slug] для отдельных
+      posts/         — MDX-файлы постов (*.mdx)
+    globals.css      — Глобальные стили, prose-классы
+    layout.tsx       — Корневой layout (шрифт, header, footer)
+    page.tsx         — Главная (Hero, About, Experience, Projects, Posts, Contact)
+    robots.ts        — robots.txt для SEO
+    sitemap.ts       — sitemap.xml для SEO
+  components/        — Секции и виджеты страниц
+  ui/                — Переиспользуемые UI-компоненты (Card, Section, Tags, Icons)
+  constants/         — Константы (ID секций и прочее)
+```
+
+## Принципы
+
+- Чётко разделять `components/` (секции страниц, бизнес-компоненты) и `ui/` (чистые презентационные компоненты).
+- Каждый компонент в отдельной папке с одноимённым файлом: `hero/hero.tsx`.
+- Контент блога — MDX-файлы с YAML-frontmatter, не хардкод в компонентах.
+- Статические данные (опыт, проекты, навыки) хранить в константах или массивах внутри компонентов секций; при росте — выносить в отдельные файлы данных.

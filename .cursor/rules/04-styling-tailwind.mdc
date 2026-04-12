@@ -1,0 +1,42 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Стилизация: Tailwind CSS 4
+
+## Стек
+
+- Tailwind CSS 4 — единственный способ стилизации; CSS-first конфигурация.
+- Нет `tailwind.config.ts` — все токены через `@theme` в `globals.css`.
+- `@tailwindcss/typography` — prose-классы для MDX-контента блога, подключается через `@plugin`.
+- PostCSS через `@tailwindcss/postcss`.
+- Prettier сортирует классы через `prettier-plugin-tailwindcss`.
+
+## Цвета и тема
+
+- Цветовые токены через `@theme` в globals.css: `--color-background`, `--color-foreground`, `--color-accent`, `--color-muted`, `--color-surface`, `--color-border`.
+- Тёмная тема: class-based через `@custom-variant dark`, переключение через `next-themes`.
+- Тёмные значения переопределяются в `.dark { --color-*: ... }`.
+- Контраст текст/фон минимум 4.5:1 (WCAG AA).
+
+## Tailwind 4 vs 3
+
+- `@import "tailwindcss"` вместо `@tailwind base/components/utilities`.
+- `bg-linear-to-r` вместо `bg-gradient-to-r`.
+- Цвета проекта: `bg-accent`, `text-muted`, `border-border`, `bg-surface` и т.д. (автоматически из `@theme`).
+- `darkMode: 'class'` → `@custom-variant dark (&:where(.dark, .dark *))`.
+
+## Типографика
+
+- Шрифт Geist (sans + mono) через `--font-sans`, `--font-mono` в `@theme`.
+- Prose-стили для блога в `globals.css`.
+- Подсветка синтаксиса: CSS-переменные `--sh-*` для `sugar-high`.
+
+## Конвенции
+
+- Не создавать кастомные CSS-классы, если можно решить Tailwind-утилитами.
+- Радиусы: `rounded-xl` / `rounded-2xl` для карточек, `rounded-lg` для мелких элементов.
+- Максимальная ширина контента: `max-w-screen-xl`.
+- Адаптивность: mobile-first, расширять через `md:`, `lg:`.
+- Анимации: framer-motion для сложных (scroll, stagger), CSS transitions для простых (hover).

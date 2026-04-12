@@ -1,0 +1,39 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Frontend: Next.js + React + TypeScript
+
+## TypeScript
+
+- Strict mode обязателен; `any` запрещён без явного обоснования.
+- `unknown` вместо `any` для внешних данных; сужать через type guard.
+- Path alias: `@/` → `src/`.
+
+## Next.js App Router
+
+- Страницы — серверные компоненты по умолчанию.
+- `'use client'` только когда нужен state, effects, browser API или framer-motion.
+- Metadata через `export const metadata` или `generateMetadata()`.
+- Статический экспорт (`output: 'export'`) — нет серверных route handlers, middleware, ISR.
+- Домен `per0w.space` — basePath не используется, сайт на корне.
+- Использовать `next/link` для навигации, `next/image` для изображений (с `unoptimized: true` для static export).
+- Turbopack — дефолтный бандлер, `next dev --turbopack`.
+
+## Компоненты
+
+- Компоненты презентационные; side effects — в хуках.
+- Принимать `className` и `...props` для расширяемости.
+- Именование: `PascalCase.tsx` для компонентов, `camelCase.ts` для утилит и хуков.
+
+## Импорты
+
+- Порядок: react/next → external → `@/` internal → relative.
+- Избегать глубокого prop drilling; предпочитать composition и children.
+
+## Общие правила
+
+- Не дублировать типы: определять в одном месте и реэкспортировать.
+- Не создавать компоненты-обёртки без добавления поведения/стилей.
+- Для списков > 50 элементов рассматривать виртуализацию.

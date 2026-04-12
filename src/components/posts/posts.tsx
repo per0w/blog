@@ -1,72 +1,54 @@
 import Link from "next/link";
-import { formatDate, getBlogPosts } from "@/app/blog/utils";
 
+import { formatDate, getBlogPosts } from "@/app/blog/utils";
 import { SECTIONS_IDS } from "@/constants/common";
 import { Section } from "@/ui/section/section";
-
-type LastArticleProps = {
-  tags: string[];
-  title: string;
-  date: string;
-  description: string;
-};
-
-const LastArticle = ({ tags, title, date, description }: LastArticleProps) => {
-  return (
-    <article>
-      <div className="flex items-center gap-x-4 text-xs">
-        <time dateTime="2020-03-16">{date}</time>
-        {tags.map((tag) => (
-          <span
-            key={tag}
-            className="relative z-10 rounded-full px-3 py-1.5 font-medium  hover:bg-gray-100"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-      <div className="group relative">
-        <h3 className="mt-3 text-lg font-semibold leading-6  group-hover:text-gray-600">
-          <span className="absolute inset-0"></span>
-          {title}
-        </h3>
-        <p className="mt-5 line-clamp-3 text-sm leading-6">{description}</p>
-      </div>
-    </article>
-  );
-};
+import { Tags } from "@/ui/tags/tags";
 
 export const Posts = () => {
   const allBlogs = getBlogPosts();
 
+  const sorted = allBlogs.sort(
+    (a, b) =>
+      new Date(b.metadata.publishedAt).getTime() - new Date(a.metadata.publishedAt).getTime(),
+  );
+
   return (
     <Section id={SECTIONS_IDS.lastArticles} title="Блог">
-      <div className="mb-10 flex w-full flex-col items-center md:flex-row ">
-        {allBlogs
-          .sort((a, b) => {
-            if (
-              new Date(a.metadata.publishedAt) >
-              new Date(b.metadata.publishedAt)
-            ) {
-              return -1;
-            }
-            return 1;
-          })
-          .map((post) => (
+      <div className="grid w-full grid-cols-1 gap-6 px-4 md:grid-cols-2 lg:grid-cols-3">
+        {sorted.map((post) => {
+          const date = formatDate(post.metadata.publishedAt, false);
+
+          return (
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
-              className="rounded-xl dark:bg-slate-800 shadow-lg duration-100 hover:scale-105 hover:transform hover:shadow-xl w-full m-4 p-4 md:w-1/2 lg:w-1/3"
+              className="group rounded-xl border border-border/50 border-t-2 border-t-accent bg-[var(--color-surface)] p-5 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_20px_color-mix(in_srgb,var(--color-accent)_15%,transparent)]"
             >
-              <LastArticle
-                title={post.metadata.title}
-                tags={[post.metadata.tags]}
-                description={post.metadata.description}
-                date={formatDate(post.metadata.publishedAt, false)}
-              />
+              <article>
+                <time dateTime={post.metadata.publishedAt} className="text-xs text-muted">
+                  {date}
+                </time>
+
+                <h3 className="mt-2 text-lg leading-snug font-semibold group-hover:text-accent">
+                  {post.metadata.title}
+                </h3>
+
+                <p className="mt-2 line-clamp-3 text-sm text-muted">{post.metadata.description}</p>
+
+                <Tags tags={post.metadata.tags.split(", ")} />
+              </article>
             </Link>
-          ))}
+          );
+        })}
       </div>
+
+      <Link
+        href="/blog"
+        className="mt-8 inline-block rounded-lg border border-accent px-6 py-2.5 text-sm font-medium text-accent transition-colors hover:bg-accent hover:text-white"
+      >
+        Все статьи
+      </Link>
     </Section>
   );
 };
