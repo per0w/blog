@@ -29,124 +29,107 @@
 
 ```bash
 pnpm install
-pnpm dev
+pnpm dev        # или: make dev
 ```
 
 Открыть [http://localhost:3000](http://localhost:3000)
 
-## Скрипты
+## Команды
+
+Все команды доступны через `make`:
+
+```bash
+make help       # Показать список команд
+```
 
 | Команда             | Описание                                  |
 | ------------------- | ----------------------------------------- |
-| `pnpm dev`          | Dev-сервер с Turbopack                    |
-| `pnpm build`        | Production build (static export → `out/`) |
-| `pnpm lint`         | ESLint проверка                           |
-| `pnpm lint:fix`     | ESLint с автоисправлением                 |
-| `pnpm format`       | Prettier форматирование                   |
-| `pnpm format:check` | Проверка форматирования                   |
+| `make dev`          | Dev-сервер с Turbopack                    |
+| `make build`        | Production build (static export → `out/`) |
+| `make lint`         | ESLint проверка                           |
+| `make format`       | Prettier форматирование                   |
+| `make docker-build` | Собрать Docker-образ локально             |
+| `make docker-up`    | Запустить production локально             |
+| `make clean`        | Удалить build-артефакты                   |
 
-## Деплой
+## Развёртывание
+
+Два варианта деплоя — оба работают параллельно.
+
+### Маршрутизация (VPS)
+
+| Домен | Сервис | Контейнер |
+|-------|--------|-----------|
+| `per0w.space` | Блог (статика) | `perow-blog` |
+
+SSL-сертификаты — автоматически через **Traefik + Let's Encrypt**.
+
+### VPS (основной) — Docker + Traefik
+
+Push в `main` → GitHub Actions → SSH → `deploy.sh` → git pull → Docker build → up → healthcheck.
+
+#### 1. Первичная настройка VPS
+
+```bash
+# Скопировать и запустить скрипт настройки (от root)
+scp deploy/setup-vps.sh root@<VPS_IP>:~
+ssh root@<VPS_IP> bash setup-vps.sh
+```
+
+Скрипт установит Docker, создаст пользователя `deploy`, настроит firewall и swap.
+
+#### 2. Деплой (первый раз)
+
+```bash
+# Войти как deploy
+ssh deploy@<VPS_IP>
+
+# Склонировать репозиторий
+cd /opt/per0w-space
+git clone https://github.com/per0w/blog.git .
+
+# Создать и заполнить .env
+cp .env.production.example .env.production
+vim .env.production  # DOMAIN и ACME_EMAIL
+
+# Запустить
+./deploy/deploy.sh
+```
+
+#### 3. GitHub Secrets
+
+В репозитории: **Settings → Secrets → Actions**
+
+| Secret         | Значение                                          |
+| -------------- | ------------------------------------------------- |
+| `VPS_HOST`     | IP-адрес VPS                                      |
+| `VPS_SSH_KEY`  | Приватный SSH-ключ пользователя `deploy`           |
+| `VPS_SSH_PORT` | SSH-порт (по умолчанию 22)                         |
+
+#### 4. DNS
+
+| Тип | Имя  | Значение      |
+| --- | ---- | ------------- |
+| A   | @    | `<VPS_IP>`    |
+| A   | www  | `<VPS_IP>`    |
+
+#### 5. Ручной деплой
+
+```bash
+ssh deploy@<VPS_IP>
+cd /opt/per0w-space
+./deploy/deploy.sh              # полный деплой
+./deploy/deploy.sh --no-build   # только перезапуск
+./deploy/deploy.sh --build-only # только сборка
+```
 
 ### GitHub Pages (резервный)
 
-Push в `main` → GitHub Actions → static export → GitHub Pages.
+Push в `main` → GitHub Actions → static export (с `basePath: /blog`) → GitHub Pages.
 
-### VPS (основной)
+Доступен по адресу: `https://per0w.github.io/blog/`
 
-Push в `main` → GitHub Actions → Docker build → GHCR → SSH deploy на VPS.
-
-#### 1. Настройка GitHub Secrets
-
-В репозитории: **Settings → Secrets and variables → Actions → New repository secret**
-
-| Secret             | Значение                                                     |
-| ------------------ | ------------------------------------------------------------ |
-| `SSH_PRIVATE_KEY`  | Содержимое приватного SSH-ключа для подключения к VPS         |
-
-`GITHUB_TOKEN` создаётся автоматически — отдельно добавлять не нужно.
-
-#### 2. Генерация SSH-ключа (если нет)
-
-```bash
-# На локальной машине
-ssh-keygen -t ed25519 -C "deploy@per0w.space" -f ~/.ssh/per0w_deploy
-
-# Скопировать публичный ключ на VPS
-ssh-copy-id -i ~/.ssh/per0w_deploy.pub -p 2222 root@212.192.0.241
-
-# Содержимое приватного ключа → в GitHub Secret SSH_PRIVATE_KEY
-cat ~/.ssh/per0w_deploy
-```
-
-#### 3. Подготовка VPS (первый раз)
-
-```bash
-# Подключиться к VPS
-ssh -p 2222 root@212.192.0.241
-
-# Создать директорию проекта
-mkdir -p /opt/per0w-space
-cd /opt/per0w-space
-
-# Создать docker-compose.yml (или скопировать из репозитория)
-cat > docker-compose.yml << 'EOF'
-services:
-  app:
-    image: ghcr.io/per0w/blog:latest
-    ports:
-      - "80:80"
-    restart: always
-EOF
-
-# Авторизоваться в GitHub Container Registry
-# (нужен Personal Access Token с правом read:packages)
-docker login ghcr.io -u per0w
-
-# Запустить
-docker compose up -d
-```
-
-#### 4. Настройка DNS
-
-Направить домен `per0w.space` на IP VPS:
-
-| Тип   | Имя           | Значение         |
-| ----- | ------------- | ---------------- |
-| A     | @             | 212.192.0.241    |
-| A     | www           | 212.192.0.241    |
-
-#### 5. SSL (опционально)
-
-Если не используется Cloudflare Proxy, настроить Let's Encrypt на VPS:
-
-```bash
-apt install certbot
-certbot certonly --standalone -d per0w.space -d www.per0w.space
-```
-
-Затем обновить nginx.conf для HTTPS и пробросить порт 443 в docker-compose.
-
-#### 6. Проверка
-
-После первого push в `main`:
-
-```bash
-# На VPS — проверить что контейнер работает
-docker compose ps
-docker compose logs
-
-# Проверить сайт
-curl -I http://per0w.space
-```
-
-#### Откат
-
-```bash
-# Откатиться на предыдущую версию образа
-docker compose down
-docker pull ghcr.io/per0w/blog:previous-tag
-docker compose up -d
-```
+Работает автоматически — отдельной настройки не требует. Переменная `GITHUB_PAGES=true` в workflow автоматически добавляет `basePath` и `assetPrefix`.
 
 ## Структура
 
@@ -155,9 +138,16 @@ src/
   app/                 # App Router: страницы, layout, SEO
     blog/              # Блог: список, посты, утилиты
       posts/*.mdx      # MDX-файлы постов
+    cv/                # Страница резюме
   components/          # Секции страниц (Hero, About, Skills, ...)
+    ai-buddy/          # Орбо — интерактивный AI-компаньон
   ui/                  # UI-компоненты (Card, Section, Tags, Icons)
+  hooks/               # Кастомные хуки
   constants/           # Константы
+  types/               # TypeScript-декларации
+deploy/
+  deploy.sh            # Скрипт деплоя на VPS
+  setup-vps.sh         # Первичная настройка VPS
 ```
 
 ## Блог

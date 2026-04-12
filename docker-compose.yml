@@ -1,6 +1,0 @@
-services:
-  app:
-    image: ghcr.io/per0w/blog:latest
-    ports:
-      - "80:80"
-    restart: always
