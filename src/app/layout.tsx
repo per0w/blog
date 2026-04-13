@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
-import NextTopLoader from "nextjs-toploader";
-import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { GeistSans } from "geist/font/sans";
+import NextTopLoader from "nextjs-toploader";
 
-import { Providers } from "@/components/providers/providers";
-import { Header } from "@/components/header/header";
 import { Footer } from "@/components/footer/footer";
+import { Header } from "@/components/header/header";
+import { Providers } from "@/components/providers/providers";
+import { MAIN_CONTENT_ID } from "@/constants/common";
+
+import type { Metadata } from "next";
 
 import "./globals.css";
 
@@ -41,8 +43,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Владимир Перов — Senior Frontend Developer",
-    description:
-      "8+ лет опыта. React, TypeScript, Next.js, Redux, Docker, K8s. Портфолио и блог.",
+    description: "8+ лет опыта. React, TypeScript, Next.js, Redux, Docker, K8s. Портфолио и блог.",
   },
   alternates: {
     canonical: "https://per0w.space",
@@ -58,14 +59,15 @@ export default function RootLayout({
 }>) {
   return (
     <html
+      className={cx(GeistSans.variable, GeistMono.variable)}
       lang="ru"
       suppressHydrationWarning={true}
-      className={cx(GeistSans.variable, GeistMono.variable)}
     >
       <body className="xs:text-[16px] mx-auto max-w-screen-xl px-5 antialiased md:text-[18px]">
+        <a className="skip-to-content" href={`#${MAIN_CONTENT_ID}`}>
+          Перейти к содержимому
+        </a>
         <script
-          type="application/ld+json"
-          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
@@ -99,6 +101,8 @@ export default function RootLayout({
                 "Senior Frontend Developer с 8+ годами опыта. Главный инженер разработки в Газпромбанке. Экспертиза: React, TypeScript, Next.js, Redux, DevOps (Docker, Kubernetes, CI/CD). Путь от системного администратора и DevOps-инженера до Frontend Team Lead.",
             }),
           }}
+          suppressHydrationWarning
+          type="application/ld+json"
         />
         <Providers>
           <div className="relative z-10">

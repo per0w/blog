@@ -2,8 +2,8 @@ import Link from "next/link";
 
 import { formatDate, getBlogPosts } from "@/app/blog/utils";
 import { SECTIONS_IDS } from "@/constants/common";
+import { BlogPostCard } from "@/ui/blog-post-card/blog-post-card";
 import { Section } from "@/ui/section/section";
-import { Tags } from "@/ui/tags/tags";
 
 export const Posts = () => {
   const allBlogs = getBlogPosts();
@@ -15,37 +15,28 @@ export const Posts = () => {
 
   return (
     <Section id={SECTIONS_IDS.lastArticles} title="Блог">
-      <div className="grid w-full grid-cols-1 gap-6 px-4 md:grid-cols-2 lg:grid-cols-3">
-        {sorted.map((post) => {
-          const date = formatDate(post.metadata.publishedAt, false);
-
-          return (
-            <Link
-              key={post.slug}
-              href={`/blog/${post.slug}`}
-              className="group rounded-xl border border-border/50 border-t-2 border-t-accent bg-[var(--color-surface)] p-5 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_20px_color-mix(in_srgb,var(--color-accent)_15%,transparent)]"
-            >
-              <article>
-                <time dateTime={post.metadata.publishedAt} className="text-xs text-muted">
-                  {date}
-                </time>
-
-                <h3 className="mt-2 text-lg leading-snug font-semibold group-hover:text-accent">
-                  {post.metadata.title}
-                </h3>
-
-                <p className="mt-2 line-clamp-3 text-sm text-muted">{post.metadata.description}</p>
-
-                <Tags tags={post.metadata.tags.split(", ")} />
-              </article>
-            </Link>
-          );
-        })}
-      </div>
+      <section
+        aria-label="Последние статьи блога"
+        className="grid w-full grid-cols-1 gap-6 px-4 md:grid-cols-2 lg:grid-cols-3"
+      >
+        {sorted.map((post) => (
+          <BlogPostCard
+            key={post.slug}
+            coverImage={post.metadata.image}
+            dateLabel={formatDate(post.metadata.publishedAt, false)}
+            description={post.metadata.description}
+            href={`/blog/${post.slug}`}
+            publishedAt={post.metadata.publishedAt}
+            tags={post.metadata.tags.split(", ")}
+            title={post.metadata.title}
+            titleAs="h3"
+          />
+        ))}
+      </section>
 
       <Link
-        href="/blog"
         className="mt-8 inline-block rounded-lg border border-accent px-6 py-2.5 text-sm font-medium text-accent transition-colors hover:bg-accent hover:text-white"
+        href="/blog"
       >
         Все статьи
       </Link>

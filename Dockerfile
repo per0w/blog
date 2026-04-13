@@ -15,6 +15,13 @@ WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+# Публичные ключи (этап сборки на VPS / CI — см. .env.production.example).
+ARG NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY
+ENV NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY=$NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY
+ARG NEXT_PUBLIC_GEMINI_API_KEY
+ENV NEXT_PUBLIC_GEMINI_API_KEY=$NEXT_PUBLIC_GEMINI_API_KEY
+
 RUN pnpm build
 
 # ── Stage 3: production (nginx) ──────────────────────────────────

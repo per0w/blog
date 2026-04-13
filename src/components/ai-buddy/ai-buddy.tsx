@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+
+import { createPortal } from "react-dom";
+
 import { AnimatePresence, motion } from "framer-motion";
 import { Sparkles, X } from "lucide-react";
 
-import { SECTIONS_IDS } from "@/constants/common";
+import { ORBO_CONTACT_SPAM_EVENT, ORBO_MAX_HOVER_EVENT, SECTIONS_IDS } from "@/constants/common";
 
 // --- Данные ---
 
@@ -34,6 +37,7 @@ const SECTION_COMMENTS: Record<string, string[]> = {
     "Посмотри на этот путь: сисадмин → DevOps → фронтенд-лид. Не каждый так может.",
   ],
   projects: [
+    "Сервис24 — акты в поле, 1С на связи, офлайн не страшен. Пока в разработке, но уже выглядит серьёзно.",
     "Trenika — заставит тебя пойти в зал. Ну или хотя бы почувствовать вину.",
     "GlassesUSA — подобрал очки всей Америке. Буквально.",
     "Каждый проект — маленький стартап. Только работающий. Почувствуй разницу.",
@@ -124,19 +128,101 @@ const CURSOR_COMMENTS: Record<string, string[]> = {
 
 // Контекстные фразы: Орбо «читает» текст элемента
 const CONTEXTUAL_HOVER: { pattern: RegExp; comments: string[] }[] = [
-  { pattern: /telegram/i, comments: ["Telegram? Пиши, он отвечает. Обычно.", "О, Telegram заметил. Хороший знак."] },
-  { pattern: /github/i, comments: ["GitHub открыть хочешь? Там код, там душа.", "Репозитории смотришь? Правильно, код не врёт."] },
-  { pattern: /react|typescript|next/i, comments: ["React, TypeScript… Его стек. Мощный, проверенный.", "Технологии читаешь? Тут всё серьёзно, без jQuery."] },
-  { pattern: /docker|kubernetes|devops|nginx/i, comments: ["DevOps-часть заметил? Он и сервера умеет, не только кнопки.", "Docker, K8s — он из тех, кто и деплоит сам."] },
-  { pattern: /газпромбанк|gazprombank/i, comments: ["Газпромбанк! Это enterprise, тут без шуток.", "Банк — это надёжность, безопасность. Серьёзный опыт."] },
-  { pattern: /trenika/i, comments: ["Trenika! Его pet-проект. С душой сделано.", "Тренировки, фитнес. Он ещё и в зал ходит, между прочим."] },
-  { pattern: /glasses|очки/i, comments: ["GlassesUSA — крупный e-commerce. Миллионы пользователей!", "Очки для Америки подбирал. Масштаб, однако."] },
-  { pattern: /опыт|experience|карьер/i, comments: ["Карьерный путь впечатляет, правда? Я тоже впечатлён.", "Опыт — это не годы, это история. Тут она крутая."] },
-  { pattern: /навыки|skills|скилл/i, comments: ["Скиллов — на троих хватит. Серьёзно.", "Список навыков длиннее, чем мой буфер памяти."] },
-  { pattern: /контакт|написать|связаться|hire|нанять/i, comments: ["Пиши ему! Не стесняйся. Я одобряю.", "Связаться хочешь? Правильное решение. Одобряю."] },
-  { pattern: /блог|статья|article|post/i, comments: ["Блог! Он ещё и пишет. Талантливый человек, что сказать.", "Статьи авторские. Не сгенерированные. Ну, почти."] },
-  { pattern: /проект|project/i, comments: ["Проекты разглядываешь? Каждый — с нуля и с душой.", "Тут не шаблонные проекты. Всё живое, рабочее."] },
-  { pattern: /mentor|менторинг|команд|team/i, comments: ["Менторит, командой управляет. Лидер, короче.", "Он людей растит. Не каждый senior это умеет."] },
+  {
+    pattern: /telegram/i,
+    comments: ["Telegram? Пиши, он отвечает. Обычно.", "О, Telegram заметил. Хороший знак."],
+  },
+  {
+    pattern: /github/i,
+    comments: [
+      "GitHub открыть хочешь? Там код, там душа.",
+      "Репозитории смотришь? Правильно, код не врёт.",
+    ],
+  },
+  {
+    pattern: /react|typescript|next/i,
+    comments: [
+      "React, TypeScript… Его стек. Мощный, проверенный.",
+      "Технологии читаешь? Тут всё серьёзно, без jQuery.",
+    ],
+  },
+  {
+    pattern: /docker|kubernetes|devops|nginx/i,
+    comments: [
+      "DevOps-часть заметил? Он и сервера умеет, не только кнопки.",
+      "Docker, K8s — он из тех, кто и деплоит сам.",
+    ],
+  },
+  {
+    pattern: /газпромбанк|gazprombank/i,
+    comments: [
+      "Газпромбанк! Это enterprise, тут без шуток.",
+      "Банк — это надёжность, безопасность. Серьёзный опыт.",
+    ],
+  },
+  {
+    pattern: /сервис24|service\s*24|мобильн(ые|ых)\s+акт/i,
+    comments: [
+      "Сервис24 — механики, акты, 1С. Реальная полевая работа, не очередной TODO.",
+      "Офлайн-очередь и синхронизация — он любит, когда интернет пропадает не в самый подходящий момент.",
+    ],
+  },
+  {
+    pattern: /trenika/i,
+    comments: [
+      "Trenika! Его pet-проект. С душой сделано.",
+      "Тренировки, фитнес. Он ещё и в зал ходит, между прочим.",
+    ],
+  },
+  {
+    pattern: /glasses|очки/i,
+    comments: [
+      "GlassesUSA — крупный e-commerce. Миллионы пользователей!",
+      "Очки для Америки подбирал. Масштаб, однако.",
+    ],
+  },
+  {
+    pattern: /опыт|experience|карьер/i,
+    comments: [
+      "Карьерный путь впечатляет, правда? Я тоже впечатлён.",
+      "Опыт — это не годы, это история. Тут она крутая.",
+    ],
+  },
+  {
+    pattern: /навыки|skills|скилл/i,
+    comments: [
+      "Скиллов — на троих хватит. Серьёзно.",
+      "Список навыков длиннее, чем мой буфер памяти.",
+    ],
+  },
+  {
+    pattern: /контакт|написать|связаться|hire|нанять/i,
+    comments: [
+      "Пиши ему! Не стесняйся. Я одобряю.",
+      "Связаться хочешь? Правильное решение. Одобряю.",
+    ],
+  },
+  {
+    pattern: /блог|статья|article|post/i,
+    comments: [
+      "Блог! Он ещё и пишет. Талантливый человек, что сказать.",
+      "Статьи авторские. Не сгенерированные. Ну, почти.",
+    ],
+  },
+  {
+    pattern: /проект|project/i,
+    comments: [
+      "Проекты разглядываешь? Каждый — с нуля и с душой.",
+      "Тут не шаблонные проекты. Всё живое, рабочее.",
+    ],
+  },
+  {
+    pattern: /mentor|менторинг|команд|team/i,
+    comments: [
+      "Менторит, командой управляет. Лидер, короче.",
+      "Он людей растит. Не каждый senior это умеет.",
+    ],
+  },
 ];
 
 function getContextualComment(el: Element): string | null {
@@ -148,6 +234,26 @@ function getContextualComment(el: Element): string | null {
   }
   return null;
 }
+
+/** Шутки при наведении на MAX — добрый подкол, без занудства */
+const MAX_ORBO_COMMENTS = [
+  "Не переживай — товарищ майор не читает, что ты там напишешь. Ну… почти не читает.",
+  "MAX открываешь? Расслабься: майор сегодня в другом чате. Шучу. Наверное.",
+  "Пиши спокойно. Говорят, не каждое сообщение попадает в папку «особой важности». Говорят.",
+  "Решил написать? Товарищ майор занят отчётами — у тебя есть окно возможностей. Целых несколько секунд!",
+  "Главное — не начинай с «план захвата» и не прикладывай чертежи. Тогда всё нормально.",
+  "Это же MAX, не секретный канал. Хотя… ладно, шучу. Пиши, он человек нормальный.",
+];
+
+/** Форма контактов: жмаканье «Отправить» чаще, чем у людей с терпением */
+const CONTACT_FORM_SPAM_COMMENTS = [
+  "Форму ддосишь? Тут даже своего сервера нет, только Web3Forms. Скучный пентест.",
+  "Мамкин хацкер нашёлся? Кнопку пожалей — она не бессмертная.",
+  "Спамить форму — не взлом. Это просто… ну ты понял. Выпей воды.",
+  "Один клик — уважение к почте хозяина. Десять — уважение к бану у провайдера. Шучу. Наверное.",
+  "Ты чё не нормальный? Заполни, отправь один раз и иди пить чай. Орбо за всем видит.",
+  "Хацкерство уровня «жму отправить до тепловой смерти пальца»? Не впечатляет.",
+];
 
 const EXPERIENCE_TOOLTIP_COMMENTS = [
   "Бла-бла-бла… 8 лет, сисадмин, сети, 1С. Мог бы книгу написать. И она бы продавалась!",
@@ -283,74 +389,125 @@ const TEXT_SELECT_GENERIC = [
 ];
 
 const SELECTION_CONTEXT: { pattern: RegExp; comments: string[] }[] = [
-  { pattern: /главный инженер|ведущий/i, comments: [
-    "Должность выделил? Да, звучит солидно. Потому что так и есть.",
-    "«Главный инженер» — это не просто title, это ответственность за всё.",
-  ]},
-  { pattern: /газпромбанк/i, comments: [
-    "Газпромбанк! Запомни это название. Enterprise-масштаб.",
-    "Выделил банк? Правильно, тут серьёзные проекты.",
-  ]},
-  { pattern: /react|typescript|javascript|next\.?js/i, comments: [
-    "Технологии копируешь? Да, стек внушительный.",
-    "React, TypeScript… Выделяешь то, что знаешь? Или то, что хочешь узнать?",
-  ]},
-  { pattern: /docker|kubernetes|k8s|nginx|ci\/cd|ansible/i, comments: [
-    "DevOps-стек выделил? Он реально и сервера настраивает.",
-    "Docker, K8s… Не каждый фронтендер это даже знает, а он — делает.",
-  ]},
-  { pattern: /team\s*lead|тимлид|руковод|команд/i, comments: [
-    "Лидерские качества заметил? Он команды ведёт, не только код пишет.",
-    "Team Lead — это когда и за людей, и за результат отвечаешь.",
-  ]},
-  { pattern: /paypal|stripe|klarna|apple\s*pay|платёж/i, comments: [
-    "Платёжки! Интеграция платёжных систем — это ювелирная работа.",
-    "PayPal, Stripe, Klarna… Деньги доверяли — значит, надёжный.",
-  ]},
-  { pattern: /менторинг|обучение|онбординг|адаптаци/i, comments: [
-    "Менторит! Не каждый senior умеет учить, а он делает это системно.",
-    "Выделил менторинг? Значит, ценишь soft skills. Правильно.",
-  ]},
-  { pattern: /рефакторинг|рефакторнул|оптимизац|ускорен/i, comments: [
-    "Рефакторинг — его конёк. Ускорил внедрение фич вдвое!",
-    "Оптимизация выделена. Он не просто код пишет — он его улучшает.",
-  ]},
-  { pattern: /ssr|server.?side|core\s*web\s*vitals|производительност/i, comments: [
-    "SSR, производительность — он про метрики, не про красивые слова.",
-    "Core Web Vitals улучшил. Google оценил бы, и рекрутеры тоже.",
-  ]},
-  { pattern: /cosysoft|мэш|электронный дневник/i, comments: [
-    "МЭШ — электронный дневник для миллионов! Масштаб, однако.",
-    "CosySoft — кроссплатформа, React Native. Серьёзный проект.",
-  ]},
-  { pattern: /optimax/i, comments: [
-    "Optimax Dev — тут он вырос от DevOps до Team Lead. Карьерный рост!",
-    "В Optimax он три разные роли прошёл. Универсальный солдат.",
-  ]},
-  { pattern: /glassesusa|glasses/i, comments: [
-    "GlassesUSA! Очки для всей Америки. Миллионы пользователей.",
-    "E-commerce для US-рынка. Международный опыт, между прочим.",
-  ]},
-  { pattern: /trenika/i, comments: [
-    "Trenika — pet-проект с душой. Full-stack, от идеи до прода.",
-    "Дневник тренировок! Он ещё и спортсмен. Ну или пытается.",
-  ]},
-  { pattern: /скрипт|bash|python|автоматизац/i, comments: [
-    "Автоматизация! Он из тех, кто руками дважды не делает.",
-    "Bash, Python — он автоматизирует всё, до чего дотянется.",
-  ]},
-  { pattern: /полный цикл|аналитика.*проектирование|от.*до/i, comments: [
-    "Полный цикл! От аналитики до деплоя — один человек.",
-    "Видишь? Он не просто кодит, он весь процесс ведёт.",
-  ]},
-  { pattern: /senior|8\+.*лет|опыт/i, comments: [
-    "8+ лет! И каждый год — в деле, не на диване.",
-    "Senior — это не возраст, это уровень. И он его заслужил.",
-  ]},
-  { pattern: /ai|cursor|copilot|claude|chatgpt|llm/i, comments: [
-    "AI-инструменты! Он в тренде. Ну как и я, собственно.",
-    "Cursor, Claude, Copilot… Он дружит с нами, AI-шками.",
-  ]},
+  {
+    pattern: /главный инженер|ведущий/i,
+    comments: [
+      "Должность выделил? Да, звучит солидно. Потому что так и есть.",
+      "«Главный инженер» — это не просто title, это ответственность за всё.",
+    ],
+  },
+  {
+    pattern: /газпромбанк/i,
+    comments: [
+      "Газпромбанк! Запомни это название. Enterprise-масштаб.",
+      "Выделил банк? Правильно, тут серьёзные проекты.",
+    ],
+  },
+  {
+    pattern: /react|typescript|javascript|next\.?js/i,
+    comments: [
+      "Технологии копируешь? Да, стек внушительный.",
+      "React, TypeScript… Выделяешь то, что знаешь? Или то, что хочешь узнать?",
+    ],
+  },
+  {
+    pattern: /docker|kubernetes|k8s|nginx|ci\/cd|ansible/i,
+    comments: [
+      "DevOps-стек выделил? Он реально и сервера настраивает.",
+      "Docker, K8s… Не каждый фронтендер это даже знает, а он — делает.",
+    ],
+  },
+  {
+    pattern: /team\s*lead|тимлид|руковод|команд/i,
+    comments: [
+      "Лидерские качества заметил? Он команды ведёт, не только код пишет.",
+      "Team Lead — это когда и за людей, и за результат отвечаешь.",
+    ],
+  },
+  {
+    pattern: /paypal|stripe|klarna|apple\s*pay|платёж/i,
+    comments: [
+      "Платёжки! Интеграция платёжных систем — это ювелирная работа.",
+      "PayPal, Stripe, Klarna… Деньги доверяли — значит, надёжный.",
+    ],
+  },
+  {
+    pattern: /менторинг|обучение|онбординг|адаптаци/i,
+    comments: [
+      "Менторит! Не каждый senior умеет учить, а он делает это системно.",
+      "Выделил менторинг? Значит, ценишь soft skills. Правильно.",
+    ],
+  },
+  {
+    pattern: /рефакторинг|рефакторнул|оптимизац|ускорен/i,
+    comments: [
+      "Рефакторинг — его конёк. Ускорил внедрение фич вдвое!",
+      "Оптимизация выделена. Он не просто код пишет — он его улучшает.",
+    ],
+  },
+  {
+    pattern: /ssr|server.?side|core\s*web\s*vitals|производительност/i,
+    comments: [
+      "SSR, производительность — он про метрики, не про красивые слова.",
+      "Core Web Vitals улучшил. Google оценил бы, и рекрутеры тоже.",
+    ],
+  },
+  {
+    pattern: /cosysoft|мэш|электронный дневник/i,
+    comments: [
+      "МЭШ — электронный дневник для миллионов! Масштаб, однако.",
+      "CosySoft — кроссплатформа, React Native. Серьёзный проект.",
+    ],
+  },
+  {
+    pattern: /optimax/i,
+    comments: [
+      "Optimax Dev — тут он вырос от DevOps до Team Lead. Карьерный рост!",
+      "В Optimax он три разные роли прошёл. Универсальный солдат.",
+    ],
+  },
+  {
+    pattern: /glassesusa|glasses/i,
+    comments: [
+      "GlassesUSA! Очки для всей Америки. Миллионы пользователей.",
+      "E-commerce для US-рынка. Международный опыт, между прочим.",
+    ],
+  },
+  {
+    pattern: /trenika/i,
+    comments: [
+      "Trenika — pet-проект с душой. Full-stack, от идеи до прода.",
+      "Дневник тренировок! Он ещё и спортсмен. Ну или пытается.",
+    ],
+  },
+  {
+    pattern: /скрипт|bash|python|автоматизац/i,
+    comments: [
+      "Автоматизация! Он из тех, кто руками дважды не делает.",
+      "Bash, Python — он автоматизирует всё, до чего дотянется.",
+    ],
+  },
+  {
+    pattern: /полный цикл|аналитика.*проектирование|от.*до/i,
+    comments: [
+      "Полный цикл! От аналитики до деплоя — один человек.",
+      "Видишь? Он не просто кодит, он весь процесс ведёт.",
+    ],
+  },
+  {
+    pattern: /senior|8\+.*лет|опыт/i,
+    comments: [
+      "8+ лет! И каждый год — в деле, не на диване.",
+      "Senior — это не возраст, это уровень. И он его заслужил.",
+    ],
+  },
+  {
+    pattern: /ai|cursor|copilot|claude|chatgpt|llm/i,
+    comments: [
+      "AI-инструменты! Он в тренде. Ну как и я, собственно.",
+      "Cursor, Claude, Copilot… Он дружит с нами, AI-шками.",
+    ],
+  },
 ];
 
 function getSelectionComment(text: string): string {
@@ -429,9 +586,7 @@ async function getAiComment(sectionId: string): Promise<string | null> {
 
     const session = await Promise.race([
       LanguageModel.create(),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("timeout")), AI_TIMEOUT),
-      ),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), AI_TIMEOUT)),
     ]);
 
     const sectionName = SECTION_NAMES[sectionId] ?? sectionId;
@@ -482,7 +637,9 @@ function OrbAvatar({ speaking }: { speaking: boolean }) {
   const speakingRef = useRef(speaking);
   const mouseRef = useRef({ x: -1, y: -1 });
 
-  speakingRef.current = speaking;
+  useEffect(() => {
+    speakingRef.current = speaking;
+  }, [speaking]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -625,16 +782,16 @@ function OrbAvatar({ speaking }: { speaking: boolean }) {
   return (
     <canvas
       ref={canvasRef}
-      width={ORB_SIZE}
-      height={ORB_SIZE}
       className="size-16"
+      height={ORB_SIZE}
       style={{ width: ORB_SIZE, height: ORB_SIZE }}
+      width={ORB_SIZE}
+      onMouseLeave={() => {
+        mouseRef.current = { x: -1, y: -1 };
+      }}
       onMouseMove={(e) => {
         const rect = e.currentTarget.getBoundingClientRect();
         mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-      }}
-      onMouseLeave={() => {
-        mouseRef.current = { x: -1, y: -1 };
       }}
     />
   );
@@ -647,7 +804,7 @@ function SimpleAvatar({ speaking, compact }: { speaking: boolean; compact?: bool
   const iconSize = compact ? "size-4" : "size-5";
   return (
     <div
-      className={`flex ${size} items-center justify-center rounded-2xl bg-linear-to-br from-accent/20 to-accent-secondary/20 transition-transform duration-300 ${speaking ? "animate-pulse scale-110" : ""}`}
+      className={`flex ${size} items-center justify-center rounded-2xl bg-linear-to-br from-accent/20 to-accent-secondary/20 transition-transform duration-300 ${speaking ? "scale-110 animate-pulse" : ""}`}
     >
       <Sparkles className={`${iconSize} text-accent`} />
     </div>
@@ -670,32 +827,40 @@ function CommentTooltip({
       {visible && comment && (
         <motion.div
           key="buddy-tooltip"
-          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 8 }}
-          transition={{ duration: 0.25, ease: "easeOut" }}
-          className="pointer-events-auto absolute right-0 bottom-14 w-56 sm:right-[72px] sm:bottom-0 sm:w-64"
           aria-live="polite"
+          className="pointer-events-auto z-10 w-full max-w-[min(22rem,calc(100vw-1.5rem))] max-sm:relative max-sm:mx-auto max-sm:mb-2 sm:absolute sm:right-0 sm:bottom-14 sm:mb-0 sm:w-64 sm:max-w-none"
+          exit={{ opacity: 0, y: 8 }}
+          initial={{ opacity: 0, y: 8 }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
         >
-          <div className="relative rounded-2xl border border-accent/20 bg-surface/90 px-3.5 py-2.5 shadow-[0_0_25px_color-mix(in_srgb,var(--color-accent)_15%,transparent)] backdrop-blur-xl sm:px-4 sm:py-3">
+          <div className="relative rounded-2xl border border-accent/15 bg-surface/60 px-4 py-3.5 shadow-[0_12px_40px_-8px_color-mix(in_srgb,var(--color-foreground)_12%,transparent)] backdrop-blur-xl supports-[backdrop-filter]:bg-surface/50 sm:border-accent/20 sm:bg-surface/88 sm:px-4 sm:py-3 sm:shadow-[0_0_25px_color-mix(in_srgb,var(--color-accent)_12%,transparent)] sm:supports-[backdrop-filter]:bg-surface/80">
             <button
-              onClick={onDismiss}
               aria-label="Закрыть Орбо"
-              className="absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full border border-accent/20 bg-surface text-muted transition-colors hover:text-foreground"
+              className="absolute -top-2 -right-2 flex size-7 items-center justify-center rounded-full border border-accent/25 bg-surface/90 text-muted shadow-sm backdrop-blur-md transition-colors hover:border-accent/40 hover:text-foreground sm:size-6"
+              onClick={onDismiss}
             >
-              <X className="size-3" />
+              <X className="size-3.5 sm:size-3" />
             </button>
 
-            <div className="flex items-start gap-2">
-              <div>
-                <p className="text-xs font-semibold text-accent">Орбо</p>
-                <p className="mt-0.5 text-sm leading-relaxed text-foreground">{comment}</p>
+            <div className="flex items-start gap-2 pr-5 sm:pr-4">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold tracking-wide text-accent">Орбо</p>
+                <p className="mt-1 text-sm leading-snug text-foreground sm:mt-0.5 sm:leading-relaxed">
+                  {comment}
+                </p>
               </div>
             </div>
 
-            {/* Мобилка: стрелка вниз, десктоп: стрелка вправо */}
-            <div className="absolute -bottom-1.5 right-4 size-3 rotate-45 border-r border-b border-accent/20 bg-surface/90 sm:hidden" />
-            <div className="absolute top-1/2 -right-1.5 hidden size-3 -translate-y-1/2 rotate-45 border-t border-r border-accent/20 bg-surface/90 sm:block" />
+            {/* Мобилка: стрелка вниз по центру к орбу; десктоп: вправо */}
+            <div
+              aria-hidden
+              className="absolute -bottom-1.5 left-1/2 size-3 -translate-x-1/2 rotate-45 border-r border-b border-accent/20 bg-surface/60 backdrop-blur-xl supports-[backdrop-filter]:bg-surface/45 sm:hidden"
+            />
+            <div
+              aria-hidden
+              className="absolute top-1/2 -right-1.5 hidden size-3 -translate-y-1/2 rotate-45 border-t border-r border-accent/20 bg-surface/88 backdrop-blur-xl sm:block"
+            />
           </div>
         </motion.div>
       )}
@@ -705,6 +870,13 @@ function CommentTooltip({
 
 // --- AiBuddy (основной) ---
 
+/**
+ * Мобилка: по центру снизу — не перекрывает основной текст у правого края.
+ * Десктоп: правый нижний угол.
+ */
+const ORBO_FLOAT_CLASS =
+  "fixed z-[100] [contain:layout] max-sm:bottom-[max(1rem,env(safe-area-inset-bottom,0px))] max-sm:left-1/2 max-sm:right-auto max-sm:-translate-x-1/2 sm:bottom-[max(1.5rem,env(safe-area-inset-bottom,0px))] sm:right-[max(1.5rem,env(safe-area-inset-right,0px))] sm:left-auto sm:translate-x-0";
+
 export function AiBuddy() {
   const [comment, setComment] = useState<string | null>(null);
   const [tooltipVisible, setTooltipVisible] = useState(false);
@@ -713,6 +885,7 @@ export function AiBuddy() {
   const [enhanced, setEnhanced] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isCvPage, setIsCvPage] = useState(false);
+  const [portalReady, setPortalReady] = useState(false);
 
   const lastSectionRef = useRef<string | null>(null);
   const displayTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
@@ -722,14 +895,20 @@ export function AiBuddy() {
   const lastCommentRef = useRef<string | null>(null);
 
   useEffect(() => {
-    try {
-      setDismissed(sessionStorage.getItem(STORAGE_KEY) === "true");
-    } catch {
-      setDismissed(false);
-    }
-    setEnhanced(isCapableDevice());
-    setIsMobile(window.innerWidth < 640);
-    setIsCvPage(window.location.pathname.startsWith("/cv"));
+    // Все setState — в микрозадаче (eslint react-hooks/set-state-in-effect).
+    queueMicrotask(() => {
+      setPortalReady(true);
+      try {
+        setDismissed(sessionStorage.getItem(STORAGE_KEY) === "true");
+      } catch {
+        setDismissed(false);
+      }
+      setEnhanced(isCapableDevice());
+      setIsMobile(window.innerWidth < 640);
+      const path = window.location.pathname.replace(/\/+$/, "") || "/";
+      const cvPath = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/cv`;
+      setIsCvPage(path === cvPath || path.startsWith(`${cvPath}/`));
+    });
   }, []);
 
   const dismiss = useCallback(() => {
@@ -897,6 +1076,9 @@ export function AiBuddy() {
       // Не комментировать сам виджет Орбо
       if (target.closest("[data-orbo]")) return;
 
+      // MAX — шутка только через orbo:max-hover (enter/focus), без второго срабатывания по таймеру
+      if (target.closest("[data-orbo-max]")) return;
+
       hoverTimer = setTimeout(() => {
         if (cursorCommented) return;
         cursorCommented = true;
@@ -934,6 +1116,36 @@ export function AiBuddy() {
     };
   }, [dismissed, showComment]);
 
+  // Наведение на ссылку MAX — шутка без ожидания курсорного таймера
+  useEffect(() => {
+    if (dismissed) return;
+
+    let lastAt = 0;
+    const cooldownMs = 14_000;
+
+    const handleMaxHover = () => {
+      const now = Date.now();
+      if (now - lastAt < cooldownMs) return;
+      lastAt = now;
+      showComment(pickRandom(MAX_ORBO_COMMENTS));
+    };
+
+    window.addEventListener(ORBO_MAX_HOVER_EVENT, handleMaxHover);
+    return () => window.removeEventListener(ORBO_MAX_HOVER_EVENT, handleMaxHover);
+  }, [dismissed, showComment]);
+
+  // Спам по кнопке отправки формы контактов
+  useEffect(() => {
+    if (dismissed) return;
+
+    const handleContactSpam = () => {
+      showComment(pickRandom(CONTACT_FORM_SPAM_COMMENTS));
+    };
+
+    window.addEventListener(ORBO_CONTACT_SPAM_EVENT, handleContactSpam);
+    return () => window.removeEventListener(ORBO_CONTACT_SPAM_EVENT, handleContactSpam);
+  }, [dismissed, showComment]);
+
   // Быстрый скролл: >3000px за секунду
   useEffect(() => {
     if (dismissed) return;
@@ -952,7 +1164,9 @@ export function AiBuddy() {
         if (speed > 3000 && !fired) {
           fired = true;
           showComment(pickRandom(FAST_SCROLL_COMMENTS));
-          setTimeout(() => { fired = false; }, 8000);
+          setTimeout(() => {
+            fired = false;
+          }, 8000);
         }
         lastY = window.scrollY;
         lastTime = now;
@@ -1005,8 +1219,7 @@ export function AiBuddy() {
 
     const handleTheme = (e: Event) => {
       const detail = (e as CustomEvent<{ theme: string }>).detail;
-      const comments =
-        detail?.theme === "dark" ? THEME_DARK_COMMENTS : THEME_LIGHT_COMMENTS;
+      const comments = detail?.theme === "dark" ? THEME_DARK_COMMENTS : THEME_LIGHT_COMMENTS;
       showComment(pickRandom(comments));
     };
 
@@ -1041,8 +1254,7 @@ export function AiBuddy() {
 
     const handleScroll = () => {
       if (firedBottom) return;
-      const atBottom =
-        window.innerHeight + window.scrollY >= document.body.scrollHeight - 100;
+      const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 100;
       if (atBottom) {
         firedBottom = true;
         showComment(pickRandom(PAGE_BOTTOM_COMMENTS));
@@ -1077,16 +1289,13 @@ export function AiBuddy() {
     };
   }, [dismissed, showComment]);
 
-  const getUniqueComment = useCallback(
-    (sectionId: string): string => {
-      const comments = SECTION_COMMENTS[sectionId] ?? [];
-      const available = comments.filter((c) => c !== lastCommentRef.current);
-      const picked = available.length > 0 ? pickRandom(available) : pickRandom(comments);
-      lastCommentRef.current = picked;
-      return picked;
-    },
-    [],
-  );
+  const getUniqueComment = useCallback((sectionId: string): string => {
+    const comments = SECTION_COMMENTS[sectionId] ?? [];
+    const available = comments.filter((c) => c !== lastCommentRef.current);
+    const picked = available.length > 0 ? pickRandom(available) : pickRandom(comments);
+    lastCommentRef.current = picked;
+    return picked;
+  }, []);
 
   // Клик по орбу — другой комментарий или ругань при спаме
   const handleOrbClick = useCallback(() => {
@@ -1123,37 +1332,49 @@ export function AiBuddy() {
     if (section) requestComment(section);
   }, [requestComment]);
 
+  if (!portalReady) {
+    return null;
+  }
+
   if (dismissed) {
-    return (
-      <div data-orbo className="fixed right-4 bottom-4 z-50 sm:right-6 sm:bottom-6">
+    return createPortal(
+      <div data-orbo className={ORBO_FLOAT_CLASS}>
         <button
-          onClick={revive}
           aria-label="Вернуть Орбо"
           className="group flex size-8 items-center justify-center rounded-full border border-accent/20 bg-surface/80 shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:border-accent/40 hover:shadow-[0_0_12px_color-mix(in_srgb,var(--color-accent)_25%,transparent)]"
+          type="button"
+          onClick={revive}
         >
           <Sparkles className="size-3.5 text-accent/60 transition-colors group-hover:text-accent" />
         </button>
-      </div>
+      </div>,
+      document.body,
     );
   }
 
-  return (
-    <div data-orbo className="pointer-events-none fixed right-4 bottom-4 z-50 sm:right-6 sm:bottom-6">
-      <div className="relative flex items-end">
-        <CommentTooltip comment={comment} visible={tooltipVisible} onDismiss={dismiss} />
-
+  return createPortal(
+    <div data-orbo className={`pointer-events-none ${ORBO_FLOAT_CLASS}`}>
+      {/*
+        flex-col-reverse: на мобилке тултип визуально над орбом, ширина по контенту.
+        На sm+ слот 4×4 справа — тултип снова absolute у края.
+      */}
+      <div className="flex max-w-[calc(100vw-1rem)] flex-col-reverse items-center gap-2.5 sm:relative sm:h-16 sm:w-16 sm:max-w-none sm:items-end sm:gap-0">
         <button
-          onClick={handleOrbClick}
           aria-label="Орбо — нажми для комментария"
-          className="pointer-events-auto cursor-pointer rounded-2xl transition-transform duration-200 hover:scale-105"
+          className="pointer-events-auto shrink-0 cursor-pointer rounded-2xl transition-transform duration-200 hover:scale-105"
+          type="button"
+          onClick={handleOrbClick}
         >
           {enhanced ? (
             <OrbAvatar speaking={speaking} />
           ) : (
-            <SimpleAvatar speaking={speaking} compact={isMobile} />
+            <SimpleAvatar compact={isMobile} speaking={speaking} />
           )}
         </button>
+
+        <CommentTooltip comment={comment} visible={tooltipVisible} onDismiss={dismiss} />
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

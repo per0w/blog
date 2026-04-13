@@ -16,7 +16,8 @@ type Particle = {
 };
 
 const DESKTOP_COUNT = 80;
-const MOBILE_COUNT = 30;
+/** Меньше связей на маленьких экранах — стабильнее FPS. */
+const MOBILE_COUNT = 22;
 const LINE_DISTANCE = 150;
 const MOUSE_RADIUS = 150;
 const MOUSE_FORCE = 1.2;
@@ -148,11 +149,14 @@ export const ParticlesBackground = () => {
             const avgDepth = (pi.depth + pj.depth) / 2;
             const opacity = (1 - dist / LINE_DISTANCE) * 0.35 * avgDepth;
             const isMixed = pi.type !== pj.type;
-            const rgb = isMixed
-              ? secondaryRgb
-              : pi.type === "accent"
-                ? accentRgb
-                : secondaryRgb;
+            let rgb: [number, number, number];
+            if (isMixed) {
+              rgb = secondaryRgb;
+            } else if (pi.type === "accent") {
+              rgb = accentRgb;
+            } else {
+              rgb = secondaryRgb;
+            }
 
             ctx.beginPath();
             ctx.strokeStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${opacity})`;
@@ -216,10 +220,6 @@ export const ParticlesBackground = () => {
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="pointer-events-none fixed inset-0 z-0"
-      aria-hidden="true"
-    />
+    <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none fixed inset-0 z-0" />
   );
 };

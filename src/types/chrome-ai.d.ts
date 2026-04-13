@@ -7,10 +7,7 @@ interface AILanguageModelSession {
 }
 
 interface AILanguageModelMonitor extends EventTarget {
-  addEventListener(
-    type: "downloadprogress",
-    listener: (e: { loaded: number }) => void,
-  ): void;
+  addEventListener(type: "downloadprogress", listener: (e: { loaded: number }) => void): void;
 }
 
 interface AILanguageModelCreateOptions {

@@ -1,17 +1,44 @@
 "use client";
 
-import Link from "next/link";
-import { Download, Mail, Send, ArrowLeft } from "lucide-react";
-import { GitHubIcon } from "@/ui/icons";
+import type { ComponentType } from "react";
 
-const CONTACTS = [
-  { icon: Mail, label: "per0w@yandex.ru", href: "mailto:per0w@yandex.ru" },
-  { icon: Send, label: "Telegram @per0w", href: "https://t.me/per0w" },
-  { icon: GitHubIcon, label: "github.com/per0w", href: "https://github.com/per0w" },
+import Link from "next/link";
+
+import { Download, Mail, Send, ArrowLeft } from "lucide-react";
+
+import {
+  MAIN_CONTENT_ID,
+  MAX_MESSENGER_PROFILE_URL,
+  PROFILE_EMAIL,
+  PROFILE_GITHUB_URL,
+  PROFILE_TELEGRAM_URL,
+  PROFILE_VK_URL,
+} from "@/constants/common";
+import { GitHubIcon, MaxMessengerIcon, VkIcon } from "@/ui/icons";
+
+type CvContact = {
+  Icon: ComponentType<{ className?: string }>;
+  label: string;
+  href: string;
+  external: boolean;
+};
+
+const CONTACTS: CvContact[] = [
+  { Icon: Mail, label: PROFILE_EMAIL, href: `mailto:${PROFILE_EMAIL}`, external: false },
+  { Icon: Send, label: "Telegram @per0w", href: PROFILE_TELEGRAM_URL, external: true },
+  { Icon: GitHubIcon, label: "github.com/per0w", href: PROFILE_GITHUB_URL, external: true },
+  { Icon: VkIcon, label: "vk.com/per0w", href: PROFILE_VK_URL, external: true },
+  {
+    Icon: MaxMessengerIcon,
+    label: "MAX — профиль",
+    href: MAX_MESSENGER_PROFILE_URL,
+    external: true,
+  },
 ];
 
 const SKILLS = {
-  "Frontend": "React, TypeScript, JavaScript, Next.js, Redux, Tailwind CSS, Svelte, Astro, HTML5, CSS3, Sass, Material UI, Framer Motion",
+  Frontend:
+    "React, TypeScript, JavaScript, Next.js, Redux, Tailwind CSS, Svelte, Astro, HTML5, CSS3, Sass, Material UI, Framer Motion",
   "DevOps & Infra": "Docker, Kubernetes, Nginx, Linux, Bash, Ansible, CI/CD, TeamCity",
   "Backend & Tools": "Node.js, Deno, Vite, Webpack, Babel, Gulp",
   "AI & Modern": "LLM, Cursor AI, ChatGPT, Claude, GitHub Copilot, Prompt Engineering",
@@ -73,6 +100,11 @@ const EXPERIENCE = [
 
 const PROJECTS = [
   {
+    name: "Сервис24 — мобильные акты",
+    url: "https://neyron163.github.io/service24/dashboard",
+    desc: "PWA для сервисных инженеров: акты, 1С, офлайн-очередь. Ionic, TanStack Query, Dexie, Vite (в разработке)",
+  },
+  {
     name: "Trenika",
     url: "https://trenika.space",
     desc: "PWA-дневник тренировок. Full-stack: React, Fastify, Prisma, Docker",
@@ -93,19 +125,26 @@ export const CvContent = () => {
   const handlePrint = () => window.print();
 
   return (
-    <main className="py-10 print:py-0">
+    <main
+      aria-labelledby="cv-page-title"
+      className="py-10 outline-none focus:outline-none print:py-0"
+      id={MAIN_CONTENT_ID}
+      tabIndex={-1}
+    >
       {/* Навигация */}
       <div className="mb-8 flex items-center justify-between print:hidden">
         <Link
-          href="/"
           className="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-accent"
+          href="/"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft aria-hidden className="h-4 w-4" />
           На главную
         </Link>
         <button
-          onClick={handlePrint}
+          aria-label="Открыть диалог печати браузера для сохранения резюме в PDF"
           className="neon-glow inline-flex items-center gap-2 rounded-lg border border-accent/60 px-5 py-2.5 text-sm font-medium text-accent transition-all hover:border-accent hover:bg-accent/10"
+          type="button"
+          onClick={handlePrint}
         >
           <Download className="h-4 w-4" />
           Скачать PDF
@@ -113,26 +152,29 @@ export const CvContent = () => {
       </div>
 
       {/* Шапка */}
-      <header data-orbo-cv="header" className="mb-10 border-b border-border/50 pb-8">
-        <h1 className="bg-linear-to-r from-accent via-accent-light to-accent-secondary bg-clip-text text-3xl font-bold tracking-tight text-transparent print:text-foreground sm:text-4xl">
+      <header className="mb-10 border-b border-border/50 pb-8" data-orbo-cv="header">
+        <h1
+          className="bg-linear-to-r from-accent via-accent-light to-accent-secondary bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl print:text-foreground"
+          id="cv-page-title"
+        >
           Владимир Перов
         </h1>
         <p className="mt-1 text-xl font-semibold text-foreground/80">Senior Frontend Developer</p>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
           8+ лет в IT. От DevOps-инженера до ведущего frontend-разработчика в банковском секторе.
-          Понимаю весь стек — от серверной инфраструктуры до пиксель-перфект UI.
-          Активно применяю AI-инструменты для ускорения разработки.
+          Понимаю весь стек — от серверной инфраструктуры до пиксель-перфект UI. Активно применяю
+          AI-инструменты для ускорения разработки.
         </p>
-        <div className="mt-4 flex flex-wrap gap-4">
-          {CONTACTS.map(({ icon: Icon, label, href }) => (
+        <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
+          {CONTACTS.map(({ Icon, label, href, external }) => (
             <a
               key={label}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-accent"
+              href={href}
+              rel={external ? "noopener noreferrer" : undefined}
+              target={external ? "_blank" : undefined}
             >
-              <Icon className="h-4 w-4" />
+              <Icon className="h-4 w-4 shrink-0" />
               {label}
             </a>
           ))}
@@ -145,14 +187,17 @@ export const CvContent = () => {
           <SectionTitle>Опыт работы</SectionTitle>
           <div className="space-y-7">
             {EXPERIENCE.map((job) => (
-              <div key={`${job.company}-${job.title}`} data-orbo-cv={`job-${job.company}-${job.title}`.toLowerCase().replace(/\s+/g, "-")}>
+              <div
+                key={`${job.company}-${job.title}`}
+                data-orbo-cv={`job-${job.company}-${job.title}`.toLowerCase().replace(/\s+/g, "-")}
+              >
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
                   <h3 className="text-base font-bold">{job.title}</h3>
                   <a
-                    href={job.companyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="text-sm font-medium text-accent transition-colors hover:text-accent-light print:text-foreground"
+                    href={job.companyUrl}
+                    rel="noopener noreferrer"
+                    target="_blank"
                   >
                     {job.company} ↗
                   </a>
@@ -175,14 +220,14 @@ export const CvContent = () => {
           </div>
 
           <SectionTitle className="mt-10">Проекты</SectionTitle>
-          <div data-orbo-cv="projects" className="space-y-4">
+          <div className="space-y-4" data-orbo-cv="projects">
             {PROJECTS.map((p) => (
               <div key={p.name}>
                 <a
-                  href={p.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="text-sm font-bold text-foreground transition-colors hover:text-accent"
+                  href={p.url}
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
                   {p.name} ↗
                 </a>
@@ -207,7 +252,9 @@ export const CvContent = () => {
           </div>
 
           <SectionTitle className="mt-10">Образование</SectionTitle>
-          <p className="text-sm text-muted">Самообразование, профессиональные курсы, 8+ лет коммерческой практики</p>
+          <p className="text-sm text-muted">
+            Самообразование, профессиональные курсы, 8+ лет коммерческой практики
+          </p>
 
           <SectionTitle className="mt-10">Языки</SectionTitle>
           <p className="text-sm text-muted">Русский — родной</p>
@@ -218,7 +265,13 @@ export const CvContent = () => {
   );
 };
 
-const SectionTitle = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
+const SectionTitle = ({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => (
   <h2
     className={`mb-4 border-b border-border/50 pb-2 text-sm font-bold tracking-wide text-foreground uppercase ${className}`}
   >

@@ -1,8 +1,8 @@
-import { Metadata } from "next";
-import Link from "next/link";
-
 import { formatDate, getBlogPosts } from "@/app/blog/utils";
-import { Tags } from "@/ui/tags/tags";
+import { MAIN_CONTENT_ID } from "@/constants/common";
+import { BlogPostCard } from "@/ui/blog-post-card/blog-post-card";
+
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Блог | per0w.space",
@@ -16,37 +16,40 @@ export default function BlogPage() {
   );
 
   return (
-    <main className="py-12">
+    <main
+      aria-labelledby="blog-page-title"
+      className="py-12 outline-none focus:outline-none"
+      id={MAIN_CONTENT_ID}
+      tabIndex={-1}
+    >
       <header className="mb-10 text-center">
-        <h1 className="bg-linear-to-r from-accent to-accent-secondary bg-clip-text text-4xl font-bold tracking-tight text-transparent">
+        <h1
+          className="bg-linear-to-r from-accent to-accent-secondary bg-clip-text text-4xl font-bold tracking-tight text-transparent"
+          id="blog-page-title"
+        >
           Блог
         </h1>
         <p className="mt-3 text-lg text-muted">Статьи о фронтенде, DevOps и разработке</p>
       </header>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <section
+        aria-label="Статьи блога"
+        className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+      >
         {posts.map((post) => (
-          <Link
+          <BlogPostCard
             key={post.slug}
+            coverImage={post.metadata.image}
+            dateLabel={formatDate(post.metadata.publishedAt)}
+            description={post.metadata.description}
             href={`/blog/${post.slug}`}
-            className="group rounded-xl border border-border/50 border-t-2 border-t-accent bg-[var(--color-surface)] p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_20px_color-mix(in_srgb,var(--color-accent)_15%,transparent)]"
-          >
-            <article>
-              <time dateTime={post.metadata.publishedAt} className="text-xs text-muted">
-                {formatDate(post.metadata.publishedAt)}
-              </time>
-
-              <h2 className="mt-2 text-lg leading-snug font-semibold group-hover:text-accent">
-                {post.metadata.title}
-              </h2>
-
-              <p className="mt-2 line-clamp-3 text-sm text-muted">{post.metadata.description}</p>
-
-              <Tags tags={post.metadata.tags.split(", ")} />
-            </article>
-          </Link>
+            publishedAt={post.metadata.publishedAt}
+            tags={post.metadata.tags.split(", ")}
+            title={post.metadata.title}
+            titleAs="h2"
+          />
         ))}
-      </div>
+      </section>
     </main>
   );
 }

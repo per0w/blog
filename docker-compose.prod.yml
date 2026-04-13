@@ -27,8 +27,8 @@ services:
       - --log.level=WARN
       - --accesslog=false
     ports:
-      - '80:80'
-      - '443:443'
+      - "80:80"
+      - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - letsencrypt:/letsencrypt
@@ -36,13 +36,16 @@ services:
       resources:
         limits:
           memory: 128M
-          cpus: '0.25'
+          cpus: "0.25"
 
   # ── Blog (Next.js static export, nginx) ─────────────────────────────
   blog:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY: ${NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY:-}
+        NEXT_PUBLIC_GEMINI_API_KEY: ${NEXT_PUBLIC_GEMINI_API_KEY:-}
     container_name: perow-blog
     restart: unless-stopped
     labels:
@@ -63,7 +66,7 @@ services:
       resources:
         limits:
           memory: 64M
-          cpus: '0.25'
+          cpus: "0.25"
 
 volumes:
   letsencrypt:

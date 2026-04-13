@@ -9,6 +9,10 @@ const nextConfig = {
     unoptimized: true,
   },
   output: "export",
+  // Для клиентских проверок пути (GitHub Pages) — см. withBasePath, ai-buddy CV.
+  env: {
+    NEXT_PUBLIC_BASE_PATH: isGithubPages ? "/blog" : "",
+  },
   ...(isGithubPages && {
     basePath: "/blog",
     assetPrefix: "/blog",

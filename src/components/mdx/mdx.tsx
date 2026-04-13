@@ -1,8 +1,15 @@
+import React, {
+  type AnchorHTMLAttributes,
+  type DetailedHTMLProps,
+  type HTMLAttributes,
+  type ReactNode,
+} from "react";
+
+import Image, { type ImageProps } from "next/image";
 import Link from "next/link";
-import Image, { ImageProps } from "next/image";
-import { MDXRemote, MDXRemoteProps } from "next-mdx-remote/rsc";
+
+import { MDXRemote, type MDXRemoteProps } from "next-mdx-remote/rsc";
 import { highlight } from "sugar-high";
-import React, { AnchorHTMLAttributes, DetailedHTMLProps, HTMLAttributes, ReactNode } from "react";
 
 type TablProps = {
   data: {
@@ -48,7 +55,7 @@ function CustomLink(
     return <a {...props} />;
   }
 
-  return <a target="_blank" rel="noopener noreferrer" {...props} />;
+  return <a rel="noopener noreferrer" target="_blank" {...props} />;
 }
 
 type RoundedImageProps = {

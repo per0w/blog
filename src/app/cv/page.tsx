@@ -1,6 +1,6 @@
-import { Metadata } from "next";
-
 import { CvContent } from "@/components/cv/cv-content";
+
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "CV — Владимир Перов | Senior Frontend Developer",

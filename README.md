@@ -58,8 +58,8 @@ make help       # Показать список команд
 
 ### Маршрутизация (VPS)
 
-| Домен | Сервис | Контейнер |
-|-------|--------|-----------|
+| Домен         | Сервис         | Контейнер    |
+| ------------- | -------------- | ------------ |
 | `per0w.space` | Блог (статика) | `perow-blog` |
 
 SSL-сертификаты — автоматически через **Traefik + Let's Encrypt**.
@@ -100,18 +100,18 @@ vim .env.production  # DOMAIN и ACME_EMAIL
 
 В репозитории: **Settings → Secrets → Actions**
 
-| Secret         | Значение                                          |
-| -------------- | ------------------------------------------------- |
-| `VPS_HOST`     | IP-адрес VPS                                      |
-| `VPS_SSH_KEY`  | Приватный SSH-ключ пользователя `deploy`           |
-| `VPS_SSH_PORT` | SSH-порт (по умолчанию 22)                         |
+| Secret         | Значение                                 |
+| -------------- | ---------------------------------------- |
+| `VPS_HOST`     | IP-адрес VPS                             |
+| `VPS_SSH_KEY`  | Приватный SSH-ключ пользователя `deploy` |
+| `VPS_SSH_PORT` | SSH-порт (по умолчанию 22)               |
 
 #### 4. DNS
 
-| Тип | Имя  | Значение      |
-| --- | ---- | ------------- |
-| A   | @    | `<VPS_IP>`    |
-| A   | www  | `<VPS_IP>`    |
+| Тип | Имя | Значение   |
+| --- | --- | ---------- |
+| A   | @   | `<VPS_IP>` |
+| A   | www | `<VPS_IP>` |
 
 #### 5. Ручной деплой
 
@@ -130,6 +130,33 @@ Push в `main` → GitHub Actions → static export (с `basePath: /blog`) → G
 Доступен по адресу: `https://per0w.github.io/blog/`
 
 Работает автоматически — отдельной настройки не требует. Переменная `GITHUB_PAGES=true` в workflow автоматически добавляет `basePath` и `assetPrefix`.
+
+#### Почта с формы «Связаться» на GitHub Pages (Web3Forms)
+
+Сайт статический — своего API нет. Письма уходят через [Web3Forms](https://web3forms.com): их сервер принимает POST и пересылает на ваш email.
+
+1. Зарегистрируйтесь на [web3forms.com](https://web3forms.com), создайте форму и в панели укажите **email получателя** (тот же, куда хотите получать обращения с сайта).
+2. Скопируйте **Access Key** (публичный идентификатор формы, не пароль от почты).
+3. В GitHub: **Settings** → **Secrets and variables** → **Actions** → **New repository secret**:
+   - имя: `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY`;
+   - значение: ключ из кабинета Web3Forms.
+4. Запушьте в `main` — workflow [.github/workflows/nextjs.yml](.github/workflows/nextjs.yml) подставит секрет при `pnpm build`, ключ попадёт в клиентский бандл (так устроен static export; для Web3Forms это ожидаемо).
+5. Откройте сайт на GitHub Pages и отправьте тестовое сообщение с блока контактов.
+
+Локально создайте `.env.local`:
+
+```bash
+NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY=ваш_ключ_из_web3forms
+```
+
+**Опционально — кнопка «AI» в форме (Google Gemini, бесплатный лимит в AI Studio):**
+
+- Создайте ключ в [Google AI Studio](https://aistudio.google.com/).
+- Добавьте secret `NEXT_PUBLIC_GEMINI_API_KEY` в GitHub Actions (или строку в `.env.local`).
+- **Важно:** любой `NEXT_PUBLIC_*` виден в скачанном JS. В настройках ключа Google задайте ограничения по **HTTP referrer** (домен GitHub Pages и при необходимости `http://localhost:3000`).
+- Без переменной кнопка «AI» не показывается.
+
+**Основной сайт (Docker / VPS):** задайте те же переменные в `.env.production` рядом с `docker-compose.prod.yml` — они передаются как build-args в [Dockerfile](Dockerfile) при сборке образа.
 
 ## Структура
 

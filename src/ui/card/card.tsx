@@ -1,60 +1,110 @@
 "use client";
 
-import Image, { type StaticImageData } from "next/image";
+import { useState } from "react";
+
 import { motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
+
+import {
+  ProjectCardMedia,
+  type ProjectCardSlide,
+} from "@/ui/project-card-media/project-card-media";
 
 import { Tags } from "../tags/tags";
 
 interface CardProps {
   url?: string;
-  alt?: string;
-  title?: string;
   description: string;
   tags: string[];
-  image?: StaticImageData | string;
+  title?: string;
+  /** Все превью проекта: один элемент — статичная картинка, несколько — общий слайдер */
+  slides: ProjectCardSlide[];
+  imageClassName?: string;
   emoji?: string;
+  /** Коротко для эйчаров (карусель); иначе описание режется */
+  hook?: string;
+  /** Карусель: узкая карточка в горизонтальной ленте */
+  variant?: "carousel" | "grid";
 }
 
-export const Card = ({ url, alt = "", description, title, tags, image, emoji }: CardProps) => {
+export const Card = ({
+  url,
+  description,
+  title,
+  tags,
+  slides,
+  imageClassName,
+  emoji,
+  hook,
+  variant = "grid",
+}: CardProps) => {
+  const [pauseCarousel, setPauseCarousel] = useState(false);
+  const isCarousel = variant === "carousel";
+
+  const wrapCls = isCarousel
+    ? "w-[min(17.5rem,calc(100vw-5rem))] shrink-0 snap-start sm:w-72"
+    : "w-full p-3 md:w-1/2 lg:w-1/3";
+
   return (
-    <div className="w-full p-3 md:w-1/2 lg:w-1/3">
+    <div className={wrapCls}>
       <motion.article
-        whileHover={{ scale: 1.02 }}
+        className="group/project-card flex h-full flex-col rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-lg transition-[border-color,box-shadow] duration-300 ease-out hover:border-[var(--color-accent)]/55"
         transition={{ duration: 0.3, ease: "easeOut" as const }}
-        className="flex h-full flex-col rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 shadow-lg transition-all duration-300 ease-in-out hover:border-[var(--color-accent)]/60 hover:shadow-[0_4px_20px_color-mix(in_srgb,var(--color-accent)_15%,transparent)]"
+        whileHover={isCarousel ? { y: -2 } : { scale: 1.02, y: -3 }}
       >
         <a
-          href={url}
-          aria-label={`${title} — открыть проект`}
-          target="_blank"
-          rel="noopener noreferrer"
+          aria-label={`${title} — открыть проект в новой вкладке`}
           className="flex flex-1 flex-col"
+          href={url}
+          rel="noopener noreferrer"
+          target="_blank"
+          onFocus={() => setPauseCarousel(true)}
+          onBlur={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget)) {
+              setPauseCarousel(false);
+            }
+          }}
         >
-          <div className="relative overflow-hidden rounded-xl">
-            {image ? (
-              <Image
-                src={image}
-                alt={alt}
-                width={400}
-                height={225}
-                className="aspect-video w-full object-cover"
-                loading="eager"
-              />
-            ) : (
-              <div className="flex aspect-video w-full items-center justify-center rounded-xl bg-linear-to-br from-accent/10 via-accent-secondary/5 to-accent-light/10">
-                <span className="text-5xl">{emoji ?? "🚀"}</span>
+          {hook && isCarousel ? <span className="sr-only">{description}</span> : null}
+          <div className={isCarousel ? "p-2" : "p-3"}>
+            <ProjectCardMedia
+              imageClassName={imageClassName}
+              pauseAutoplay={pauseCarousel}
+              placeholderEmoji={emoji}
+              slides={slides}
+            />
+            <div
+              className={`mt-1.5 flex flex-1 flex-col ${isCarousel ? "px-0.5 pt-0 pb-1" : "p-2"}`}
+            >
+              <div className="flex items-start gap-1.5">
+                <h3
+                  className={
+                    isCarousel
+                      ? "min-w-0 flex-1 text-base leading-tight font-bold text-foreground"
+                      : "text-lg font-bold lg:text-xl"
+                  }
+                >
+                  {title}
+                </h3>
+                <ExternalLink
+                  aria-hidden
+                  className={`mt-0.5 shrink-0 text-muted ${isCarousel ? "size-3.5" : "h-3.5 w-3.5"}`}
+                />
               </div>
-            )}
-          </div>
-          <div className="mt-1 flex flex-1 flex-col p-2">
-            <div className="flex items-center gap-2">
-              <h3 className="text-lg font-bold lg:text-xl">{title}</h3>
-              <ExternalLink className="h-3.5 w-3.5 text-muted" />
-            </div>
-            <p className="mt-1 text-sm text-muted">{description}</p>
-            <div className="mt-auto">
-              <Tags tags={tags} />
+              {hook ? (
+                <p className="mt-1.5 line-clamp-2 text-sm leading-snug font-medium text-foreground">
+                  {hook}
+                </p>
+              ) : (
+                <p
+                  className={`mt-1.5 text-muted ${isCarousel ? "line-clamp-2 text-xs leading-snug" : "text-sm"}`}
+                >
+                  {description}
+                </p>
+              )}
+              <div className="mt-auto">
+                <Tags size={isCarousel ? "sm" : "default"} tags={tags} />
+              </div>
             </div>
           </div>
         </a>

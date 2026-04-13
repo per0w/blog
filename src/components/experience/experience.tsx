@@ -46,8 +46,7 @@ const JOBS: ExperienceItemProps[] = [
     company: "Optimax Dev",
     companyUrl: "https://optimax.dev",
     title: "Frontend-разработчик",
-    description:
-      "Разработка e-commerce платформ для международных клиентов (GlassesUSA и др.).",
+    description: "Разработка e-commerce платформ для международных клиентов (GlassesUSA и др.).",
     highlights: [
       "Внедрение SSR — улучшение Core Web Vitals и конверсии",
       "Рост до Team Lead за счёт высокой личной эффективности",
@@ -87,12 +86,12 @@ export const Experience = () => {
           {JOBS.map((job, index) => (
             <motion.li
               key={`${job.company}-${job.title}`}
-              variants={itemVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
               className="relative pb-10 pl-8 last:pb-0"
+              initial="hidden"
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+              variants={itemVariants}
+              viewport={{ once: true, margin: "-50px" }}
+              whileInView="visible"
             >
               <div
                 className={`absolute top-1.5 -left-[7px] h-3 w-3 rounded-full ${
@@ -106,10 +105,10 @@ export const Experience = () => {
                 <h3 className="text-lg font-bold">{job.title}</h3>
                 {job.companyUrl ? (
                   <a
-                    href={job.companyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="text-sm font-medium text-accent transition-colors hover:text-accent-light"
+                    href={job.companyUrl}
+                    rel="noopener noreferrer"
+                    target="_blank"
                   >
                     {job.company} ↗
                   </a>
