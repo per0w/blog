@@ -7,6 +7,7 @@ import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 
+import { withBasePath } from "@/constants/base-path";
 import { ORBO_EASTER_EGG_HINT_EVENT } from "@/constants/common";
 
 const REQUIRED_CLICKS = 10;
@@ -63,8 +64,8 @@ export const ExperienceTitleEasterEgg = ({
     typeof photoIntrinsicHeight === "number" &&
     photoIntrinsicWidth > 0 &&
     photoIntrinsicHeight > 0;
-  const isLandscapePhoto =
-    hasIntrinsicSize && photoIntrinsicWidth >= photoIntrinsicHeight;
+  const isLandscapePhoto = hasIntrinsicSize && photoIntrinsicWidth >= photoIntrinsicHeight;
+  const resolvedPhotoSrc = withBasePath(photoSrc);
 
   useEffect(() => {
     if (!isOpen) {
@@ -152,7 +153,7 @@ export const ExperienceTitleEasterEgg = ({
               exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 16 }}
               initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.92, y: 24 }}
               transition={{ duration: 0.32, ease: "easeOut" }}
-              className={`relative max-h-[min(92vh,56rem)] w-full overflow-y-auto overflow-x-hidden rounded-[2rem] border border-accent/20 bg-surface/95 p-4 shadow-[0_24px_80px_-24px_color-mix(in_srgb,var(--color-accent)_40%,transparent)] sm:p-6 ${
+              className={`relative max-h-[min(92vh,56rem)] w-full overflow-x-hidden overflow-y-auto rounded-[2rem] border border-accent/20 bg-surface/95 p-4 shadow-[0_24px_80px_-24px_color-mix(in_srgb,var(--color-accent)_40%,transparent)] sm:p-6 ${
                 isLandscapePhoto ? "max-w-3xl" : "max-w-xl"
               }`}
               onClick={(event) => event.stopPropagation()}
@@ -170,7 +171,9 @@ export const ExperienceTitleEasterEgg = ({
                   <h4 className="mt-2 text-2xl font-black text-foreground" id={dialogTitleId}>
                     {modalHeading}
                   </h4>
-                  <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">{modalDescription}</p>
+                  <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">
+                    {modalDescription}
+                  </p>
                 </div>
 
                 <button
@@ -200,7 +203,7 @@ export const ExperienceTitleEasterEgg = ({
                       alt={photoAlt}
                       className="h-auto max-h-[min(58vh,560px)] w-auto max-w-full object-contain"
                       height={photoIntrinsicHeight}
-                      src={photoSrc}
+                      src={resolvedPhotoSrc}
                       width={photoIntrinsicWidth}
                       sizes={
                         isLandscapePhoto
@@ -217,7 +220,7 @@ export const ExperienceTitleEasterEgg = ({
                       alt={photoAlt}
                       className="object-contain"
                       sizes="(max-width: 768px) 90vw, 480px"
-                      src={photoSrc}
+                      src={resolvedPhotoSrc}
                     />
                   </div>
                 )}
