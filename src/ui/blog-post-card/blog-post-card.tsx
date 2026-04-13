@@ -13,7 +13,7 @@ export type BlogPostCardProps = {
   title: string;
   description: string;
   tags: string[];
-  /** Заголовок карточки: на странице блога — h2, на главной — h3 */
+  /** Заголовок карточки: на странице заметок — h2, на главной — h3 */
   titleAs?: "h2" | "h3";
   /** Обложка из frontmatter; иначе — тематическая SVG */
   coverImage?: string;

@@ -12,7 +12,7 @@ export const AvatarFrame = ({ children }: AvatarFrameProps) => {
   const reduced = useReducedMotion();
 
   return (
-    <div className="relative flex w-full max-w-full items-center justify-center py-2 md:py-3">
+    <div className="relative flex w-full max-w-full items-center justify-center overflow-x-clip py-2 md:py-3">
       {/* Мягкая aura — компактнее, без «облака» */}
       <motion.div
         className="absolute inset-4 rounded-xl bg-linear-to-br from-accent/14 via-accent-secondary/8 to-accent-light/12 blur-2xl md:inset-3 md:rounded-[0.85rem]"

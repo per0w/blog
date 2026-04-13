@@ -5,8 +5,8 @@ import { BlogPostCard } from "@/ui/blog-post-card/blog-post-card";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Блог | per0w.space",
-  description: "Статьи о фронтенде, React, TypeScript, DevOps и разработке",
+  title: "Заметки | per0w.space",
+  description: "Заметки о фронтенде, React, TypeScript, DevOps и разработке",
 };
 
 export default function BlogPage() {
@@ -27,13 +27,13 @@ export default function BlogPage() {
           className="bg-linear-to-r from-accent to-accent-secondary bg-clip-text text-4xl font-bold tracking-tight text-transparent"
           id="blog-page-title"
         >
-          Блог
+          Заметки
         </h1>
-        <p className="mt-3 text-lg text-muted">Статьи о фронтенде, DevOps и разработке</p>
+        <p className="mt-3 text-lg text-muted">Заметки о фронтенде, DevOps и разработке</p>
       </header>
 
       <section
-        aria-label="Статьи блога"
+        aria-label="Список заметок"
         className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
       >
         {posts.map((post) => (

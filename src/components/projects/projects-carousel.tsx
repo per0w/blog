@@ -146,7 +146,7 @@ export const ProjectsCarousel = ({ children, itemCount }: ProjectsCarouselProps)
         <div className="min-w-0 flex-1 touch-pan-x">
           <div
             ref={scrollerRef}
-            className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth py-2 pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             id={`${regionId}-track`}
             tabIndex={0}
             onKeyDown={(e) => {

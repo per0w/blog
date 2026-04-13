@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Владимир Перов — Senior Frontend Developer",
     description:
-      "8+ лет опыта. React, TypeScript, Next.js, Redux, Docker, K8s. Главный инженер в Газпромбанке. Портфолио и блог.",
+      "8+ лет опыта. React, TypeScript, Next.js, Redux, Docker, K8s. Главный инженер в Газпромбанке. Портфолио и заметки.",
     url: "https://per0w.space",
     siteName: "per0w.space",
     type: "website",
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Владимир Перов — Senior Frontend Developer",
-    description: "8+ лет опыта. React, TypeScript, Next.js, Redux, Docker, K8s. Портфолио и блог.",
+    description: "8+ лет опыта. React, TypeScript, Next.js, Redux, Docker, K8s. Портфолио и заметки.",
   },
   alternates: {
     canonical: "https://per0w.space",
@@ -60,6 +60,7 @@ export default function RootLayout({
   return (
     <html
       className={cx(GeistSans.variable, GeistMono.variable)}
+      data-scroll-behavior="smooth"
       lang="ru"
       suppressHydrationWarning={true}
     >

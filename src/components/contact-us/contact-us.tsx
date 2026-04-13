@@ -104,31 +104,21 @@ export const ContactUs = () => {
     visible: reduceMotion ? {} : { transition: { delayChildren: 0.02, staggerChildren: 0.052 } },
   };
 
+  /**
+   * Только opacity на самой ссылке: без transform от Framer — иначе родительский
+   * translate + backdrop-filter на кнопке даёт артефакты в Chrome; отдельно
+   * полупрозрачная фаза «просвечивает» aurora/сетку и выглядит как баг.
+   * CSS hover (translateY) на `.contact-cta-link` не конфликтует, пока Motion не задаёт transform.
+   */
   const linkVariants = {
-    hidden: {
-      opacity: reduceMotion ? 1 : 0,
-      scale: reduceMotion ? 1 : 0.93,
-      y: reduceMotion ? 0 : 14,
-    },
+    hidden: { opacity: reduceMotion ? 1 : 0 },
     visible: {
       opacity: 1,
-      scale: 1,
-      y: 0,
       transition: reduceMotion
         ? { duration: 0 }
-        : { damping: 24, stiffness: 400, type: "spring" as const },
+        : { duration: 0.38, ease: [0.22, 1, 0.36, 1] as const },
     },
   };
-
-  const linkHover = reduceMotion
-    ? undefined
-    : {
-        transition: { damping: 16, stiffness: 440, type: "spring" as const },
-        y: -4,
-        scale: 1.035,
-      };
-
-  const linkTap = reduceMotion ? undefined : { scale: 0.97 };
 
   return (
     <Section id={SECTIONS_IDS.contactUs}>
@@ -183,18 +173,16 @@ export const ContactUs = () => {
                 <motion.a
                   key={label}
                   aria-label={ariaLabel ?? label}
-                  className="group/contact-cta contact-cta-link flex items-center gap-3 rounded-xl px-5 py-3 text-sm font-medium md:px-6 md:text-base"
+                  className="group/contact-cta contact-cta-link inline-flex items-center gap-3 rounded-xl px-5 py-3 text-sm font-medium md:px-6 md:text-base"
                   href={href}
                   variants={linkVariants}
-                  whileHover={linkHover}
-                  whileTap={linkTap}
                   {...(isMax && { "data-orbo-max": "" })}
                   {...(isMax && { onFocus: fireOrboMax, onMouseEnter: fireOrboMax })}
                   {...(external
                     ? { rel: "noopener noreferrer" as const, target: "_blank" as const }
                     : {})}
                 >
-                  <Icon className="h-5 w-5 shrink-0 transition-transform duration-300 group-hover/contact-cta:scale-110 group-hover/contact-cta:-rotate-3" />
+                  <Icon className="h-5 w-5 shrink-0 transition-transform duration-300 group-hover/contact-cta:scale-110" />
                   <span>{value}</span>
                 </motion.a>
               );

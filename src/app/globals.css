@@ -82,8 +82,13 @@
 }
 
 html {
-  min-width: 360px;
   scroll-behavior: smooth;
+  /* Любой «вылет» на пару px не должен давать горизонтальный скролл всей страницы */
+  overflow-x: clip;
+}
+
+body {
+  overflow-x: clip;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -92,10 +97,36 @@ html {
   }
 }
 
+/* Орбо: лёгкая «левитация» виджета (отключается при reduced-motion). */
+@keyframes orbo-ambient-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.orbo-ambient-float {
+  animation: orbo-ambient-float 4.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbo-ambient-float {
+    animation: none;
+  }
+}
+
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans);
+}
+
+/* /cv: семейство задаётся next/font (переменная на обёртке из cv/layout.tsx) */
+.cv-page-root {
+  font-family: var(--font-cv-serif), ui-serif, Georgia, "Times New Roman", serif;
 }
 
 /* Первый фокус на странице: переход к основному содержимому (WCAG 2.4.1) */
@@ -164,7 +195,7 @@ body {
   --sh-entity: #a78bfa;
 }
 
-/* Prose: стили для MDX-контента блога */
+/* Prose: стили для MDX-контента заметок */
 .prose .anchor {
   @apply invisible absolute no-underline;
   margin-left: -1em;
@@ -250,6 +281,34 @@ body {
   margin-bottom: 1.25em !important;
 }
 
+/*
+ * Глобальное правило `table { display: block }` ниже ломает сетку настоящих таблиц в MDX.
+ * В статьях блога возвращаем table-layout и границы ячеек.
+ */
+article.prose :where(table) {
+  display: table;
+  width: 100%;
+  max-width: 100%;
+  white-space: normal;
+  border-collapse: collapse;
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+  font-size: 0.95em;
+}
+
+article.prose :where(table) :where(th),
+article.prose :where(table) :where(td) {
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+article.prose :where(table) :where(thead th) {
+  background-color: var(--color-surface-hover);
+  font-weight: 600;
+}
+
 pre::-webkit-scrollbar {
   display: none;
 }
@@ -293,6 +352,10 @@ table {
 
 /* Маска: плавное затухание по краям */
 .skill-marquee-mask {
+  /* min-width: 0 — иначе во flex-колонке с items-center внутренняя лента max-content раздувает ширину макета */
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
   mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
   -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
 }
@@ -939,7 +1002,8 @@ table {
 .contact-cta-link {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
+  /* Иконки при hover scale/rotate не должны обрезаться (VK и др.). */
+  overflow: visible;
   border: 1px solid color-mix(in srgb, white 30%, transparent);
   background: color-mix(in srgb, white 13%, transparent);
   backdrop-filter: blur(12px);
@@ -950,7 +1014,8 @@ table {
   transition:
     border-color 0.25s ease,
     background-color 0.25s ease,
-    box-shadow 0.3s ease;
+    box-shadow 0.3s ease,
+    transform 0.22s ease;
 }
 
 .contact-cta-link::before {
@@ -978,11 +1043,17 @@ table {
     0 0 0 1px color-mix(in srgb, white 22%, transparent),
     0 8px 32px color-mix(in srgb, var(--color-accent-secondary) 30%, transparent),
     0 0 48px color-mix(in srgb, white 14%, transparent);
+  transform: translateY(-3px);
 }
 
 .contact-cta-link:hover::before {
   transform: translateX(130%) skewX(-14deg);
   opacity: 0.55;
+}
+
+.contact-cta-link:active {
+  transform: translateY(-1px) scale(0.985);
+  transition-duration: 0.12s;
 }
 
 .contact-cta-link:focus-visible {
@@ -1422,6 +1493,11 @@ table {
 
   .contact-cta-scanbeam {
     opacity: 0 !important;
+  }
+
+  .contact-cta-link:hover,
+  .contact-cta-link:active {
+    transform: none;
   }
 }
 

@@ -9,11 +9,33 @@ export const WEB3FORMS_SUBMIT_URL = "https://api.web3forms.com/submit" as const;
 export const CONTACT_FORM_OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions" as const;
 
 /**
- * Бесплатная модель по умолчанию (суффикс `:free` в каталоге OpenRouter).
- * Переопределение: `NEXT_PUBLIC_OPENROUTER_MODEL` в .env / CI.
+ * Несколько `:free` моделей с разными провайдерами: при 429 клиент перебирает список,
+ * пока не задан явный `NEXT_PUBLIC_OPENROUTER_MODEL`. Порядок — сначала менее «забитые» upstream
+ * (Google Gemma часто в 429 — ниже в списке).
  */
+export const CONTACT_FORM_OPENROUTER_FREE_FALLBACK_MODELS = [
+  "openai/gpt-oss-120b:free",
+  "liquid/lfm-2.5-1.2b-instruct:free",
+  "z-ai/glm-4.5-air:free",
+] as const;
+
+/** Первая из цепочки — для документации и `getOpenRouterModel()`. */
 export const CONTACT_FORM_OPENROUTER_MODEL_DEFAULT =
-  "meta-llama/llama-3.2-3b-instruct:free" as const;
+  CONTACT_FORM_OPENROUTER_FREE_FALLBACK_MODELS[0];
+
+/**
+ * Орбо использует ту же цепочку `getOpenRouterModelsToTry()`, но с лимитом попыток и паузой —
+ * иначе при скролле уходит пачка запросов к OpenRouter (см. `maxFallbackAttempts` в клиенте).
+ */
+/** Три разных провайдера подряд — чаще обходим 429 на первых free-моделях. */
+export const ORBO_OPENROUTER_MAX_FALLBACK_ATTEMPTS = 3;
+
+/**
+ * Минимальный интервал между **стартами** запросов OpenRouter из Орбо (мс).
+ * Должен быть меньше паузы между секциями в `ai-buddy` (~8800 мс после ответа),
+ * иначе вторая и следующие секции почти всегда получают заготовку без API.
+ */
+export const ORBO_OPENROUTER_COOLDOWN_MS = 3_500;
 
 export const CONTACT_FORM_LIMITS = {
   nameMax: 120,
@@ -78,7 +100,18 @@ export function getOpenRouterApiKey(): string {
   return process.env.NEXT_PUBLIC_OPENROUTER_API_KEY?.trim() ?? "";
 }
 
+/** Одна модель из env или первая из бесплатной цепочки. */
 export function getOpenRouterModel(): string {
-  const m = process.env.NEXT_PUBLIC_OPENROUTER_MODEL?.trim();
-  return m && m.length > 0 ? m : CONTACT_FORM_OPENROUTER_MODEL_DEFAULT;
+  const models = getOpenRouterModelsToTry();
+  return models[0] ?? CONTACT_FORM_OPENROUTER_MODEL_DEFAULT;
+}
+
+/**
+ * Список моделей для запроса: либо только из `NEXT_PUBLIC_OPENROUTER_MODEL`,
+ * либо вся цепочка `CONTACT_FORM_OPENROUTER_FREE_FALLBACK_MODELS` (перебор при 429).
+ */
+export function getOpenRouterModelsToTry(): readonly string[] {
+  const manual = process.env.NEXT_PUBLIC_OPENROUTER_MODEL?.trim();
+  if (manual && manual.length > 0) return [manual];
+  return [...CONTACT_FORM_OPENROUTER_FREE_FALLBACK_MODELS];
 }

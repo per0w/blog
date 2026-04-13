@@ -4,8 +4,17 @@ import { Exo_2 } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 
-import { motion } from "framer-motion";
-import { ArrowRight, FileText, Layers, Rocket, Target, Users } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  ArrowRight,
+  Briefcase,
+  FileText,
+  GraduationCap,
+  Layers,
+  Rocket,
+  Target,
+  Users,
+} from "lucide-react";
 
 import { SECTIONS_IDS } from "@/constants/common";
 import { ScrambleRevealText } from "@/ui/scramble-reveal/scramble-reveal";
@@ -58,6 +67,74 @@ const itemVariants = {
     transition: { duration: 0.5, ease: "easeOut" as const },
   },
 };
+
+function HeroMentorCta() {
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <motion.span
+      className="inline-flex"
+      transition={{ damping: 22, stiffness: 420, type: "spring" }}
+      whileHover={{ scale: 1.04, y: -3 }}
+      whileTap={{ scale: 0.97 }}
+    >
+      <a
+        className="neon-glow group/mentor relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-linear-to-r from-accent via-accent-light to-accent-secondary px-7 py-3.5 text-base font-semibold text-white shadow-[0_4px_24px_-4px_color-mix(in_srgb,var(--color-accent)_45%,transparent)] transition-[box-shadow,filter] duration-300 hover:shadow-[0_8px_32px_-6px_color-mix(in_srgb,var(--color-accent)_50%,transparent)] hover:brightness-[1.05]"
+        href={`#${SECTIONS_IDS.mentorship}`}
+      >
+        {!reduceMotion ? (
+          <motion.span
+            aria-hidden
+            animate={{ x: ["-120%", "120%"] }}
+            className="pointer-events-none absolute inset-0 -skew-x-12 bg-linear-to-r from-transparent via-white/20 to-transparent"
+            initial={false}
+            transition={{
+              duration: 2.4,
+              ease: "easeInOut",
+              repeat: Infinity,
+              repeatDelay: 4.5,
+            }}
+          />
+        ) : null}
+        <GraduationCap
+          aria-hidden
+          className="relative z-10 size-[1.15rem] shrink-0 transition-transform duration-300 group-hover/mentor:scale-110 group-hover/mentor:-rotate-6"
+        />
+        <span className="relative z-10">Менторство</span>
+        <ArrowRight
+          aria-hidden
+          className="relative z-10 size-[1.05rem] shrink-0 transition-transform duration-300 group-hover/mentor:translate-x-1"
+        />
+      </a>
+    </motion.span>
+  );
+}
+
+function HeroServicesCta() {
+  return (
+    <motion.span
+      className="inline-flex"
+      transition={{ damping: 22, stiffness: 420, type: "spring" }}
+      whileHover={{ scale: 1.05, y: -2 }}
+      whileTap={{ scale: 0.97 }}
+    >
+      <a
+        className="group/order inline-flex items-center justify-center gap-2 rounded-lg border-2 border-accent-secondary/55 bg-surface/40 px-6 py-3 text-base font-semibold text-accent-secondary backdrop-blur-sm transition-colors hover:border-accent-secondary hover:bg-accent-secondary/10 sm:px-7"
+        href={`#${SECTIONS_IDS.services}`}
+      >
+        <Briefcase
+          aria-hidden
+          className="size-[1.05rem] shrink-0 transition-transform duration-300 group-hover/order:-rotate-6"
+        />
+        Заказать проект
+        <ArrowRight
+          aria-hidden
+          className="size-[1.05rem] shrink-0 transition-transform duration-300 group-hover/order:translate-x-1"
+        />
+      </a>
+    </motion.span>
+  );
+}
 
 export const Hero = () => {
   return (
@@ -138,13 +215,9 @@ export const Hero = () => {
             ))}
           </motion.div>
 
-          <motion.div className="mt-8 flex flex-wrap gap-4" variants={itemVariants}>
-            <a
-              className="neon-glow inline-flex items-center justify-center rounded-lg bg-linear-to-r from-accent to-accent-secondary px-7 py-3 text-base font-medium text-white transition-all"
-              href={`#${SECTIONS_IDS.projects}`}
-            >
-              Смотреть проекты
-            </a>
+          <motion.div className="mt-8 flex flex-wrap justify-center gap-4 md:justify-start" variants={itemVariants}>
+            <HeroMentorCta />
+            <HeroServicesCta />
             <motion.span
               className="inline-flex"
               transition={{ damping: 22, stiffness: 420, type: "spring" }}

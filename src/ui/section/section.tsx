@@ -18,7 +18,7 @@ export const Section = ({ id, children, title }: SectionProps) => {
   return (
     <motion.section
       aria-labelledby={headingId}
-      className="mb-10 flex flex-col items-center justify-center md:mb-24"
+      className="mb-10 flex w-full max-w-full min-w-0 flex-col items-center justify-center md:mb-24"
       id={id}
       initial={{ opacity: 0, y: 40 }}
       transition={{ duration: 0.6, ease: "easeOut" as const }}

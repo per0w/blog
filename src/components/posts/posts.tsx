@@ -14,9 +14,9 @@ export const Posts = () => {
   );
 
   return (
-    <Section id={SECTIONS_IDS.lastArticles} title="Блог">
+    <Section id={SECTIONS_IDS.lastArticles} title="Заметки">
       <section
-        aria-label="Последние статьи блога"
+        aria-label="Последние заметки"
         className="grid w-full grid-cols-1 gap-6 px-4 md:grid-cols-2 lg:grid-cols-3"
       >
         {sorted.map((post) => (
@@ -38,7 +38,7 @@ export const Posts = () => {
         className="mt-8 inline-block rounded-lg border border-accent px-6 py-2.5 text-sm font-medium text-accent transition-colors hover:bg-accent hover:text-white"
         href="/blog"
       >
-        Все статьи
+        Все заметки
       </Link>
     </Section>
   );

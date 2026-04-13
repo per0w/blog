@@ -16,7 +16,9 @@ const NAV_LINKS = [
   { label: "Обо мне", href: `/#${SECTIONS_IDS.about}` },
   { label: "Опыт", href: `/#${SECTIONS_IDS.experience}` },
   { label: "Проекты", href: `/#${SECTIONS_IDS.projects}` },
-  { label: "Блог", href: `/#${SECTIONS_IDS.lastArticles}` },
+  { label: "На заказ", href: `/#${SECTIONS_IDS.services}` },
+  { label: "Менторство", href: `/#${SECTIONS_IDS.mentorship}` },
+  { label: "Заметки", href: `/#${SECTIONS_IDS.lastArticles}` },
   { label: "Контакты", href: `/#${SECTIONS_IDS.contactUs}` },
 ];
 

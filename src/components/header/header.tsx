@@ -30,7 +30,9 @@ const NAV_LINKS = [
   { label: "Обо мне", href: `/#${SECTIONS_IDS.about}` },
   { label: "Опыт", href: `/#${SECTIONS_IDS.experience}` },
   { label: "Проекты", href: `/#${SECTIONS_IDS.projects}` },
-  { label: "Блог", href: `/#${SECTIONS_IDS.lastArticles}` },
+  { label: "На заказ", href: `/#${SECTIONS_IDS.services}` },
+  { label: "Менторство", href: `/#${SECTIONS_IDS.mentorship}` },
+  { label: "Заметки", href: `/#${SECTIONS_IDS.lastArticles}` },
   { label: "CV", href: "/cv" },
   { label: "Контакты", href: `/#${SECTIONS_IDS.contactUs}` },
 ];
@@ -170,32 +172,37 @@ export const Header = () => {
       </AnimatePresence>
 
       <header className="sticky top-0 z-50 w-full border-b border-accent/10 bg-background/70 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-screen-xl items-center justify-between gap-2 px-4 sm:px-5">
+        <div className="mx-auto flex h-16 max-w-screen-xl items-center gap-2 px-3 sm:gap-3 sm:px-5">
           <Link
             aria-label="На главную, per0w.space"
-            className="min-w-0 shrink bg-linear-to-r from-accent to-accent-secondary bg-clip-text text-lg font-bold tracking-tighter text-transparent sm:text-xl"
+            className="min-w-0 shrink-0 bg-linear-to-r from-accent to-accent-secondary bg-clip-text text-lg font-bold tracking-tighter text-transparent sm:text-xl"
             href="/"
           >
             PER0W.SPACE
           </Link>
 
-          <nav
-            aria-label="Основная навигация"
-            className="hidden items-center gap-6 lg:flex xl:gap-8"
+          {/* На широких экранах много пунктов — даём flex-1 и горизонтальный скролл без полосы, чтобы не ломать вёрстку */}
+          <div
+            className="hidden min-h-0 min-w-0 flex-1 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] lg:block [&::-webkit-scrollbar]:hidden"
           >
-            {NAV_LINKS.map(({ label, href }) => (
-              <Link
-                key={href}
-                className="group relative text-sm font-medium text-muted transition-colors hover:text-foreground"
-                href={href}
-              >
-                {label}
-                <span className="absolute -bottom-1 left-0 h-px w-0 bg-linear-to-r from-accent to-accent-secondary transition-all duration-300 group-hover:w-full" />
-              </Link>
-            ))}
-          </nav>
+            <nav
+              aria-label="Основная навигация"
+              className="flex h-16 w-max items-center gap-x-2.5 pr-1 pl-0.5 sm:gap-x-3 lg:mx-auto lg:justify-center"
+            >
+              {NAV_LINKS.map(({ label, href }) => (
+                <Link
+                  key={href}
+                  className="group relative shrink-0 whitespace-nowrap text-xs font-medium text-muted transition-colors hover:text-foreground sm:text-sm"
+                  href={href}
+                >
+                  {label}
+                  <span className="absolute -bottom-1 left-0 h-px w-0 bg-linear-to-r from-accent to-accent-secondary transition-all duration-300 group-hover:w-full" />
+                </Link>
+              ))}
+            </nav>
+          </div>
 
-          <div className="flex min-w-0 items-center justify-end gap-0.5 sm:gap-1">
+          <div className="flex shrink-0 items-center justify-end gap-0.5 sm:gap-1">
             <ThemeSwitcher />
 
             <div className="hidden items-center border-l border-border/60 pl-1 sm:pl-2 md:flex">
@@ -221,7 +228,7 @@ export const Header = () => {
               aria-controls={isMobileMenuOpen ? MOBILE_NAV_ID : undefined}
               aria-expanded={isMobileMenuOpen}
               aria-label={isMobileMenuOpen ? "Закрыть меню" : "Открыть меню"}
-              className="flex size-9 shrink-0 items-center justify-center rounded-xl text-muted transition-all duration-200 hover:bg-accent/10 hover:text-foreground md:hidden"
+              className="flex size-9 shrink-0 items-center justify-center rounded-xl text-muted transition-all duration-200 hover:bg-accent/10 hover:text-foreground lg:hidden"
               type="button"
               onClick={() => setIsMobileMenuOpen((prev) => !prev)}
             >

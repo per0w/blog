@@ -38,6 +38,9 @@ type ScrambleRevealTextProps = {
 /**
  * Эффект «расшифровки» как у подзаголовка в hero.
  * Секции: запуск по viewport (once), без лишней нагрузки до скролла.
+ *
+ * Нельзя блокировать повторный запуск через ref после cleanup: в Strict Mode эффект
+ * монтируется дважды подряд — второй раз анимация должна стартовать заново.
  */
 export function ScrambleRevealText({
   as = "p",
@@ -50,16 +53,18 @@ export function ScrambleRevealText({
   const ref = useRef<HTMLHeadingElement | HTMLParagraphElement>(null);
   const isInView = useInView(ref, { amount: 0.35, margin: "-12% 0px -12% 0px", once: true });
   const [display, setDisplay] = useState(text);
-  const startedRef = useRef(false);
 
   const shouldStart = immediate || isInView;
 
   useLayoutEffect(() => {
-    if (!shouldStart || startedRef.current) return;
-    startedRef.current = true;
+    if (!shouldStart) {
+      return;
+    }
 
     if (prefersReduced === true) {
-      queueMicrotask(() => setDisplay(text));
+      queueMicrotask(() => {
+        setDisplay(text);
+      });
       return;
     }
 
@@ -69,7 +74,7 @@ export function ScrambleRevealText({
 
     const totalTicks = 28;
     let tick = 0;
-    const id = window.setInterval(() => {
+    const intervalId = window.setInterval(() => {
       tick += 1;
       const revealRatio = tick / totalTicks;
 
@@ -86,12 +91,14 @@ export function ScrambleRevealText({
       );
 
       if (tick >= totalTicks) {
-        window.clearInterval(id);
+        window.clearInterval(intervalId);
         setDisplay(text);
       }
     }, 38);
 
-    return () => window.clearInterval(id);
+    return () => {
+      window.clearInterval(intervalId);
+    };
   }, [prefersReduced, shouldStart, text]);
 
   if (as === "h2") {

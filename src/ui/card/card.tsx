@@ -47,10 +47,15 @@ export const Card = ({
 
   return (
     <div className={wrapCls}>
+      {/* В карусели не двигаем карточку: overflow-x на треке даёт clip по вертикали — бордер визуально «рвётся». */}
       <motion.article
-        className="group/project-card flex h-full flex-col rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-lg transition-[border-color,box-shadow] duration-300 ease-out hover:border-[var(--color-accent)]/55"
         transition={{ duration: 0.3, ease: "easeOut" as const }}
-        whileHover={isCarousel ? { y: -2 } : { scale: 1.02, y: -3 }}
+        whileHover={isCarousel ? undefined : { scale: 1.02, y: -3 }}
+        className={`group/project-card flex h-full flex-col rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-lg transition-[border-color,box-shadow] duration-300 ease-out hover:border-[var(--color-accent)]/55 ${
+          isCarousel
+            ? "hover:shadow-[0_12px_32px_-8px_color-mix(in_srgb,var(--color-accent)_18%,transparent)]"
+            : ""
+        }`}
       >
         <a
           aria-label={`${title} — открыть проект в новой вкладке`}

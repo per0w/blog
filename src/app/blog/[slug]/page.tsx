@@ -65,7 +65,7 @@ export default async function BlogPost(props: Params) {
 
   return (
     <main
-      aria-label="Статья блога"
+      aria-label="Страница заметки"
       className="outline-none focus:outline-none"
       id={MAIN_CONTENT_ID}
       tabIndex={-1}
@@ -98,7 +98,7 @@ export default async function BlogPost(props: Params) {
           className="inline-flex items-center gap-1 text-sm text-muted transition-colors hover:text-accent"
           href="/blog"
         >
-          ← Назад к блогу
+          ← Назад к заметкам
         </Link>
       </nav>
 

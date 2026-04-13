@@ -5,6 +5,30 @@ import { motion } from "framer-motion";
 import { SECTIONS_IDS } from "@/constants/common";
 import { Section } from "@/ui/section/section";
 
+import {
+  ExperienceTitleEasterEgg,
+  type ExperienceTitleEasterEggProps,
+} from "./experience-title-easter-egg";
+
+const EXPERIENCE_EASTER_EGGS: Record<string, Omit<ExperienceTitleEasterEggProps, "title">> = {
+  "Frontend Team Lead": {
+    photoSrc: "/images/easter-eggs/experience-secret-frontend-lead.png",
+    photoAlt: "Секретное фото после десяти кликов по должности Frontend Team Lead",
+    photoIntrinsicWidth: 768,
+    photoIntrinsicHeight: 1024,
+    modalHeading: "Секрет тимлида",
+    modalDescription: "Личный кадр — награда за десять нажатий по заголовку.",
+  },
+  "DevOps-инженер": {
+    photoSrc: "/images/easter-eggs/experience-secret-devops.png",
+    photoAlt: "Секретное фото после десяти кликов по должности DevOps-инженер",
+    photoIntrinsicWidth: 1024,
+    photoIntrinsicHeight: 768,
+    modalHeading: "Дежурный кадр",
+    modalDescription: "Снимок с рабочего места — открывается только десятью кликами.",
+  },
+};
+
 type ExperienceItemProps = {
   title: string;
   company: string;
@@ -102,7 +126,11 @@ export const Experience = () => {
               />
 
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-                <h3 className="text-lg font-bold">{job.title}</h3>
+                {EXPERIENCE_EASTER_EGGS[job.title] ? (
+                  <ExperienceTitleEasterEgg title={job.title} {...EXPERIENCE_EASTER_EGGS[job.title]} />
+                ) : (
+                  <h3 className="text-lg font-bold">{job.title}</h3>
+                )}
                 {job.companyUrl ? (
                   <a
                     className="text-sm font-medium text-accent transition-colors hover:text-accent-light"

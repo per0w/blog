@@ -120,7 +120,7 @@ const MarqueeRow = ({ items, direction, speed }: SkillRow) => {
   const doubled = [...items, ...items];
 
   return (
-    <div className="skill-marquee-mask relative overflow-hidden">
+    <div className="skill-marquee-mask relative w-full max-w-full min-w-0 overflow-hidden">
       <div
         className={`skill-marquee flex gap-3 ${direction === "right" ? "skill-marquee--reverse" : ""}`}
         style={{ animationDuration: `${speed}s` }}
@@ -136,7 +136,7 @@ const MarqueeRow = ({ items, direction, speed }: SkillRow) => {
 export const Skills = () => {
   return (
     <motion.div
-      className="mx-auto mt-8 w-full max-w-3xl space-y-3"
+      className="mx-auto mt-8 w-full max-w-3xl min-w-0 space-y-3"
       initial={{ opacity: 0, y: 20 }}
       transition={{ duration: 0.5, ease: "easeOut" as const }}
       viewport={{ once: true, margin: "-60px" }}
