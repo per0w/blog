@@ -1,7 +1,10 @@
 "use client";
 
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
+
 import { motion } from "framer-motion";
+
+import { ScrambleRevealText } from "@/ui/scramble-reveal/scramble-reveal";
 
 type SectionProps = {
   id: string;
@@ -10,20 +13,26 @@ type SectionProps = {
 };
 
 export const Section = ({ id, children, title }: SectionProps) => {
+  const headingId = title ? `${id}-heading` : undefined;
+
   return (
     <motion.section
+      aria-labelledby={headingId}
+      className="mb-10 flex w-full max-w-full min-w-0 flex-col items-center justify-center md:mb-24"
       id={id}
       initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.6, ease: "easeOut" as const }}
-      className="mb-10 flex flex-col items-center justify-center md:mb-24"
+      viewport={{ once: true, margin: "-100px" }}
+      whileInView={{ opacity: 1, y: 0 }}
     >
-      {title && (
-        <h2 className="bg-linear-to-r from-accent via-accent-light to-accent-secondary bg-clip-text py-4 text-3xl font-bold tracking-tighter text-transparent">
-          {title}
-        </h2>
-      )}
+      {title ? (
+        <ScrambleRevealText
+          as="h2"
+          className="bg-linear-to-r from-accent via-accent-light to-accent-secondary bg-clip-text py-4 text-3xl font-bold tracking-tighter text-transparent"
+          id={headingId}
+          text={title}
+        />
+      ) : null}
       {children}
     </motion.section>
   );

@@ -2,14 +2,14 @@
 
 import { ThemeProvider } from "next-themes";
 
+import { AiBuddyDeferred } from "@/components/ai-buddy/ai-buddy-deferred";
 import { ParticlesBackground } from "@/components/particles/particles-background";
-import { AiBuddy } from "@/components/ai-buddy/ai-buddy";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider enableSystem attribute="class" defaultTheme="system">
       <ParticlesBackground />
-      <AiBuddy />
+      <AiBuddyDeferred />
       {children}
     </ThemeProvider>
   );

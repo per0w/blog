@@ -1,9 +1,11 @@
-import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Metadata } from "next";
+import { notFound } from "next/navigation";
 
-import { CustomMDX } from "@/components/mdx/mdx";
 import { formatDate, getBlogPosts } from "@/app/blog/utils";
+import { CustomMDX } from "@/components/mdx/mdx";
+import { MAIN_CONTENT_ID } from "@/constants/common";
+
+import type { Metadata } from "next";
 
 const BASE_URL = "https://per0w.space";
 
@@ -62,10 +64,13 @@ export default async function BlogPost(props: Params) {
   }
 
   return (
-    <section>
+    <main
+      aria-label="Страница заметки"
+      className="outline-none focus:outline-none"
+      id={MAIN_CONTENT_ID}
+      tabIndex={-1}
+    >
       <script
-        type="application/ld+json"
-        suppressHydrationWarning
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
@@ -84,22 +89,30 @@ export default async function BlogPost(props: Params) {
             },
           }),
         }}
+        suppressHydrationWarning
+        type="application/ld+json"
       />
 
-      <Link
-        href="/blog"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-muted transition-colors hover:text-accent"
-      >
-        ← Назад к блогу
-      </Link>
+      <nav aria-label="Хлебные крошки" className="mb-6">
+        <Link
+          className="inline-flex items-center gap-1 text-sm text-muted transition-colors hover:text-accent"
+          href="/blog"
+        >
+          ← Назад к заметкам
+        </Link>
+      </nav>
 
-      <h1 className="title text-2xl font-semibold tracking-tighter">{post.metadata.title}</h1>
-      <div className="mt-2 mb-8 flex items-center justify-between text-sm">
-        <p className="text-sm text-muted">{formatDate(post.metadata.publishedAt)}</p>
-      </div>
-      <article className="prose">
+      <article className="prose max-w-none">
+        <header className="not-prose mb-8">
+          <h1 className="title text-2xl font-semibold tracking-tighter">{post.metadata.title}</h1>
+          <p className="mt-2 text-sm text-muted">
+            <time dateTime={post.metadata.publishedAt}>
+              {formatDate(post.metadata.publishedAt)}
+            </time>
+          </p>
+        </header>
         <CustomMDX source={post.content} />
       </article>
-    </section>
+    </main>
   );
 }

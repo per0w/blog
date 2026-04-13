@@ -82,14 +82,81 @@
 }
 
 html {
-  min-width: 360px;
   scroll-behavior: smooth;
+  /* Любой «вылет» на пару px не должен давать горизонтальный скролл всей страницы */
+  overflow-x: clip;
+}
+
+body {
+  overflow-x: clip;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Орбо: лёгкая «левитация» виджета (отключается при reduced-motion). */
+@keyframes orbo-ambient-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.orbo-ambient-float {
+  animation: orbo-ambient-float 4.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbo-ambient-float {
+    animation: none;
+  }
 }
 
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans);
+}
+
+/* /cv: семейство задаётся next/font (переменная на обёртке из cv/layout.tsx) */
+.cv-page-root {
+  font-family: var(--font-cv-serif), ui-serif, Georgia, "Times New Roman", serif;
+}
+
+/* Первый фокус на странице: переход к основному содержимому (WCAG 2.4.1) */
+.skip-to-content {
+  position: fixed;
+  top: 0.75rem;
+  left: 50%;
+  z-index: 10000;
+  padding: 0.6rem 1rem;
+  border-radius: 0.75rem;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--color-accent) 45%, transparent);
+  transform: translate(-50%, -160%);
+  transition: transform 0.2s ease;
+}
+
+.skip-to-content:focus {
+  transform: translate(-50%, 0);
+  outline: 2px solid var(--color-foreground);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skip-to-content {
+    transition: none;
+  }
 }
 
 /* Градиентный фон в тёмной теме — от тёмно-фиолетового к чёрно-синему */
@@ -128,7 +195,7 @@ body {
   --sh-entity: #a78bfa;
 }
 
-/* Prose: стили для MDX-контента блога */
+/* Prose: стили для MDX-контента заметок */
 .prose .anchor {
   @apply invisible absolute no-underline;
   margin-left: -1em;
@@ -214,6 +281,34 @@ body {
   margin-bottom: 1.25em !important;
 }
 
+/*
+ * Глобальное правило `table { display: block }` ниже ломает сетку настоящих таблиц в MDX.
+ * В статьях блога возвращаем table-layout и границы ячеек.
+ */
+article.prose :where(table) {
+  display: table;
+  width: 100%;
+  max-width: 100%;
+  white-space: normal;
+  border-collapse: collapse;
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+  font-size: 0.95em;
+}
+
+article.prose :where(table) :where(th),
+article.prose :where(table) :where(td) {
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+article.prose :where(table) :where(thead th) {
+  background-color: var(--color-surface-hover);
+  font-weight: 600;
+}
+
 pre::-webkit-scrollbar {
   display: none;
 }
@@ -257,20 +352,12 @@ table {
 
 /* Маска: плавное затухание по краям */
 .skill-marquee-mask {
-  mask-image: linear-gradient(
-    to right,
-    transparent,
-    black 8%,
-    black 92%,
-    transparent
-  );
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent,
-    black 8%,
-    black 92%,
-    transparent
-  );
+  /* min-width: 0 — иначе во flex-колонке с items-center внутренняя лента max-content раздувает ширину макета */
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
 }
 
 @keyframes marquee-scroll {
@@ -312,6 +399,845 @@ table {
   }
 }
 
+/* Hero: имя в стиле HUD / cyberpunk — те же accent-цвета, хроматика + лёгкий скан */
+.hero-cyber-title-wrap {
+  position: relative;
+  display: inline-block;
+  line-height: 1.05;
+}
+
+.hero-cyber-hud {
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+  inset: -0.35em -0.5em;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 28%, transparent);
+  border-radius: 0.2em;
+  opacity: 0.65;
+  animation: hero-cyber-hud-pulse 5s ease-in-out infinite;
+}
+
+.hero-cyber-hud::before,
+.hero-cyber-hud::after {
+  content: "";
+  position: absolute;
+  width: 0.45em;
+  height: 0.45em;
+  border-color: var(--color-accent-secondary);
+  border-style: solid;
+  opacity: 0.85;
+}
+
+.hero-cyber-hud::before {
+  top: -1px;
+  left: -1px;
+  border-width: 2px 0 0 2px;
+}
+
+.hero-cyber-hud::after {
+  right: -1px;
+  bottom: -1px;
+  border-width: 0 2px 2px 0;
+}
+
+@keyframes hero-cyber-hud-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    border-color: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  }
+
+  50% {
+    opacity: 0.85;
+    border-color: color-mix(in srgb, var(--color-accent) 42%, transparent);
+  }
+}
+
+.hero-cyber-title-main {
+  position: relative;
+  z-index: 2;
+  animation: hero-cyber-main-glitch 6s ease-in-out infinite;
+}
+
+@keyframes hero-cyber-main-glitch {
+  0%,
+  94%,
+  100% {
+    transform: translate(0);
+    filter: none;
+  }
+
+  95% {
+    transform: translate(-1px, 0.5px);
+    filter: drop-shadow(1px 0 0 color-mix(in srgb, var(--color-accent) 55%, transparent));
+  }
+
+  96.5% {
+    transform: translate(1px, -0.5px);
+    filter: drop-shadow(
+      -1px 0 0 color-mix(in srgb, var(--color-accent-secondary) 55%, transparent)
+    );
+  }
+
+  98% {
+    transform: translate(0);
+    filter: none;
+  }
+}
+
+.hero-cyber-title-r,
+.hero-cyber-title-c {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  font: inherit;
+  font-weight: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  pointer-events: none;
+}
+
+.hero-cyber-title-r {
+  color: var(--color-accent);
+  opacity: 0.32;
+  mix-blend-mode: screen;
+  animation: hero-cyber-chroma-r 5.5s ease-in-out infinite;
+}
+
+.hero-cyber-title-c {
+  color: var(--color-accent-secondary);
+  opacity: 0.28;
+  mix-blend-mode: screen;
+  animation: hero-cyber-chroma-c 5.8s ease-in-out infinite;
+}
+
+.dark .hero-cyber-title-r {
+  opacity: 0.38;
+}
+
+.dark .hero-cyber-title-c {
+  opacity: 0.34;
+}
+
+@keyframes hero-cyber-chroma-r {
+  0%,
+  90%,
+  100% {
+    transform: translate(-1px, 0);
+    clip-path: inset(0 0 0 0);
+  }
+
+  92% {
+    transform: translate(-4px, 1px);
+    clip-path: inset(0 8% 12% 0);
+  }
+
+  94% {
+    transform: translate(3px, -1px);
+    clip-path: inset(8% 0 0 10%);
+  }
+
+  96% {
+    transform: translate(-1px, 0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes hero-cyber-chroma-c {
+  0%,
+  91%,
+  100% {
+    transform: translate(1px, 0);
+    clip-path: inset(0 0 0 0);
+  }
+
+  93% {
+    transform: translate(4px, -1px);
+    clip-path: inset(10% 0 0 8%);
+  }
+
+  95% {
+    transform: translate(-3px, 1px);
+    clip-path: inset(0 10% 8% 0);
+  }
+
+  97% {
+    transform: translate(1px, 0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.hero-cyber-scan {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 0.08em;
+  opacity: 0.07;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 1px,
+    color-mix(in srgb, var(--color-foreground) 12%, transparent) 1px,
+    color-mix(in srgb, var(--color-foreground) 12%, transparent) 2px
+  );
+  mix-blend-mode: overlay;
+  animation: hero-cyber-scan-move 7s linear infinite;
+}
+
+@keyframes hero-cyber-scan-move {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 0 100%;
+  }
+}
+
+/* Hero: кнопка CV — пульс + редкие «сбои» (кибер-глич) */
+.hero-cv-cta {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  animation:
+    hero-cv-glow-pulse 2.75s ease-in-out infinite,
+    hero-cv-cyber-glitch 12.5s linear infinite;
+}
+
+.hero-cv-cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transform: translateX(-120%) skewX(-12deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--color-accent) 45%, transparent),
+    color-mix(in srgb, var(--color-accent-secondary) 35%, transparent),
+    transparent
+  );
+  opacity: 0;
+  transition:
+    transform 0.65s ease,
+    opacity 0.35s ease;
+}
+
+.hero-cv-cta:hover::before {
+  transform: translateX(120%) skewX(-12deg);
+  opacity: 0.55;
+}
+
+.hero-cv-cta:hover {
+  animation: none;
+  border-color: color-mix(in srgb, var(--color-accent) 85%, transparent) !important;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 40%, transparent),
+    0 0 28px color-mix(in srgb, var(--color-accent) 35%, transparent),
+    0 0 48px color-mix(in srgb, var(--color-accent-secondary) 18%, transparent);
+}
+
+.hero-cv-cta:focus-visible {
+  animation: none;
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 70%, transparent);
+  outline-offset: 3px;
+}
+
+@keyframes hero-cv-glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 0%, transparent);
+  }
+
+  50% {
+    box-shadow:
+      0 0 16px color-mix(in srgb, var(--color-accent) 28%, transparent),
+      0 0 36px color-mix(in srgb, var(--color-accent-secondary) 12%, transparent);
+  }
+}
+
+/*
+ * Редкие вспышки «поломки» сигнала: сдвиг, skew, нарезка clip-path, краткий chroma.
+ * Длительный цикл — чтобы эффект не надоедал; шаги резкие, без плавного тленья.
+ */
+@keyframes hero-cv-cyber-glitch {
+  0%,
+  88%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    filter: none;
+    clip-path: inset(0 0 0 0);
+    border-color: color-mix(in srgb, var(--color-accent) 65%, transparent);
+  }
+
+  88.35% {
+    transform: translate3d(-3px, 1px, 0) skewX(-3deg);
+    filter: drop-shadow(2px 0 0 color-mix(in srgb, var(--color-accent-secondary) 55%, transparent))
+      drop-shadow(-2px 0 0 color-mix(in srgb, var(--color-accent) 45%, transparent));
+    clip-path: inset(0 0 62% 0);
+    border-color: color-mix(in srgb, var(--color-accent-secondary) 75%, transparent);
+  }
+
+  88.5% {
+    transform: translate3d(4px, -2px, 0) skewX(4deg);
+    clip-path: inset(58% 0 0 0);
+  }
+
+  88.65% {
+    transform: translate3d(-2px, 0, 0);
+    clip-path: inset(0 0 0 0);
+    filter: brightness(1.12) contrast(1.08);
+  }
+
+  88.8% {
+    transform: translate3d(0, 0, 0);
+    filter: none;
+    border-color: color-mix(in srgb, var(--color-accent) 65%, transparent);
+  }
+
+  93.2% {
+    transform: translate3d(2px, 0, 0);
+    clip-path: inset(22% 0 55% 0);
+  }
+
+  93.35% {
+    transform: translate3d(-5px, 1px, 0) skewX(-5deg);
+    clip-path: inset(48% 0 18% 0);
+    filter: hue-rotate(25deg) saturate(1.25);
+  }
+
+  93.5% {
+    transform: translate3d(3px, -1px, 0) skewX(3deg);
+    filter: none;
+    clip-path: inset(0 0 0 0);
+  }
+
+  93.65%,
+  97.5%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    filter: none;
+    clip-path: inset(0 0 0 0);
+    border-color: color-mix(in srgb, var(--color-accent) 65%, transparent);
+  }
+
+  97.65% {
+    transform: skewX(-7deg) translate3d(1px, 0, 0);
+    filter: drop-shadow(1px 0 0 color-mix(in srgb, var(--color-accent-light) 50%, transparent));
+  }
+
+  97.78% {
+    transform: skewX(5deg) translate3d(-2px, 0, 0);
+  }
+
+  97.9% {
+    transform: none;
+    filter: none;
+  }
+}
+
+/*
+ * Форма «Связаться»: кнопка «Отправить» — те же hero-cv-glow-pulse + hero-cv-cyber-glitch,
+ * блик при hover; на градиентной заливке бордер и свечение чуть светлее, чем у outline-CV.
+ */
+.contact-form-submit-cyber {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  animation:
+    hero-cv-glow-pulse 2.75s ease-in-out infinite,
+    hero-cv-cyber-glitch 12.5s linear infinite;
+}
+
+.contact-form-submit-cyber::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transform: translateX(-120%) skewX(-12deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, white 55%, transparent),
+    color-mix(in srgb, var(--color-accent-secondary) 42%, transparent),
+    transparent
+  );
+  opacity: 0;
+  transition:
+    transform 0.65s ease,
+    opacity 0.35s ease;
+}
+
+.contact-form-submit-cyber:hover:not(:disabled)::before {
+  transform: translateX(120%) skewX(-12deg);
+  opacity: 0.5;
+}
+
+.contact-form-submit-cyber:hover:not(:disabled) {
+  animation: none;
+  border-color: color-mix(in srgb, white 50%, transparent) !important;
+  filter: brightness(1.06);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 50%, transparent),
+    0 0 26px color-mix(in srgb, var(--color-accent) 42%, transparent),
+    0 0 52px color-mix(in srgb, var(--color-accent-secondary) 28%, transparent);
+}
+
+.contact-form-submit-cyber:focus-visible {
+  animation: none;
+  outline: 2px solid color-mix(in srgb, var(--color-accent-light) 85%, transparent);
+  outline-offset: 3px;
+}
+
+.contact-form-submit-cyber:disabled {
+  animation: none !important;
+  filter: none;
+}
+
+.contact-form-submit-cyber:disabled::before {
+  display: none;
+}
+
+@keyframes contact-form-ai-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 14px color-mix(in srgb, var(--color-accent-secondary) 38%, transparent),
+      0 0 0 1px color-mix(in srgb, cyan 22%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 22px color-mix(in srgb, var(--color-accent) 45%, transparent),
+      0 0 0 1px color-mix(in srgb, fuchsia 28%, transparent);
+  }
+}
+
+@keyframes contact-form-flood-nudge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}
+
+.contact-form-ai-badge {
+  animation: contact-form-ai-glow 2.2s ease-in-out infinite;
+}
+
+.contact-form-flood-banner {
+  animation: contact-form-flood-nudge 0.45s ease-out 1;
+}
+
+/*
+ * Блок «Контакты» / CTA: aurora-слой, сетка, скан-луч, свечение заголовка,
+ * стеклянные кнопки с бликом (в духе hero / cyber).
+ */
+.contact-cta-shell {
+  position: relative;
+  isolation: isolate;
+  box-shadow:
+    0 4px 28px color-mix(in srgb, var(--color-accent) 32%, transparent),
+    0 0 0 1px color-mix(in srgb, white 16%, transparent) inset;
+}
+
+.contact-cta-shell::before {
+  content: "";
+  position: absolute;
+  inset: -38%;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(
+      ellipse 44% 40% at 12% 22%,
+      color-mix(in srgb, white 26%, transparent),
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 40% 38% at 90% 78%,
+      color-mix(in srgb, var(--color-accent-secondary) 42%, transparent),
+      transparent 52%
+    );
+  mix-blend-mode: overlay;
+  opacity: 0.88;
+  animation: contact-cta-aurora 17s ease-in-out infinite;
+}
+
+.contact-cta-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background-image:
+    linear-gradient(color-mix(in srgb, white 10%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, white 10%, transparent) 1px, transparent 1px);
+  background-size: 22px 22px;
+  opacity: 0.3;
+  animation: contact-cta-grid-breathe 7.5s ease-in-out infinite;
+  mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+}
+
+@keyframes contact-cta-aurora {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  35% {
+    transform: translate(5%, -4%) scale(1.06);
+  }
+
+  70% {
+    transform: translate(-4%, 5%) scale(1.02);
+  }
+}
+
+@keyframes contact-cta-grid-breathe {
+  0%,
+  100% {
+    opacity: 0.24;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.contact-cta-scan-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.contact-cta-scanbeam {
+  position: absolute;
+  left: -8%;
+  width: 116%;
+  height: 42%;
+  top: -48%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in srgb, white 12%, transparent) 42%,
+    color-mix(in srgb, var(--color-accent-secondary) 22%, transparent) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  animation: contact-cta-scan-sweep 10s ease-in-out infinite;
+}
+
+@keyframes contact-cta-scan-sweep {
+  0%,
+  10%,
+  100% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+
+  14% {
+    opacity: 0.75;
+  }
+
+  46% {
+    transform: translateY(310%);
+    opacity: 0.55;
+  }
+
+  52% {
+    opacity: 0;
+  }
+}
+
+.contact-cta-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.contact-cta-title {
+  animation: contact-cta-title-pulse 5.5s ease-in-out infinite;
+  text-shadow:
+    0 0 22px color-mix(in srgb, white 20%, transparent),
+    0 2px 14px color-mix(in srgb, black 18%, transparent);
+}
+
+@keyframes contact-cta-title-pulse {
+  0%,
+  100% {
+    text-shadow:
+      0 0 18px color-mix(in srgb, white 16%, transparent),
+      0 0 36px color-mix(in srgb, var(--color-accent-secondary) 14%, transparent);
+  }
+
+  50% {
+    text-shadow:
+      0 0 34px color-mix(in srgb, white 30%, transparent),
+      0 0 52px color-mix(in srgb, var(--color-accent-secondary) 24%, transparent);
+  }
+}
+
+.contact-cta-sub {
+  text-shadow: 0 1px 14px color-mix(in srgb, black 22%, transparent);
+}
+
+.contact-cta-link {
+  position: relative;
+  isolation: isolate;
+  /* Иконки при hover scale/rotate не должны обрезаться (VK и др.). */
+  overflow: visible;
+  border: 1px solid color-mix(in srgb, white 30%, transparent);
+  background: color-mix(in srgb, white 13%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 2px 14px color-mix(in srgb, black 14%, transparent),
+    inset 0 1px 0 color-mix(in srgb, white 24%, transparent);
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    box-shadow 0.3s ease,
+    transform 0.22s ease;
+}
+
+.contact-cta-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transform: translateX(-130%) skewX(-14deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, white 38%, transparent),
+    transparent
+  );
+  opacity: 0;
+  transition:
+    transform 0.6s ease,
+    opacity 0.35s ease;
+}
+
+.contact-cta-link:hover {
+  border-color: color-mix(in srgb, white 58%, transparent);
+  background: color-mix(in srgb, white 27%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, white 22%, transparent),
+    0 8px 32px color-mix(in srgb, var(--color-accent-secondary) 30%, transparent),
+    0 0 48px color-mix(in srgb, white 14%, transparent);
+  transform: translateY(-3px);
+}
+
+.contact-cta-link:hover::before {
+  transform: translateX(130%) skewX(-14deg);
+  opacity: 0.55;
+}
+
+.contact-cta-link:active {
+  transform: translateY(-1px) scale(0.985);
+  transition-duration: 0.12s;
+}
+
+.contact-cta-link:focus-visible {
+  outline: 2px solid color-mix(in srgb, white 85%, transparent);
+  outline-offset: 3px;
+}
+
+.contact-cta-link > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Скрытый honeypot: не убирать с экрана иначе (доступность / автозаполнение) */
+.contact-form-honeypot-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/*
+ * Переключатель темы: восьмиугольный HUD, сетка, редкий скан-луч, пульс неона;
+ * класс --flip — короткий «сбой» при клике.
+ */
+.theme-switcher-cyber {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  width: 2.35rem;
+  height: 2.35rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  clip-path: polygon(14% 0%, 86% 0%, 100% 14%, 100% 86%, 86% 100%, 14% 100%, 0% 86%, 0% 14%);
+  cursor: pointer;
+  border: none;
+  background: color-mix(in srgb, var(--color-surface) 72%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 42%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-accent-secondary) 28%, transparent);
+  animation: theme-switcher-hud-glow 2.8s ease-in-out infinite;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.25s ease;
+}
+
+.theme-switcher-cyber:hover {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 65%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-accent-secondary) 45%, transparent),
+    0 0 16px color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
+
+.theme-switcher-cyber:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-accent-light) 80%, transparent);
+  outline-offset: 3px;
+  animation: none;
+}
+
+.theme-switcher-cyber::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.2;
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    color-mix(in srgb, var(--color-foreground) 07%, transparent) 1px,
+    color-mix(in srgb, var(--color-foreground) 07%, transparent) 2px
+  );
+}
+
+.theme-switcher-cyber::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -55%;
+  z-index: 1;
+  height: 45%;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--color-accent-secondary) 40%, transparent),
+    transparent
+  );
+  opacity: 0;
+  animation: theme-switcher-scan-sweep 7s ease-in-out infinite;
+}
+
+@keyframes theme-switcher-hud-glow {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 42%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--color-accent-secondary) 28%, transparent);
+  }
+
+  50% {
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 55%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--color-accent-secondary) 42%, transparent),
+      0 0 14px color-mix(in srgb, var(--color-accent-secondary) 26%, transparent);
+  }
+}
+
+@keyframes theme-switcher-scan-sweep {
+  0%,
+  10%,
+  100% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+
+  14% {
+    opacity: 0.5;
+  }
+
+  42% {
+    transform: translateY(320%);
+    opacity: 0.28;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+.theme-switcher-cyber--flip {
+  animation: theme-switcher-click-glitch 0.34s steps(2, end) 1;
+}
+
+.theme-switcher-cyber--flip::after {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes theme-switcher-click-glitch {
+  0% {
+    filter: none;
+    transform: scale(1);
+  }
+
+  20% {
+    filter: hue-rotate(95deg) contrast(1.15) brightness(1.12)
+      drop-shadow(2px 0 0 color-mix(in srgb, var(--color-accent-secondary) 60%, transparent));
+    transform: scale(1.06) skewX(-4deg);
+  }
+
+  45% {
+    filter: hue-rotate(-35deg) saturate(1.2);
+    transform: scale(0.94) skewX(3deg);
+  }
+
+  70% {
+    filter: brightness(1.08);
+    transform: scale(1.02);
+  }
+
+  100% {
+    filter: none;
+    transform: scale(1);
+  }
+}
+
+.theme-switcher-cyber--static {
+  animation: none !important;
+}
+
+.theme-switcher-cyber--static::after {
+  animation: none !important;
+  opacity: 0 !important;
+}
+
 /* Neon-glow: фиолетово-cyan свечение на hover */
 .neon-glow {
   transition:
@@ -340,7 +1266,7 @@ table {
       )
       border-box;
   animation: avatar-spin 16s linear infinite;
-  opacity: 0.6;
+  opacity: 0.48;
 }
 
 /* Контейнер-орбита для точки */
@@ -374,12 +1300,204 @@ table {
   }
 }
 
+/* Hero: обработка фото — контраст, неон-оверлей, виньетка, лёгкие сканлайны */
+.hero-photo-stack {
+  position: relative;
+}
+
+.hero-photo-stack .hero-photo-img {
+  filter: contrast(1.04) saturate(1.05);
+}
+
+.dark .hero-photo-stack .hero-photo-img {
+  filter: contrast(1.03) brightness(1.03) saturate(1.04);
+}
+
+.hero-photo-gradient {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.75rem;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-accent) 16%, transparent) 0%,
+    transparent 45%,
+    color-mix(in srgb, var(--color-accent-secondary) 14%, transparent) 100%
+  );
+  mix-blend-mode: overlay;
+}
+
+.hero-photo-vignette {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.75rem;
+  pointer-events: none;
+  box-shadow: inset 0 0 56px color-mix(in srgb, var(--color-background) 55%, transparent);
+}
+
+.hero-photo-scanlines {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.75rem;
+  pointer-events: none;
+  opacity: 0.055;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    color-mix(in srgb, var(--color-foreground) 7%, transparent) 2px,
+    color-mix(in srgb, var(--color-foreground) 7%, transparent) 3px
+  );
+  animation: hero-scan-drift 10s linear infinite;
+}
+
+.hero-photo-corner-accent {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0 0.75rem 0 0;
+  pointer-events: none;
+  background: linear-gradient(
+    225deg,
+    color-mix(in srgb, var(--color-accent-secondary) 28%, transparent),
+    transparent 75%
+  );
+}
+
+@keyframes hero-scan-drift {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 0 100%;
+  }
+}
+
+/* Карточки проектов: неон-тень, блик, лёгкий глитч контейнера при hover */
+.group\/project-card {
+  transform: translateZ(0);
+}
+
+.group\/project-card:hover {
+  box-shadow:
+    0 14px 44px color-mix(in srgb, var(--color-accent) 16%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 32%, transparent);
+}
+
+.project-card-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background: linear-gradient(
+    105deg,
+    transparent 34%,
+    color-mix(in srgb, var(--color-accent) 22%, transparent) 50%,
+    transparent 66%
+  );
+  mix-blend-mode: soft-light;
+}
+
+.group\/project-card:hover .project-card-media::after {
+  opacity: 1;
+}
+
+.project-card-media img {
+  transition:
+    filter 0.35s ease,
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.group\/project-card:hover .project-card-media img {
+  filter: brightness(1.06) contrast(1.04);
+  transform: scale(1.04);
+}
+
+@keyframes project-card-glitch {
+  0%,
+  100% {
+    transform: translate(0);
+  }
+
+  33% {
+    transform: translate(-1px, 0.5px);
+  }
+
+  66% {
+    transform: translate(1px, -0.5px);
+  }
+}
+
+.group\/project-card:hover .project-card-media {
+  animation: project-card-glitch 0.4s steps(2, end) 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .glitch-text,
   .avatar-ring,
   .avatar-dot-orbit,
   .skill-marquee {
     animation: none;
+  }
+
+  .hero-cyber-hud,
+  .hero-cyber-title-main,
+  .hero-cyber-title-r,
+  .hero-cyber-title-c,
+  .hero-cyber-scan {
+    animation: none !important;
+  }
+
+  .hero-cv-cta,
+  .contact-form-submit-cyber,
+  .contact-form-ai-badge,
+  .contact-form-flood-banner,
+  .theme-switcher-cyber,
+  .theme-switcher-cyber::after {
+    animation: none !important;
+  }
+
+  .hero-photo-scanlines {
+    animation: none;
+    opacity: 0.05;
+  }
+
+  .group\/project-card:hover .project-card-media {
+    animation: none;
+  }
+
+  .group\/project-card:hover .project-card-media img {
+    transform: none;
+  }
+
+  .contact-cta-shell::before,
+  .contact-cta-shell::after,
+  .contact-cta-scanbeam,
+  .contact-cta-title {
+    animation: none !important;
+  }
+
+  .contact-cta-shell::before {
+    transform: none !important;
+    opacity: 0.45;
+  }
+
+  .contact-cta-shell::after {
+    opacity: 0.28;
+  }
+
+  .contact-cta-scanbeam {
+    opacity: 0 !important;
+  }
+
+  .contact-cta-link:hover,
+  .contact-cta-link:active {
+    transform: none;
   }
 }
 
@@ -398,11 +1516,37 @@ table {
   footer,
   nav,
   canvas,
+  .skip-to-content,
+  .contact-cta-shell::before,
+  .contact-cta-shell::after,
+  .contact-cta-scan-wrap,
   .neon-glow,
   .glitch-text,
   .avatar-ring,
-  .avatar-dot-orbit {
+  .avatar-dot-orbit,
+  .hero-photo-gradient,
+  .hero-photo-vignette,
+  .hero-photo-scanlines,
+  .hero-photo-corner-accent {
     display: none !important;
+  }
+
+  .hero-photo-stack .hero-photo-img {
+    filter: none !important;
+  }
+
+  .hero-cyber-hud,
+  .hero-cyber-title-r,
+  .hero-cyber-title-c,
+  .hero-cyber-scan {
+    display: none !important;
+  }
+
+  .hero-cyber-title-main {
+    animation: none !important;
+    background: none !important;
+    color: black !important;
+    -webkit-text-fill-color: black !important;
   }
 
   main {

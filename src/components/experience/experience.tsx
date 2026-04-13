@@ -5,6 +5,30 @@ import { motion } from "framer-motion";
 import { SECTIONS_IDS } from "@/constants/common";
 import { Section } from "@/ui/section/section";
 
+import {
+  ExperienceTitleEasterEgg,
+  type ExperienceTitleEasterEggProps,
+} from "./experience-title-easter-egg";
+
+const EXPERIENCE_EASTER_EGGS: Record<string, Omit<ExperienceTitleEasterEggProps, "title">> = {
+  "Frontend Team Lead": {
+    photoSrc: "/images/easter-eggs/experience-secret-frontend-lead.png",
+    photoAlt: "Секретное фото после десяти кликов по должности Frontend Team Lead",
+    photoIntrinsicWidth: 768,
+    photoIntrinsicHeight: 1024,
+    modalHeading: "Секрет тимлида",
+    modalDescription: "Личный кадр — награда за десять нажатий по заголовку.",
+  },
+  "DevOps-инженер": {
+    photoSrc: "/images/easter-eggs/experience-secret-devops.png",
+    photoAlt: "Секретное фото после десяти кликов по должности DevOps-инженер",
+    photoIntrinsicWidth: 1024,
+    photoIntrinsicHeight: 768,
+    modalHeading: "Дежурный кадр",
+    modalDescription: "Снимок с рабочего места — открывается только десятью кликами.",
+  },
+};
+
 type ExperienceItemProps = {
   title: string;
   company: string;
@@ -46,8 +70,7 @@ const JOBS: ExperienceItemProps[] = [
     company: "Optimax Dev",
     companyUrl: "https://optimax.dev",
     title: "Frontend-разработчик",
-    description:
-      "Разработка e-commerce платформ для международных клиентов (GlassesUSA и др.).",
+    description: "Разработка e-commerce платформ для международных клиентов (GlassesUSA и др.).",
     highlights: [
       "Внедрение SSR — улучшение Core Web Vitals и конверсии",
       "Рост до Team Lead за счёт высокой личной эффективности",
@@ -87,12 +110,12 @@ export const Experience = () => {
           {JOBS.map((job, index) => (
             <motion.li
               key={`${job.company}-${job.title}`}
-              variants={itemVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
               className="relative pb-10 pl-8 last:pb-0"
+              initial="hidden"
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+              variants={itemVariants}
+              viewport={{ once: true, margin: "-50px" }}
+              whileInView="visible"
             >
               <div
                 className={`absolute top-1.5 -left-[7px] h-3 w-3 rounded-full ${
@@ -103,13 +126,17 @@ export const Experience = () => {
               />
 
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-                <h3 className="text-lg font-bold">{job.title}</h3>
+                {EXPERIENCE_EASTER_EGGS[job.title] ? (
+                  <ExperienceTitleEasterEgg title={job.title} {...EXPERIENCE_EASTER_EGGS[job.title]} />
+                ) : (
+                  <h3 className="text-lg font-bold">{job.title}</h3>
+                )}
                 {job.companyUrl ? (
                   <a
-                    href={job.companyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="text-sm font-medium text-accent transition-colors hover:text-accent-light"
+                    href={job.companyUrl}
+                    rel="noopener noreferrer"
+                    target="_blank"
                   >
                     {job.company} ↗
                   </a>

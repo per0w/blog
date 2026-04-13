@@ -7,8 +7,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix --max-warnings 0",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -25,6 +25,7 @@
     "nextjs-toploader": "^3.9.17",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
+    "remark-gfm": "^4.0.1",
     "sugar-high": "^1.1.0"
   },
   "devDependencies": {

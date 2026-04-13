@@ -1,6 +1,7 @@
 "use client";
 
-import { type ComponentType } from "react";
+import type { ComponentType } from "react";
+
 import { motion } from "framer-motion";
 import { Brain, Sparkles, Bot, Cpu, Workflow } from "lucide-react";
 
@@ -42,9 +43,16 @@ type SkillRow = {
   speed: number;
 };
 
-const LucideIcon =
-  (Icon: ComponentType<{ className?: string; size?: number }>) =>
-  ({ className }: { className?: string }) => <Icon size={20} className={className} />;
+function lucideIcon(
+  Icon: ComponentType<{ className?: string; size?: number }>,
+): ComponentType<{ className?: string }> {
+  function LucideIconWrapped({ className }: { className?: string }) {
+    return <Icon className={className} size={20} />;
+  }
+  const iconLabel = Icon.displayName ?? Icon.name ?? "Icon";
+  LucideIconWrapped.displayName = `LucideIcon(${iconLabel})`;
+  return LucideIconWrapped;
+}
 
 const SKILL_ROWS: SkillRow[] = [
   {
@@ -87,14 +95,14 @@ const SKILL_ROWS: SkillRow[] = [
     direction: "left",
     speed: 40,
     items: [
-      { name: "AI / LLM", icon: LucideIcon(Brain) },
-      { name: "Cursor AI", icon: LucideIcon(Sparkles) },
-      { name: "ChatGPT", icon: LucideIcon(Bot) },
-      { name: "Claude", icon: LucideIcon(Cpu) },
-      { name: "Prompt Engineering", icon: LucideIcon(Workflow) },
-      { name: "GitHub Copilot", icon: LucideIcon(Sparkles) },
-      { name: "AI Agents", icon: LucideIcon(Bot) },
-      { name: "RAG / Embeddings", icon: LucideIcon(Brain) },
+      { name: "AI / LLM", icon: lucideIcon(Brain) },
+      { name: "Cursor AI", icon: lucideIcon(Sparkles) },
+      { name: "ChatGPT", icon: lucideIcon(Bot) },
+      { name: "Claude", icon: lucideIcon(Cpu) },
+      { name: "Prompt Engineering", icon: lucideIcon(Workflow) },
+      { name: "GitHub Copilot", icon: lucideIcon(Sparkles) },
+      { name: "AI Agents", icon: lucideIcon(Bot) },
+      { name: "RAG / Embeddings", icon: lucideIcon(Brain) },
     ],
   },
 ];
@@ -112,7 +120,7 @@ const MarqueeRow = ({ items, direction, speed }: SkillRow) => {
   const doubled = [...items, ...items];
 
   return (
-    <div className="skill-marquee-mask relative overflow-hidden">
+    <div className="skill-marquee-mask relative w-full max-w-full min-w-0 overflow-hidden">
       <div
         className={`skill-marquee flex gap-3 ${direction === "right" ? "skill-marquee--reverse" : ""}`}
         style={{ animationDuration: `${speed}s` }}
@@ -128,11 +136,11 @@ const MarqueeRow = ({ items, direction, speed }: SkillRow) => {
 export const Skills = () => {
   return (
     <motion.div
-      className="mx-auto mt-8 w-full max-w-3xl space-y-3"
+      className="mx-auto mt-8 w-full max-w-3xl min-w-0 space-y-3"
       initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.5, ease: "easeOut" as const }}
+      viewport={{ once: true, margin: "-60px" }}
+      whileInView={{ opacity: 1, y: 0 }}
     >
       {SKILL_ROWS.map((row, i) => (
         <MarqueeRow key={i} {...row} />

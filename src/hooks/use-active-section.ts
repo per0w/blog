@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+
 import { SECTIONS_IDS } from "@/constants/common";
 
 const SECTION_IDS_LIST = Object.values(SECTIONS_IDS);

@@ -1,45 +1,64 @@
 "use client";
 
-import { type ReactNode } from "react";
-import { motion } from "framer-motion";
+import type { ReactNode } from "react";
+
+import { motion, useReducedMotion } from "framer-motion";
 
 type AvatarFrameProps = {
   children: ReactNode;
 };
 
 export const AvatarFrame = ({ children }: AvatarFrameProps) => {
+  const reduced = useReducedMotion();
+
   return (
-    <div className="relative flex items-center justify-center p-6">
-      {/* Мягкая aura — дышащее свечение за фото */}
+    <div className="relative flex w-full max-w-full items-center justify-center overflow-x-clip py-2 md:py-3">
+      {/* Мягкая aura — компактнее, без «облака» */}
       <motion.div
-        className="absolute inset-2 rounded-2xl bg-linear-to-br from-accent/20 via-accent-secondary/10 to-accent-light/20 blur-3xl"
-        animate={{
-          scale: [1, 1.06, 1],
-          opacity: [0.25, 0.45, 0.25],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut" as const,
-        }}
+        className="absolute inset-4 rounded-xl bg-linear-to-br from-accent/14 via-accent-secondary/8 to-accent-light/12 blur-2xl md:inset-3 md:rounded-[0.85rem]"
+        animate={
+          reduced
+            ? { scale: 1, opacity: 0.28 }
+            : {
+                scale: [1, 1.04, 1],
+                opacity: [0.18, 0.32, 0.18],
+              }
+        }
+        transition={
+          reduced
+            ? { duration: 0 }
+            : {
+                duration: 8,
+                repeat: Infinity,
+                ease: "easeInOut" as const,
+              }
+        }
       />
 
       {/* Одно медленное кольцо — conic gradient border */}
-      <div className="avatar-ring absolute inset-[-4px] rounded-2xl" />
+      <div className="avatar-ring absolute inset-[-2px] rounded-xl" />
 
-      {/* Две тихие орбитальные точки */}
-      <div className="avatar-dot-orbit absolute inset-[-10px]" style={{ animationDuration: "20s" }}>
+      {/* Две тихие орбитальные точки — ближе к кадру */}
+      <div className="avatar-dot-orbit absolute inset-[-6px]" style={{ animationDuration: "22s" }}>
         <span className="avatar-dot avatar-dot--accent" style={{ top: 0, left: "45%" }} />
       </div>
       <div
-        className="avatar-dot-orbit absolute inset-[-10px]"
-        style={{ animationDuration: "26s", animationDirection: "reverse" }}
+        className="avatar-dot-orbit absolute inset-[-6px]"
+        style={{ animationDuration: "28s", animationDirection: "reverse" }}
       >
         <span className="avatar-dot avatar-dot--cyan" style={{ bottom: 0, right: "40%" }} />
       </div>
 
-      {/* Фото */}
-      <div className="relative z-10 overflow-hidden rounded-2xl">{children}</div>
+      {/* Фото: фильтры + неон-оверлей, виньетка, лёгкие сканлайны */}
+      <div className="hero-photo-shell relative z-10 overflow-hidden rounded-xl shadow-[0_8px_32px_-8px_color-mix(in_srgb,var(--color-accent)_22%,transparent)]">
+        <div className="hero-photo-stack relative">
+          {children}
+          <div aria-hidden className="hero-photo-gradient" />
+          <div aria-hidden className="hero-photo-vignette" />
+          <div aria-hidden className="hero-photo-scanlines" />
+          <div aria-hidden className="hero-photo-corner-accent" />
+        </div>
+      </div>
     </div>
   );
 };
