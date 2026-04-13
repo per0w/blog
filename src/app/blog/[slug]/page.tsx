@@ -3,11 +3,9 @@ import { notFound } from "next/navigation";
 
 import { formatDate, getBlogPosts } from "@/app/blog/utils";
 import { CustomMDX } from "@/components/mdx/mdx";
-import { MAIN_CONTENT_ID } from "@/constants/common";
+import { MAIN_CONTENT_ID, SITE_ORIGIN } from "@/constants/common";
 
 import type { Metadata } from "next";
-
-const BASE_URL = "https://per0w.space";
 
 export async function generateStaticParams() {
   const posts = getBlogPosts();
@@ -33,7 +31,9 @@ export async function generateMetadata(props: Params) {
   }
 
   const { title, publishedAt: publishedTime, description, image } = post.metadata;
-  const ogImage = image ? image : `${BASE_URL}/og?title=${encodeURIComponent(title)}`;
+  const ogImage = image
+    ? `${SITE_ORIGIN}${image}`
+    : `${SITE_ORIGIN}/og?title=${encodeURIComponent(title)}`;
 
   return {
     title: `${title} | per0w.space`,
@@ -43,7 +43,7 @@ export async function generateMetadata(props: Params) {
       description,
       type: "article",
       publishedTime,
-      url: `${BASE_URL}/blog/${post.slug}`,
+      url: `${SITE_ORIGIN}/blog/${post.slug}`,
       images: [{ url: ogImage }],
     },
     twitter: {
@@ -80,9 +80,9 @@ export default async function BlogPost(props: Params) {
             dateModified: post.metadata.publishedAt,
             description: post.metadata.description,
             image: post.metadata.image
-              ? `${BASE_URL}${post.metadata.image}`
-              : `${BASE_URL}/og?title=${encodeURIComponent(post.metadata.title)}`,
-            url: `${BASE_URL}/blog/${post.slug}`,
+              ? `${SITE_ORIGIN}${post.metadata.image}`
+              : `${SITE_ORIGIN}/og?title=${encodeURIComponent(post.metadata.title)}`,
+            url: `${SITE_ORIGIN}/blog/${post.slug}`,
             author: {
               "@type": "Person",
               name: "Владимир Перов",
