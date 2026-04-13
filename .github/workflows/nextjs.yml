@@ -42,7 +42,8 @@ jobs:
         env:
           GITHUB_PAGES: "true"
           NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY: ${{ secrets.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY }}
-          NEXT_PUBLIC_GEMINI_API_KEY: ${{ secrets.NEXT_PUBLIC_GEMINI_API_KEY }}
+          NEXT_PUBLIC_OPENROUTER_API_KEY: ${{ secrets.NEXT_PUBLIC_OPENROUTER_API_KEY }}
+          NEXT_PUBLIC_OPENROUTER_MODEL: ${{ secrets.NEXT_PUBLIC_OPENROUTER_MODEL }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

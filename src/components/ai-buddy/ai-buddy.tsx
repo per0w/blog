@@ -8,6 +8,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Sparkles, X } from "lucide-react";
 
 import { ORBO_CONTACT_SPAM_EVENT, ORBO_MAX_HOVER_EVENT, SECTIONS_IDS } from "@/constants/common";
+import { getOpenRouterApiKey } from "@/constants/contact-form";
+import { openRouterChatCompletion } from "@/utils/openrouter-client";
 
 // --- Данные ---
 
@@ -578,6 +580,32 @@ function getRandomComment(sectionId: string): string {
 }
 
 async function getAiComment(sectionId: string): Promise<string | null> {
+  const sectionName = SECTION_NAMES[sectionId] ?? sectionId;
+  const prompt = AI_PROMPT_TEMPLATE(sectionName);
+
+  /* Тот же ключ, что и у формы: OpenRouter работает в любом браузере. */
+  if (getOpenRouterApiKey()) {
+    const ac = new AbortController();
+    const t = window.setTimeout(() => ac.abort(), 8_000);
+    try {
+      const or = await openRouterChatCompletion({
+        userContent: prompt,
+        maxTokens: 120,
+        temperature: 0.55,
+        xTitle: "per0w.space — Орбо",
+        signal: ac.signal,
+      });
+      if (or.ok) {
+        const line = or.text.replace(/\s+/g, " ").trim().slice(0, 280);
+        return line || null;
+      }
+    } catch {
+      /* падаем на встроенную модель Chrome */
+    } finally {
+      window.clearTimeout(t);
+    }
+  }
+
   try {
     if (typeof LanguageModel === "undefined") return null;
 
@@ -589,8 +617,7 @@ async function getAiComment(sectionId: string): Promise<string | null> {
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), AI_TIMEOUT)),
     ]);
 
-    const sectionName = SECTION_NAMES[sectionId] ?? sectionId;
-    const result = await session.prompt(AI_PROMPT_TEMPLATE(sectionName));
+    const result = await session.prompt(prompt);
     session.destroy();
 
     return result?.trim() || null;

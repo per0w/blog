@@ -5,8 +5,15 @@
  */
 export const WEB3FORMS_SUBMIT_URL = "https://api.web3forms.com/submit" as const;
 
-/** Модель Gemini для черновика письма (бесплатный tier — в Google AI Studio). */
-export const CONTACT_FORM_GEMINI_MODEL = "gemini-2.0-flash" as const;
+/** Chat Completions API OpenRouter (OpenAI-совместимый). */
+export const CONTACT_FORM_OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions" as const;
+
+/**
+ * Бесплатная модель по умолчанию (суффикс `:free` в каталоге OpenRouter).
+ * Переопределение: `NEXT_PUBLIC_OPENROUTER_MODEL` в .env / CI.
+ */
+export const CONTACT_FORM_OPENROUTER_MODEL_DEFAULT =
+  "meta-llama/llama-3.2-3b-instruct:free" as const;
 
 export const CONTACT_FORM_LIMITS = {
   nameMax: 120,
@@ -64,9 +71,14 @@ export function getWeb3FormsAccessKey(): string {
 }
 
 /**
- * Ключ Gemini в бандле — виден в DevTools. В Google Cloud задайте ограничения по referrer / IP.
+ * Ключ OpenRouter в бандле — виден в DevTools. В кабинете OpenRouter ограничьте ключ по referrer / лимитам.
  * Без ключа кнопка «AI» не показывается.
  */
-export function getGeminiApiKey(): string {
-  return process.env.NEXT_PUBLIC_GEMINI_API_KEY?.trim() ?? "";
+export function getOpenRouterApiKey(): string {
+  return process.env.NEXT_PUBLIC_OPENROUTER_API_KEY?.trim() ?? "";
+}
+
+export function getOpenRouterModel(): string {
+  const m = process.env.NEXT_PUBLIC_OPENROUTER_MODEL?.trim();
+  return m && m.length > 0 ? m : CONTACT_FORM_OPENROUTER_MODEL_DEFAULT;
 }

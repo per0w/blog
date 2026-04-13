@@ -4,12 +4,9 @@ import { useState } from "react";
 
 import { Loader2, Sparkles } from "lucide-react";
 
-import {
-  CONTACT_FORM_GEMINI_MODEL,
-  CONTACT_FORM_LIMITS,
-  getGeminiApiKey,
-} from "@/constants/contact-form";
+import { CONTACT_FORM_LIMITS, getOpenRouterApiKey } from "@/constants/contact-form";
 import { sanitizeContactText } from "@/utils/contact-form";
+import { openRouterChatCompletion } from "@/utils/openrouter-client";
 
 type Props = {
   draft: string;
@@ -17,25 +14,11 @@ type Props = {
   disabled: boolean;
 };
 
-function extractGeminiText(data: unknown): string | null {
-  if (!data || typeof data !== "object") return null;
-  const cands = (data as { candidates?: unknown }).candidates;
-  if (!Array.isArray(cands) || cands.length === 0) return null;
-  const first = cands[0];
-  if (!first || typeof first !== "object") return null;
-  const content = (first as { content?: unknown }).content;
-  if (!content || typeof content !== "object") return null;
-  const parts = (content as { parts?: unknown }).parts;
-  if (!Array.isArray(parts) || parts.length === 0) return null;
-  const part = parts[0] as { text?: unknown };
-  return typeof part.text === "string" ? part.text : null;
-}
-
 /**
- * Опциональная подсказка текста через Gemini (ключ только NEXT_PUBLIC_* — см. README).
+ * Опциональная подсказка текста через OpenRouter (бесплатные :free модели — см. README).
  */
 export function ContactFormAiAssist({ draft, onApply, disabled }: Props) {
-  const apiKey = getGeminiApiKey();
+  const apiKey = getOpenRouterApiKey();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,39 +32,27 @@ export function ContactFormAiAssist({ draft, onApply, disabled }: Props) {
       return;
     }
     const safe = sanitizeContactText(trimmed, CONTACT_FORM_LIMITS.messageMax);
-    setLoading(true);
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${CONTACT_FORM_GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`;
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: `Ты редактор писем. Переформулируй черновик на русском: вежливо, по делу, без markdown и HTML, без мета-фраз про нейросеть. Не больше 1200 символов.
+    const prompt = `Ты редактор писем. Переформулируй черновик на русском: вежливо, по делу, без markdown и HTML, без мета-фраз про нейросеть. Не больше 1200 символов.
 
 Черновик:
-${safe}`,
-                },
-              ],
-            },
-          ],
-          generationConfig: { maxOutputTokens: 768, temperature: 0.35 },
-        }),
+${safe}`;
+
+    setLoading(true);
+    try {
+      const result = await openRouterChatCompletion({
+        userContent: prompt,
+        maxTokens: 768,
+        temperature: 0.35,
+        xTitle: "per0w.space — форма контактов",
       });
-      const data: unknown = await res.json().catch(() => null);
-      if (!res.ok) {
-        setError("AI временно недоступен или сработал лимит. Попробуй позже.");
+      if (!result.ok) {
+        let msg = "AI временно недоступен или сработал лимит. Попробуй позже.";
+        if (result.hint) msg = `AI: ${result.hint}`;
+        else if (result.network) msg = "Сеть недоступна. Проверь соединение.";
+        setError(msg);
         return;
       }
-      const text = extractGeminiText(data);
-      if (!text) {
-        setError("Пустой ответ — упрости формулировку и повтори.");
-        return;
-      }
-      onApply(sanitizeContactText(text.trim(), CONTACT_FORM_LIMITS.messageMax).trim());
+      onApply(sanitizeContactText(result.text, CONTACT_FORM_LIMITS.messageMax).trim());
     } catch {
       setError("Сеть недоступна. Проверь соединение.");
     } finally {
