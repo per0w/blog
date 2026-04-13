@@ -13,6 +13,7 @@ import remarkGfm from "remark-gfm";
 import { highlight } from "sugar-high";
 
 import { LivePlayground } from "@/components/mdx/live-playground";
+import { withBasePath } from "@/constants/base-path";
 
 type TablProps = {
   data: {
@@ -69,6 +70,21 @@ function RoundedImage(props: RoundedImageProps) {
   return <Image className="rounded-lg" {...props} alt={props.alt} />;
 }
 
+/**
+ * Markdown-изображения: путь из public/ без учёта basePath — дописываем для GitHub Pages.
+ * Не next/image: в MDX у картинок нет единых width/height.
+ */
+function MdxImg(
+  props: DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>,
+) {
+  const { src, alt, ...rest } = props;
+  const resolved = typeof src === "string" ? withBasePath(src) : src;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img {...rest} alt={alt ?? ""} src={resolved} />
+  );
+}
+
 function Code({
   children,
   ...props
@@ -120,6 +136,7 @@ const components = {
   h5: createHeading(5),
   h6: createHeading(6),
   Image: RoundedImage,
+  img: MdxImg,
   a: CustomLink,
   code: Code,
   LivePlayground,

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { withBasePath } from "@/constants/base-path";
 import { Tags } from "@/ui/tags/tags";
 
 import { BlogPostPreviewArt } from "./blog-post-preview-art";
@@ -54,7 +55,7 @@ export function BlogPostCard({
                 alt=""
                 className="size-full object-cover"
                 height={160}
-                src={coverImage}
+                src={withBasePath(coverImage)}
                 width={160}
               />
             ) : (
