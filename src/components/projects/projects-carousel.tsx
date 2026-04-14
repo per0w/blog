@@ -9,12 +9,24 @@ type ProjectsCarouselProps = {
   children: ReactNode;
   /** Число карточек (для точек и кнопок) */
   itemCount: number;
+  /** Подпись над лентой; если не задана — нейтральная подсказка про свайп и стрелки */
+  helperText?: string;
+  /** Текст для screen reader заголовка региона */
+  ariaLabel?: string;
 };
 
 /**
  * Горизонтальная лента проектов: меньше высоты секции, удобно листать эйчарам с десктопа и с телефона.
  */
-export const ProjectsCarousel = ({ children, itemCount }: ProjectsCarouselProps) => {
+const DEFAULT_HELPER =
+  "Листайте карточки свайпом или стрелками — так секция не разрастается по вертикали при новых проектах.";
+
+export const ProjectsCarousel = ({
+  children,
+  itemCount,
+  helperText = DEFAULT_HELPER,
+  ariaLabel = "Горизонтальная карусель карточек",
+}: ProjectsCarouselProps) => {
   const reduceMotion = useReducedMotion();
   const scrollerRef = useRef<HTMLDivElement>(null);
   const regionId = useId();
@@ -124,12 +136,9 @@ export const ProjectsCarousel = ({ children, itemCount }: ProjectsCarouselProps)
       className="relative w-full max-w-5xl px-1 sm:px-2"
     >
       <p className="sr-only" id={`${regionId}-title`}>
-        Проекты — горизонтальная лента. Используйте кнопки или свайп, чтобы листать карточки.
+        {ariaLabel}. Используйте кнопки или свайп, чтобы листать.
       </p>
-      <p className="mb-3 text-center text-xs text-muted sm:text-sm">
-        Листайте карточки — клик по карточке откроет проект в новой вкладке. Стек и суть задачи на
-        карточке.
-      </p>
+      <p className="mb-3 text-center text-xs text-muted sm:text-sm">{helperText}</p>
 
       <div className="flex items-stretch gap-2 sm:gap-3">
         <button
@@ -146,7 +155,7 @@ export const ProjectsCarousel = ({ children, itemCount }: ProjectsCarouselProps)
         <div className="min-w-0 flex-1 touch-pan-x">
           <div
             ref={scrollerRef}
-            className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth py-2 pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex snap-x snap-mandatory items-stretch gap-4 overflow-x-auto scroll-smooth py-2 pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             id={`${regionId}-track`}
             tabIndex={0}
             onKeyDown={(e) => {

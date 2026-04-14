@@ -46,10 +46,12 @@ const JOBS: ExperienceItemProps[] = [
     description:
       "Полный цикл разработки в одном из крупнейших банков России — от аналитики и проектирования API-контрактов до frontend-реализации и настройки CI/CD.",
     highlights: [
+      "Микрофронтенды на React и Module Federation: автономные модули, которые подключаются к единому каркасу приложения банка",
+      "Продуктовые и маркетинговые лендинги — от согласования требований до выката и сопровождения",
+      "Сценарии подписания документов с квалифицированной электронной подписью (КЭП) в браузере",
+      "Конструктор форм: динамическая сборка полей и валидаций под каждый лендинг — без копипасты вёрстки с нуля",
       "Аналитика задач под ключ: декомпозиция, проектирование контрактов бэкенда, реализация фронтенда",
-      "Легаси-проекты и микросервисы на современном стеке экосистемы React",
-      "DevOps-практики: CI/CD пайплайны, скрипты деплоя, настройка TeamCity",
-      "Рефакторинг архитектуры — ускорение внедрения новых фич в 2×",
+      "DevOps-практики: CI/CD, TeamCity; рефакторинг архитектуры ускорил внедрение новых фич примерно вдвое",
       "Менторинг и онбординг разработчиков в команде",
     ],
     current: true,
@@ -70,7 +72,8 @@ const JOBS: ExperienceItemProps[] = [
     company: "Optimax Dev",
     companyUrl: "https://optimax.dev",
     title: "Frontend-разработчик",
-    description: "Разработка e-commerce платформ для международных клиентов (GlassesUSA и др.).",
+    description:
+      "Разработка e-commerce платформ для международных клиентов: высокие нагрузки, SSR и чувствительные checkout-сценарии.",
     highlights: [
       "Внедрение SSR — улучшение Core Web Vitals и конверсии",
       "Рост до Team Lead за счёт высокой личной эффективности",
@@ -127,7 +130,10 @@ export const Experience = () => {
 
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
                 {EXPERIENCE_EASTER_EGGS[job.title] ? (
-                  <ExperienceTitleEasterEgg title={job.title} {...EXPERIENCE_EASTER_EGGS[job.title]} />
+                  <ExperienceTitleEasterEgg
+                    title={job.title}
+                    {...EXPERIENCE_EASTER_EGGS[job.title]}
+                  />
                 ) : (
                   <h3 className="text-lg font-bold">{job.title}</h3>
                 )}

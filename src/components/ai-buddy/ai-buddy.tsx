@@ -30,6 +30,7 @@ import {
   getCvActionComment,
   getCvItemComment,
   getCvSectionComment,
+  getImpactProjectCardHoverComment,
   getRandomComment,
   getSelectionComment,
   IDLE_COMMENTS,
@@ -689,6 +690,11 @@ export function AiBuddy() {
             showComment(cvItemComment);
             return;
           }
+        }
+
+        if (target.closest("[data-orbo-impact-card]")) {
+          showComment(getImpactProjectCardHoverComment());
+          return;
         }
 
         const contextual = getContextualComment(target);

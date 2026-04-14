@@ -42,11 +42,12 @@ type ExperienceItem = {
   points: string[];
 };
 
-type ProjectItem = {
+/** Абстрактный кейс без публичных ссылок и брендов — детали на созвоне. */
+type WorkHighlight = {
   key: string;
-  name: string;
-  url: string;
-  desc: string;
+  title: string;
+  stack: string;
+  paragraphs: string[];
 };
 
 type CvReaderPersona = {
@@ -66,7 +67,6 @@ type CvRoleCopy = {
   projectsLead: string;
   expertiseItems: string[];
   experiencePointOverrides: Partial<Record<ExperienceItem["key"], string[]>>;
-  projectDescriptionOverrides: Partial<Record<ProjectItem["key"], string>>;
 };
 
 type CvHighlightSectionKey =
@@ -221,7 +221,7 @@ const EXPERIENCE: ExperienceItem[] = [
       "Был ответственным за интеграции платёжных систем и стабильность checkout-потока.",
       "Внедрил SSR, что улучшило производительность приложения и ключевые web-метрики.",
       "За счёт высокой личной эффективности постепенно взял на себя часть обязанностей Team Lead.",
-      "Работал с международными заказчиками, в том числе над проектом GlassesUSA.",
+      "Работал с международными заказчиками на крупных e-commerce витринах и чувствительных сценариях оплаты.",
     ],
   },
   {
@@ -254,30 +254,33 @@ const EXPERIENCE: ExperienceItem[] = [
   },
 ];
 
-const PROJECTS: ProjectItem[] = [
+const WORK_HIGHLIGHTS: WorkHighlight[] = [
   {
-    key: "service24",
-    name: "Сервис24 — мобильные акты",
-    url: "https://neyron163.github.io/service24/dashboard",
-    desc: "PWA для сервисных инженеров: акты, интеграция с 1С, офлайн-очередь. Стек: Ionic, TanStack Query, Dexie, Vite.",
+    key: "personal-pwa-fitness",
+    title: "Собственный PWA-продукт: дневник тренировок и прогресс",
+    stack: "React, TypeScript, Fastify, Prisma, PWA, Docker",
+    paragraphs: [
+      "Спроектировал и веду продукт с упором на сценарий в зале: старт тренировки, подходы и веса, история по упражнению, календарь планов и фактов, замеры тела и наглядные графики без лишнего шума в интерфейсе.",
+      "Offline-first: логирование и просмотр данных без сети, синхронизация при появлении подключения; установка с лендинга на главный экран как у привычного приложения, без обязательного стора.",
+    ],
   },
   {
-    key: "trenika",
-    name: "Trenika",
-    url: "https://trenika.space",
-    desc: "Full-stack приложение для ведения тренировок: React, Fastify, Prisma, Docker. Отвечал за продуктовую реализацию end-to-end.",
+    key: "edtech-diary-scale",
+    title: "Кроссплатформенный клиент в крупной образовательной экосистеме",
+    stack: "React Native, TypeScript, RxJS, MobX",
+    paragraphs: [
+      "Развивал электронный дневник и смежные сценарии для массовой аудитории учеников и родителей: расписание и карточки уроков, успеваемость и тематическое оценивание, домашние задания с тестами и прогрессом, посещаемость и уведомления.",
+      "Одна кодовая база под мобильные ОС и веб, реактивная модель и интеграции с backend и партнёрскими сервисами; работа в связке с DevOps, QA и мониторингом на проде.",
+    ],
   },
   {
-    key: "mesh",
-    name: "МЭШ — электронный дневник",
-    url: "https://cosysoft.org/portfolio/lms-digital-diary",
-    desc: "Кроссплатформенное приложение для большого числа пользователей. Стек: React Native, RxJS.",
-  },
-  {
-    key: "glassesusa",
-    name: "GlassesUSA",
-    url: "https://www.glassesusa.com",
-    desc: "Международный e-commerce проект: SSR, платёжные интеграции, performance-oriented frontend.",
+    key: "ecommerce-international",
+    title: "Международный e-commerce: витрина, SSR и чек-аут",
+    stack: "React, SSR, Redux, платёжные интеграции",
+    paragraphs: [
+      "Разрабатывал пользовательские потоки для крупного online-ритейлера с фокусом на конверсию, доверие к оплате и устойчивость под пиковый трафик.",
+      "SSR и поэтапная оптимизация клиентской части под продакшен-нагрузку, web-метрики и регрессии в критичных сценариях оформления заказа.",
+    ],
   },
 ];
 
@@ -296,7 +299,7 @@ const CV_ROLE_COPY: Record<CvReaderRole, CvRoleCopy> = {
     skillsLead:
       "Этот блок в первую очередь показывает зрелость профиля: сильный frontend, понятный delivery и полезный DevOps-бэкграунд.",
     projectsLead:
-      "Для HR проекты здесь работают как подтверждение, что опыт реальный, домены серьёзные, а не учебные кейсы.",
+      "Короткие абстрактные кейсы без ссылок и брендов — удобно для первого скрина; нюансы и контекст готов обсудить на созвоне.",
     expertiseItems: [
       ...EXPERTISE_ITEMS.filter((item) => ["React", "TypeScript", "Next.js"].includes(item)),
       "Mentoring",
@@ -325,15 +328,6 @@ const CV_ROLE_COPY: Record<CvReaderRole, CvRoleCopy> = {
         "За счёт высокой эффективности постепенно взял на себя часть лидерских обязанностей.",
       ],
     },
-    projectDescriptionOverrides: {
-      service24:
-        "PWA для сервисных инженеров с офлайн-сценариями и интеграцией с 1С. Хороший пример прикладного продукта под реальные рабочие процессы.",
-      trenika:
-        "Собственный full-stack продукт. Хорошо показывает инициативность, ownership и способность доводить идею до работающего решения.",
-      mesh: "Кроссплатформенный продукт для большой аудитории. Подтверждает опыт работы с серьёзной нагрузкой и массовым пользователем.",
-      glassesusa:
-        "Международный e-commerce проект с высокой бизнес-ценностью. Подтверждает опыт работы с крупными коммерческими продуктами.",
-    },
   },
   [CV_READER_ROLES.frontendLead]: {
     summary:
@@ -349,7 +343,7 @@ const CV_ROLE_COPY: Record<CvReaderRole, CvRoleCopy> = {
     skillsLead:
       "Здесь главное не ширина списка, а сочетание архитектуры, качества кода, delivery и реального production-опыта.",
     projectsLead:
-      "С технической точки зрения проекты показывают SSR, offline-first сценарии, интеграции и способность держать сложную клиентскую логику.",
+      "По формулировкам видно PWA/offline-first, кроссплатформу под нагрузкой и зрелый e-commerce — без маркетинговых названий, зато с техническим мясом.",
     expertiseItems: [
       "Architecture",
       "Performance",
@@ -384,15 +378,6 @@ const CV_ROLE_COPY: Record<CvReaderRole, CvRoleCopy> = {
         "Работал над продуктами с большой пользовательской базой, где важны устойчивость UI и предсказуемость поведения.",
       ],
     },
-    projectDescriptionOverrides: {
-      service24:
-        "PWA с offline-first сценарием, локальным хранилищем и синхронизацией. Хороший пример сложной клиентской логики вне обычного CRUD.",
-      trenika:
-        "Full-stack продукт, где можно посмотреть качество интерфейсов, структуру решений и end-to-end ownership.",
-      mesh: "Кроссплатформенное приложение для большой аудитории. Показывает опыт с React Native, RxJS и масштабной клиентской логикой.",
-      glassesusa:
-        "Production e-commerce с SSR и чувствительными интеграциями. Хороший маркер зрелого frontend-опыта под реальную нагрузку.",
-    },
   },
   [CV_READER_ROLES.cto]: {
     summary:
@@ -408,7 +393,7 @@ const CV_ROLE_COPY: Record<CvReaderRole, CvRoleCopy> = {
     skillsLead:
       "Блок навыков показывает, что кандидат может быть связующим звеном между frontend, инженерными процессами и инфраструктурой.",
     projectsLead:
-      "Проекты в этом режиме стоит читать как доказательство ownership, продуктового мышления и способности доводить инициативы до работающего результата.",
+      "Кейсы читайте как сочетание ownership, масштаба и зрелого delivery; публичные ссылки сознательно не привожу — это нормальная практика под NDA и переговоры.",
     expertiseItems: [
       "Architecture",
       "CI/CD",
@@ -436,15 +421,6 @@ const CV_ROLE_COPY: Record<CvReaderRole, CvRoleCopy> = {
         "Автоматизировал рутинные процессы, CI/CD и конфигурации, снижая ручную нагрузку и ускоряя delivery команды.",
         "Этот опыт полезен и сейчас: лучше вижу системные ограничения, риски релизов и точки для оптимизации процессов.",
       ],
-    },
-    projectDescriptionOverrides: {
-      service24:
-        "Практический продукт с офлайн-сценарием и интеграциями. Хорошо показывает умение решать реальные операционные задачи бизнеса.",
-      trenika:
-        "Собственный продуктовый контур end-to-end. Полезный маркер ownership и способности доводить инициативу до работающего сервиса.",
-      mesh: "Продукт для большой аудитории, где важны надёжность, масштабируемость клиентской части и организационная зрелость команды.",
-      glassesusa:
-        "Международный коммерческий продукт с чувствительными бизнес-сценариями. Хороший маркер того, что кандидат умеет работать в среде реальной стоимости ошибок.",
     },
   },
 };
@@ -491,10 +467,6 @@ const CV_ROLE_SECTION_PRIORITY: Record<
 
 function getRoleAwareExperiencePoints(roleCopy: CvRoleCopy, job: ExperienceItem): string[] {
   return roleCopy.experiencePointOverrides[job.key] ?? job.points;
-}
-
-function getRoleAwareProjectDescription(roleCopy: CvRoleCopy, project: ProjectItem): string {
-  return roleCopy.projectDescriptionOverrides[project.key] ?? project.desc;
 }
 
 function getSectionTone(
@@ -784,26 +756,29 @@ export const CvContent = () => {
           >
             <SectionHeader
               badge={getSectionBadge(selectedReaderRole, "projects")}
-              title="Избранные проекты"
+              title="Кейсы и продуктовый опыт"
             />
             <p className="mb-4 text-[15px] leading-[1.65] text-foreground/82 md:text-base">
               {activeRoleCopy.projectsLead}
             </p>
-            <div className="space-y-4">
-              {PROJECTS.map((project) => (
-                <div key={project.name} data-orbo-cv-item={`project-${project.key}`}>
-                  <a
-                    className="text-base font-bold text-foreground transition-colors hover:text-accent md:text-lg"
-                    data-orbo-cv-action={`project-${project.key}`}
-                    href={project.url}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    {project.name} ↗
-                  </a>
-                  <p className="mt-1 text-[15px] leading-[1.65] text-foreground/85 md:text-base">
-                    {getRoleAwareProjectDescription(activeRoleCopy, project)}
+            <div className="space-y-6">
+              {WORK_HIGHLIGHTS.map((item) => (
+                <div key={item.key} data-orbo-cv-item={`work-${item.key}`}>
+                  <h3 className="text-base font-bold text-foreground md:text-lg">{item.title}</h3>
+                  <p className="mt-1 text-[15px] text-foreground/75 md:text-base">
+                    <span className="font-semibold text-foreground">Стек: </span>
+                    {item.stack}
                   </p>
+                  <div className="mt-2 space-y-2">
+                    {item.paragraphs.map((p, i) => (
+                      <p
+                        key={`${item.key}-${i}`}
+                        className="text-[15px] leading-[1.65] text-foreground/88 md:text-base"
+                      >
+                        {p}
+                      </p>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
