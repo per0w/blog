@@ -481,17 +481,21 @@ table {
 .hero-cyber-title-wrap {
   position: relative;
   display: inline-block;
+  max-width: 100%;
   line-height: 1.05;
 }
 
-/* Верх рамки не уходит в минус — иначе линия HUD пересекает строку «Привет!» над h1 */
+/*
+ * Рамка по контуру букв: минимальный вылет по горизонтали — иначе «коробка» визуально
+ * шире строки «Привет!» и кажется, что приветствие заезжает под HUD.
+ */
 .hero-cyber-hud {
   pointer-events: none;
   position: absolute;
   z-index: 0;
-  inset: 0 -0.5em -0.35em -0.5em;
+  inset: 0 -0.06em -0.2em -0.06em;
   border: 1px solid color-mix(in srgb, var(--color-accent) 28%, transparent);
-  border-radius: 0.2em;
+  border-radius: 0.12em;
   opacity: 0.65;
   animation: hero-cyber-hud-pulse 5s ease-in-out infinite;
 }
@@ -697,7 +701,7 @@ table {
   .hero-cyber-hud {
     animation: none;
     opacity: 0.5;
-    inset: 0 -0.28em -0.15em -0.28em;
+    inset: 0 -0.06em -0.12em -0.06em;
   }
 
   .hero-cyber-title-main {
@@ -720,10 +724,11 @@ table {
 
   50% {
     opacity: 1;
+    /* Умеренный радиус — меньше «протечки» вниз на заголовок с HUD */
     text-shadow:
       0 0 1px color-mix(in srgb, var(--color-accent-secondary) 45%, transparent),
-      0 0 14px color-mix(in srgb, var(--color-accent-secondary) 50%, transparent),
-      0 0 28px color-mix(in srgb, var(--color-accent) 28%, transparent);
+      0 0 10px color-mix(in srgb, var(--color-accent-secondary) 42%, transparent),
+      0 0 20px color-mix(in srgb, var(--color-accent) 22%, transparent);
   }
 }
 
@@ -742,6 +747,7 @@ table {
 }
 
 .hero-greet-cyber-soft {
+  display: inline-block;
   animation: hero-greet-cyber-glow 5.2s ease-in-out infinite;
 }
 

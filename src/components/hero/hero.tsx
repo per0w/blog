@@ -161,7 +161,7 @@ export const Hero = () => {
           </motion.div>
 
           <motion.h1
-            className={`relative z-0 mt-3 w-full text-center text-5xl font-extrabold tracking-[0.04em] sm:text-6xl md:w-auto md:text-left lg:text-7xl ${heroDisplay.className}`}
+            className={`relative z-0 mt-5 w-full text-center text-5xl font-extrabold tracking-[0.04em] sm:mt-4 sm:text-6xl md:w-auto md:text-left lg:text-7xl ${heroDisplay.className}`}
             variants={itemVariants}
           >
             <span className="hero-cyber-title-wrap">

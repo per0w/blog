@@ -177,9 +177,9 @@ export function HeroGreetingReply() {
 
   return (
     <div data-orbo-hero-greet className="w-full">
-      <div className="relative z-10 flex flex-col items-center gap-2 md:items-start">
-        <p className="hero-greet-cyber-row inline-flex w-full max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-1 text-pretty md:justify-start md:text-left">
-          <span className="hero-greet-cyber-soft text-sm font-semibold tracking-[0.2em] text-accent-secondary uppercase">
+      <div className="relative z-10 isolate flex flex-col items-center gap-2 md:items-start">
+        <p className="hero-greet-cyber-row mx-auto inline-flex w-fit max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-1 text-pretty md:mx-0 md:justify-start md:text-left">
+          <span className="hero-greet-cyber-soft text-sm font-semibold tracking-[0.12em] text-accent-secondary uppercase sm:tracking-[0.18em] md:tracking-[0.2em]">
             Привет! Меня зовут
           </span>
           <button
