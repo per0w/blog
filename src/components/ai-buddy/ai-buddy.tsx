@@ -20,11 +20,13 @@ import { CommentTooltip } from "@/components/ai-buddy/orbo-comment-tooltip";
 import {
   ANNOYED_COMMENTS,
   CV_CLICK_COMMENTS,
+  CV_ROLE_CHANGE_COMMENTS,
   CV_ROLE_CLICK_COMMENTS,
   getRandomComment,
   pickRandom,
   SECTION_COMMENTS,
 } from "@/components/ai-buddy/orbo-data";
+import { runOrboThinkingShowPipeline } from "@/components/ai-buddy/run-orbo-thinking-pipeline";
 import {
   ORBO_DISMISSED_STORAGE_KEY,
   ORBO_DISPLAY_DURATION_MS,
@@ -33,7 +35,7 @@ import {
 } from "@/constants/ai-buddy";
 import { CV_READER_ROLES, type CvReaderRole } from "@/constants/common";
 import { HERO_GREETING_BUBBLE_REPLY_FOCUS_MS } from "@/constants/hero-greeting";
-import { getOrboAiComment } from "@/utils/orbo-ai-comment";
+import { getOrboAiComment, getOrboCvRoleSwitchComment } from "@/utils/orbo-ai-comment";
 import { logOrboDebug } from "@/utils/orbo-debug";
 import {
   getSectionVerticalVisibilityRatio,
@@ -138,6 +140,42 @@ export function AiBuddy() {
     [scheduleHideBubble],
   );
 
+  const reactToCvReaderRole = useCallback(
+    async (role: CvReaderRole) => {
+      if (dismissed) return;
+
+      await runOrboThinkingShowPipeline(
+        {
+          displayTimerRef,
+          orboSectionPipelineRef,
+          orboSuppressAmbientUntilRef,
+        },
+        {
+          setIsThinking,
+          setOrbMood,
+          setComment,
+          setTooltipVisible,
+          setSpeaking,
+        },
+        async () => {
+          const t0 = Date.now();
+          const aiLine = await getOrboCvRoleSwitchComment(role);
+          const cleaned = aiLine?.replace(/\s+/g, " ").trim() ?? "";
+          const text =
+            cleaned.length > 0 ? cleaned.slice(0, 280) : pickRandom(CV_ROLE_CHANGE_COMMENTS[role]);
+
+          const elapsed = Date.now() - t0;
+          const pad = Math.max(0, 400 - elapsed);
+          if (pad > 0) await new Promise((r) => setTimeout(r, pad));
+
+          showComment(text, "neutral");
+          return true;
+        },
+      );
+    },
+    [dismissed, showComment],
+  );
+
   const requestComment = useCallback(
     async (sectionId: string, options?: { bypassVisibility?: boolean }) => {
       const bypassVisibility = options?.bypassVisibility ?? false;
@@ -162,86 +200,80 @@ export function AiBuddy() {
         return false;
       }
 
-      if (displayTimerRef.current) clearTimeout(displayTimerRef.current);
-      orboSectionPipelineRef.current = true;
-      const t0 = Date.now();
-      setIsThinking(true);
-      setOrbMood("thinking");
-      setComment(null);
-      setTooltipVisible(true);
-      setSpeaking(true);
+      return runOrboThinkingShowPipeline(
+        {
+          displayTimerRef,
+          orboSectionPipelineRef,
+          orboSuppressAmbientUntilRef,
+        },
+        {
+          setIsThinking,
+          setOrbMood,
+          setComment,
+          setTooltipVisible,
+          setSpeaking,
+        },
+        async () => {
+          const t0 = Date.now();
+          const aiComment = await getOrboAiComment(sectionId);
 
-      let didShow = false;
-      try {
-        const aiComment = await getOrboAiComment(sectionId);
+          if (sectionCommentEpochRef.current !== epochAtStart) {
+            logOrboDebug("drop: epoch changed after ai", {
+              sectionId,
+              epochAtStart,
+              epochNow: sectionCommentEpochRef.current,
+            });
+            return false;
+          }
+          const visibilityAfterAi = getSectionVerticalVisibilityRatio(el);
+          if (
+            !bypassVisibility &&
+            visibilityAfterAi < MIN_SECTION_VISIBILITY_RATIO
+          ) {
+            logOrboDebug("drop: low visibility after ai", {
+              sectionId,
+              visibility: visibilityAfterAi,
+              min: MIN_SECTION_VISIBILITY_RATIO,
+            });
+            return false;
+          }
 
-        if (sectionCommentEpochRef.current !== epochAtStart) {
-          logOrboDebug("drop: epoch changed after ai", {
+          const text = aiComment ?? getRandomComment(sectionId);
+          const elapsed = Date.now() - t0;
+          const minThink = aiComment != null ? 400 : ORBO_MIN_THINKING_MS;
+          const pad = Math.max(0, minThink - elapsed);
+          if (pad > 0) await new Promise((r) => setTimeout(r, pad));
+
+          if (sectionCommentEpochRef.current !== epochAtStart) {
+            logOrboDebug("drop: epoch changed after think pad", {
+              sectionId,
+              epochAtStart,
+              epochNow: sectionCommentEpochRef.current,
+            });
+            return false;
+          }
+          const visibilityBeforeShow = getSectionVerticalVisibilityRatio(el);
+          if (
+            !bypassVisibility &&
+            visibilityBeforeShow < MIN_SECTION_VISIBILITY_RATIO
+          ) {
+            logOrboDebug("drop: low visibility before show", {
+              sectionId,
+              visibility: visibilityBeforeShow,
+              min: MIN_SECTION_VISIBILITY_RATIO,
+            });
+            return false;
+          }
+
+          showComment(text, "neutral");
+          logOrboDebug("show section comment", {
             sectionId,
-            epochAtStart,
-            epochNow: sectionCommentEpochRef.current,
+            ai: aiComment != null,
+            elapsedMs: elapsed,
           });
-          return false;
-        }
-        const visibilityAfterAi = getSectionVerticalVisibilityRatio(el);
-        if (
-          !bypassVisibility &&
-          visibilityAfterAi < MIN_SECTION_VISIBILITY_RATIO
-        ) {
-          logOrboDebug("drop: low visibility after ai", {
-            sectionId,
-            visibility: visibilityAfterAi,
-            min: MIN_SECTION_VISIBILITY_RATIO,
-          });
-          return false;
-        }
-
-        const text = aiComment ?? getRandomComment(sectionId);
-        const elapsed = Date.now() - t0;
-        const minThink = aiComment != null ? 400 : ORBO_MIN_THINKING_MS;
-        const pad = Math.max(0, minThink - elapsed);
-        if (pad > 0) await new Promise((r) => setTimeout(r, pad));
-
-        if (sectionCommentEpochRef.current !== epochAtStart) {
-          logOrboDebug("drop: epoch changed after think pad", {
-            sectionId,
-            epochAtStart,
-            epochNow: sectionCommentEpochRef.current,
-          });
-          return false;
-        }
-        const visibilityBeforeShow = getSectionVerticalVisibilityRatio(el);
-        if (
-          !bypassVisibility &&
-          visibilityBeforeShow < MIN_SECTION_VISIBILITY_RATIO
-        ) {
-          logOrboDebug("drop: low visibility before show", {
-            sectionId,
-            visibility: visibilityBeforeShow,
-            min: MIN_SECTION_VISIBILITY_RATIO,
-          });
-          return false;
-        }
-
-        showComment(text, "neutral");
-        logOrboDebug("show section comment", {
-          sectionId,
-          ai: aiComment != null,
-          elapsedMs: elapsed,
-        });
-        didShow = true;
-        return true;
-      } finally {
-        orboSectionPipelineRef.current = false;
-        orboSuppressAmbientUntilRef.current = Date.now() + 2200;
-        if (!didShow) {
-          setIsThinking(false);
-          setTooltipVisible(false);
-          setSpeaking(false);
-          setOrbMood("neutral");
-        }
-      }
-      return didShow;
+          return true;
+        },
+      );
     },
     [showComment],
   );
@@ -266,6 +298,7 @@ export function AiBuddy() {
     cvHireNudgeShownRef,
     cvDwellShownRef,
     hireNudgeTimerRef,
+    reactToCvReaderRole,
   );
 
   useOrboScroll(

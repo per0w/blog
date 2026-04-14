@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ComponentType, type ReactNode } from "react";
+import { useState, type ComponentType, type ReactNode } from "react";
 
 import Link from "next/link";
 
@@ -505,14 +505,6 @@ export const CvContent = () => {
   const activeReaderPersona = CV_READER_PERSONAS[selectedReaderRole];
   const activeRoleCopy = CV_ROLE_COPY[selectedReaderRole];
 
-  useEffect(() => {
-    window.dispatchEvent(
-      new CustomEvent<{ role: CvReaderRole }>(ORBO_CV_ROLE_CHANGE_EVENT, {
-        detail: { role: selectedReaderRole },
-      }),
-    );
-  }, [selectedReaderRole]);
-
   return (
     <main
       aria-labelledby="cv-page-title"
@@ -640,7 +632,15 @@ export const CvContent = () => {
                       ? "border-accent/60 bg-accent/10 text-foreground shadow-[0_0_18px_color-mix(in_srgb,var(--color-accent)_12%,transparent)]"
                       : "border-border bg-background/40 text-foreground/80 hover:border-accent/30 hover:bg-accent/5"
                   }`}
-                  onClick={() => setSelectedReaderRole(persona.id)}
+                  onClick={() => {
+                    if (persona.id === selectedReaderRole) return;
+                    setSelectedReaderRole(persona.id);
+                    window.dispatchEvent(
+                      new CustomEvent<{ role: CvReaderRole }>(ORBO_CV_ROLE_CHANGE_EVENT, {
+                        detail: { role: persona.id },
+                      }),
+                    );
+                  }}
                 >
                   <span className="block text-[15px] font-semibold md:text-base">
                     {persona.label}

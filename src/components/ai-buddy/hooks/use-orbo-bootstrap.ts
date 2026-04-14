@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+import { usePathname } from "next/navigation";
 
 import { ORBO_DISMISSED_STORAGE_KEY } from "@/constants/ai-buddy";
+import { isCvPathname } from "@/utils/cv-path";
 
 function isCapableDevice(): boolean {
   if (typeof navigator === "undefined") return false;
@@ -16,11 +19,14 @@ function isCapableDevice(): boolean {
  * Портал, sessionStorage «свёрнут», флаги вьюпорта (CV / мобилка / «тяжёлый» аватар).
  */
 export function useOrboBootstrap() {
+  const pathname = usePathname();
   const [portalReady, setPortalReady] = useState(false);
   const [dismissed, setDismissed] = useState(true);
   const [enhanced, setEnhanced] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [isCvPage, setIsCvPage] = useState(false);
+
+  /** Клиентская навигация не триггерит resize — путь берём из App Router. */
+  const isCvPage = useMemo(() => isCvPathname(pathname), [pathname]);
 
   useEffect(() => {
     /* sessionStorage и портал недоступны при SSR; обновление после гидратации намеренное */
@@ -36,9 +42,6 @@ export function useOrboBootstrap() {
     const syncViewport = () => {
       setEnhanced(isCapableDevice());
       setIsMobile(window.innerWidth < 640);
-      const path = window.location.pathname.replace(/\/+$/, "") || "/";
-      const cvPath = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/cv`;
-      setIsCvPage(path === cvPath || path.startsWith(`${cvPath}/`));
     };
 
     syncViewport();
