@@ -7,6 +7,8 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Mail, Menu, PanelBottom, X } from "lucide-react";
 
+import { useDisplayFont } from "@/components/display-font/display-font-context";
+import { DisplayFontSwitcher } from "@/components/display-font/display-font-switcher";
 import {
   MAX_MESSENGER_PROFILE_URL,
   ORBO_MAX_HOVER_EVENT,
@@ -16,6 +18,7 @@ import {
   PROFILE_VK_URL,
   SECTIONS_IDS,
 } from "@/constants/common";
+import { DISPLAY_FONT_CLASSNAMES } from "@/fonts/display-font-classnames";
 import { GitHubIcon, MaxMessengerIcon, TelegramIcon, VkIcon } from "@/ui/icons";
 
 import ThemeSwitcher from "../theme-switcher/theme-switcher";
@@ -97,6 +100,8 @@ function AllContactsLink({
 }
 
 export const Header = () => {
+  const { id: displayFontId } = useDisplayFont();
+  const displayFontClass = DISPLAY_FONT_CLASSNAMES[displayFontId];
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -175,7 +180,7 @@ export const Header = () => {
         <div className="mx-auto flex h-16 max-w-screen-xl items-center gap-2 px-3 sm:gap-3 sm:px-5">
           <Link
             aria-label="На главную, per0w.space"
-            className="focus-ring-accent min-w-0 shrink-0 rounded-md bg-linear-to-r from-accent to-accent-secondary bg-clip-text text-lg font-bold tracking-tighter text-transparent sm:text-xl"
+            className={`focus-ring-accent ${displayFontClass} min-w-0 max-w-[50vw] shrink-0 truncate rounded-md bg-linear-to-r from-accent to-accent-secondary bg-clip-text text-lg font-bold tracking-tighter text-transparent sm:max-w-none sm:text-xl`}
             href="/"
           >
             PER0W.SPACE
@@ -201,6 +206,7 @@ export const Header = () => {
           </div>
 
           <div className="flex shrink-0 items-center justify-end gap-0.5 sm:gap-1">
+            <DisplayFontSwitcher />
             <ThemeSwitcher />
 
             <div className="hidden items-center border-l border-border/60 pl-1 sm:pl-2 md:flex">

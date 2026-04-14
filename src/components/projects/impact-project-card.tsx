@@ -28,7 +28,7 @@ export function ImpactProjectCard({ emoji, title, problem, stack, role }: Impact
 
   return (
     <article
-      className="shadow-elevation-panel hover:shadow-elevation-card flex h-full min-h-0 flex-col rounded-2xl border border-border bg-surface p-5 text-left transition-[box-shadow,border-color] duration-300 hover:border-accent/35"
+      className="shadow-elevation-panel hover:shadow-elevation-card flex h-full min-h-0 w-full min-w-0 flex-col rounded-2xl border border-border bg-surface p-5 text-left transition-[box-shadow,border-color] duration-300 hover:border-accent/35"
       data-orbo-impact-card=""
     >
       <div aria-hidden className="mb-3 text-3xl">

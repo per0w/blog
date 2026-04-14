@@ -133,18 +133,18 @@ export const ProjectsCarousel = ({
     <section
       aria-labelledby={`${regionId}-title`}
       aria-roledescription="Карусель"
-      className="relative w-full max-w-5xl px-1 sm:px-2"
+      className="relative w-full max-w-5xl px-0 sm:px-2"
     >
       <p className="sr-only" id={`${regionId}-title`}>
         {ariaLabel}. Используйте кнопки или свайп, чтобы листать.
       </p>
       <p className="mb-3 text-center text-xs text-muted sm:text-sm">{helperText}</p>
 
-      <div className="flex items-stretch gap-2 sm:gap-3">
+      <div className="flex items-stretch gap-0 sm:gap-3">
         <button
           aria-controls={`${regionId}-track`}
           aria-label="Предыдущий проект"
-          className="focus-ring-accent shadow-elevation-panel flex size-10 shrink-0 items-center justify-center self-center rounded-xl border border-border bg-surface text-muted transition-colors hover:border-accent/40 hover:text-accent disabled:pointer-events-none disabled:opacity-35 sm:size-11"
+          className="focus-ring-accent shadow-elevation-panel hidden size-10 shrink-0 items-center justify-center self-center rounded-xl border border-border bg-surface text-muted transition-colors hover:border-accent/40 hover:text-accent disabled:pointer-events-none disabled:opacity-35 sm:flex sm:size-11"
           disabled={atStart}
           type="button"
           onClick={goPrev}
@@ -152,10 +152,10 @@ export const ProjectsCarousel = ({
           <ChevronLeft aria-hidden className="size-5" />
         </button>
 
-        <div className="min-w-0 flex-1 touch-pan-x">
+        <div className="min-w-0 w-full flex-1 touch-pan-x">
           <div
             ref={scrollerRef}
-            className="flex snap-x snap-mandatory items-stretch gap-4 overflow-x-auto scroll-smooth py-2 pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex snap-x snap-mandatory items-stretch gap-3 overflow-x-auto scroll-smooth py-2 pb-3 [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-4 [&::-webkit-scrollbar]:hidden"
             id={`${regionId}-track`}
             tabIndex={0}
             onKeyDown={(e) => {
@@ -176,7 +176,7 @@ export const ProjectsCarousel = ({
         <button
           aria-controls={`${regionId}-track`}
           aria-label="Следующий проект"
-          className="focus-ring-accent shadow-elevation-panel flex size-10 shrink-0 items-center justify-center self-center rounded-xl border border-border bg-surface text-muted transition-colors hover:border-accent/40 hover:text-accent disabled:pointer-events-none disabled:opacity-35 sm:size-11"
+          className="focus-ring-accent shadow-elevation-panel hidden size-10 shrink-0 items-center justify-center self-center rounded-xl border border-border bg-surface text-muted transition-colors hover:border-accent/40 hover:text-accent disabled:pointer-events-none disabled:opacity-35 sm:flex sm:size-11"
           disabled={atEnd}
           type="button"
           onClick={goNext}

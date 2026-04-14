@@ -6,6 +6,7 @@ import { Footer } from "@/components/footer/footer";
 import { Header } from "@/components/header/header";
 import { Providers } from "@/components/providers/providers";
 import { MAIN_CONTENT_ID } from "@/constants/common";
+import { cosmicDisplayGoogle } from "@/fonts/cosmic-cyrillic-google";
 
 import type { Metadata } from "next";
 
@@ -60,10 +61,14 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      className={cx(GeistSans.variable, GeistMono.variable)}
       data-scroll-behavior="smooth"
       lang="ru"
       suppressHydrationWarning={true}
+      className={cx(
+        GeistSans.variable,
+        GeistMono.variable,
+        ...Object.values(cosmicDisplayGoogle).map((f) => f.variable),
+      )}
     >
       <body className="xs:text-[16px] mx-auto max-w-screen-xl px-5 antialiased md:text-[18px]">
         <a className="skip-to-content" href={`#${MAIN_CONTENT_ID}`}>

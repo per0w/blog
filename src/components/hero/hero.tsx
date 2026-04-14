@@ -1,6 +1,5 @@
 "use client";
 
-import { Exo_2 } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -16,19 +15,15 @@ import {
   Users,
 } from "lucide-react";
 
+import { useDisplayFont } from "@/components/display-font/display-font-context";
 import { SECTIONS_IDS } from "@/constants/common";
+import type { DisplayFontId } from "@/constants/display-font";
+import { DISPLAY_FONT_CLASSNAMES } from "@/fonts/display-font-classnames";
 import { ScrambleRevealText } from "@/ui/scramble-reveal/scramble-reveal";
 
 import { AvatarFrame } from "./avatar-frame";
 import { HeroGreetingReply } from "./hero-greeting-reply";
 import photo from "./photo-main.png";
-
-/** Дисплейный шрифт с кириллицей — «игровой» HUD, без смены палитры сайта */
-const heroDisplay = Exo_2({
-  subsets: ["latin", "cyrillic", "cyrillic-ext"],
-  weight: ["700", "800"],
-  display: "swap",
-});
 
 const USP_ITEMS = [
   {
@@ -137,7 +132,87 @@ function HeroServicesCta() {
   );
 }
 
+/** Fluid-кегль для стандартных (не широких) дисплейных гарнитур. */
+const HERO_TITLE_SIZE_DEFAULT =
+  "text-[clamp(1.6rem,7.5vw,2.8rem)] sm:text-[clamp(1.8rem,5.5vw,3.2rem)] md:text-[clamp(2.2rem,4vw,3.75rem)] lg:text-[clamp(2.6rem,3.2vw,4.5rem)]";
+
+/** Широкие дисплейные гарнитуры в hero — кегль по тиру (одна clamp-строка на группу). */
+const HERO_TITLE_COMPACT_IDS = [
+  "freak-show",
+  "tesla",
+  "rubik-moonrocks",
+  "good-future",
+  "stalinist-one",
+  "pinnacle",
+  "russo-one",
+  "press-start-2p",
+  "rubik-pixels",
+  "rubik-broken-fax",
+  "rubik-wet-paint",
+  "rubik-mono-one",
+] as const satisfies readonly DisplayFontId[];
+
+type HeroTitleCompactFontId = (typeof HERO_TITLE_COMPACT_IDS)[number];
+
+type HeroTitleSizeTier =
+  | "wideStandard"
+  | "decorativeRubik"
+  | "goodFuture"
+  | "stalinist"
+  | "pinnacle"
+  | "russo"
+  | "pressStart2p"
+  | "monoOne";
+
+/** Fluid clamp по тиру; строки целиком для Tailwind. */
+const HERO_TITLE_TIER_CLASSES: Record<HeroTitleSizeTier, string> = {
+  wideStandard:
+    "text-[clamp(1.3rem,min(7vw,10vmin),2.1rem)] sm:text-[clamp(1.5rem,min(5vw,8vmin),2.5rem)] md:text-[clamp(1.9rem,3.8vw,2.8rem)] lg:text-[clamp(2.2rem,3.5vw,3.25rem)]",
+  decorativeRubik:
+    "text-[clamp(1.25rem,min(7vw,10vmin),2rem)] sm:text-[clamp(1.45rem,min(5vw,8vmin),2.4rem)] md:text-[clamp(1.85rem,3.8vw,2.7rem)] lg:text-[clamp(2.1rem,3.5vw,3.1rem)]",
+  goodFuture:
+    "text-[clamp(1.35rem,min(7vw,10vmin),2.2rem)] sm:text-[clamp(1.55rem,min(5vw,8vmin),2.7rem)] md:text-[clamp(1.95rem,3.8vw,3rem)] lg:text-[clamp(2.3rem,3.5vw,3.5rem)]",
+  stalinist:
+    "text-[clamp(1.3rem,min(7vw,10vmin),2.1rem)] sm:text-[clamp(1.5rem,min(5vw,8vmin),2.5rem)] md:text-[clamp(1.9rem,3.8vw,2.85rem)] lg:text-[clamp(2.2rem,3.5vw,3.35rem)]",
+  pinnacle:
+    "text-[clamp(1.3rem,min(7vw,10vmin),2.15rem)] sm:text-[clamp(1.5rem,min(5vw,8vmin),2.6rem)] md:text-[clamp(1.9rem,3.8vw,2.9rem)] lg:text-[clamp(2.2rem,3.5vw,3.4rem)]",
+  russo:
+    "text-[clamp(1.35rem,min(7vw,10vmin),2.2rem)] sm:text-[clamp(1.55rem,min(5vw,8vmin),2.6rem)] md:text-[clamp(1.95rem,3.8vw,2.9rem)] lg:text-[clamp(2.3rem,3.5vw,3.4rem)]",
+  pressStart2p:
+    "text-[clamp(0.7rem,min(4.5vw,6vmin),1.1rem)] sm:text-[clamp(0.85rem,min(3.5vw,5.5vmin),1.5rem)] md:text-[clamp(1.1rem,2.5vw,1.75rem)] lg:text-[clamp(1.3rem,2.2vw,2rem)]",
+  monoOne:
+    "text-[clamp(1.1rem,min(6vw,8vmin),1.7rem)] sm:text-[clamp(1.3rem,min(4.5vw,7vmin),2.1rem)] md:text-[clamp(1.6rem,3.5vw,2.4rem)] lg:text-[clamp(1.9rem,3vw,2.8rem)]",
+};
+
+const HERO_TITLE_COMPACT_TIER: Record<HeroTitleCompactFontId, HeroTitleSizeTier> = {
+  "freak-show": "wideStandard",
+  tesla: "wideStandard",
+  "rubik-moonrocks": "decorativeRubik",
+  "rubik-pixels": "decorativeRubik",
+  "rubik-broken-fax": "decorativeRubik",
+  "rubik-wet-paint": "decorativeRubik",
+  "good-future": "goodFuture",
+  "stalinist-one": "stalinist",
+  pinnacle: "pinnacle",
+  "russo-one": "russo",
+  "press-start-2p": "pressStart2p",
+  "rubik-mono-one": "monoOne",
+};
+
+function isHeroTitleCompact(id: DisplayFontId): id is HeroTitleCompactFontId {
+  return (HERO_TITLE_COMPACT_IDS as readonly string[]).includes(id);
+}
+
+function getHeroTitleSizeClass(id: DisplayFontId): string {
+  if (!isHeroTitleCompact(id)) return HERO_TITLE_SIZE_DEFAULT;
+  return HERO_TITLE_TIER_CLASSES[HERO_TITLE_COMPACT_TIER[id]];
+}
+
 export const Hero = () => {
+  const { id: displayFontId } = useDisplayFont();
+  const displayFontClass = DISPLAY_FONT_CLASSNAMES[displayFontId];
+  const heroTitleSizeClass = getHeroTitleSizeClass(displayFontId);
+
   return (
     <section
       className="relative flex min-h-[85vh] items-center justify-center overflow-hidden py-16 md:py-24"
@@ -149,10 +224,10 @@ export const Hero = () => {
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,color-mix(in_srgb,var(--color-accent)_18%,transparent),transparent_55%),radial-gradient(ellipse_60%_40%_at_100%_50%,color-mix(in_srgb,var(--color-accent-secondary)_12%,transparent),transparent_50%),radial-gradient(ellipse_50%_35%_at_0%_80%,color-mix(in_srgb,var(--color-accent-light)_10%,transparent),transparent_45%)]"
       />
 
-      <div className="mx-auto flex max-w-screen-xl flex-col-reverse items-center gap-8 px-4 sm:px-6 md:flex-row md:items-center md:gap-12 lg:gap-14">
+      <div className="mx-auto flex w-full max-w-screen-xl min-w-0 flex-col-reverse items-center gap-8 px-4 sm:px-6 md:flex-row md:items-center md:gap-12 lg:gap-14">
         <motion.div
           animate="visible"
-          className="flex flex-col items-center text-center md:flex-1 md:items-start md:text-left"
+          className="flex w-full min-w-0 flex-col items-center text-center md:min-w-0 md:flex-1 md:items-start md:text-left"
           initial="hidden"
           variants={containerVariants}
         >
@@ -161,19 +236,16 @@ export const Hero = () => {
           </motion.div>
 
           <motion.h1
-            className={`relative z-0 mt-5 w-full text-center text-5xl font-extrabold tracking-[0.04em] sm:mt-4 sm:text-6xl md:w-auto md:text-left lg:text-7xl ${heroDisplay.className}`}
+            className={`hero-display-title ${displayFontClass} ${heroTitleSizeClass} relative z-0 mt-5 w-full max-w-full min-w-0 text-center tracking-[0.06em] sm:mt-4 md:text-left`}
             variants={itemVariants}
           >
             <span className="hero-cyber-title-wrap">
               <span aria-hidden className="hero-cyber-hud" />
-              <span aria-hidden className="hero-cyber-title-r">
-                Владимир Перов
-              </span>
-              <span aria-hidden className="hero-cyber-title-c">
-                Владимир Перов
-              </span>
               <span aria-hidden className="hero-cyber-scan" />
-              <span className="hero-cyber-title-main bg-linear-to-r from-accent via-accent-light to-accent-secondary bg-clip-text text-transparent">
+              <span
+                className="hero-cyber-title-main bg-linear-to-r from-accent via-accent-light to-accent-secondary bg-clip-text text-transparent"
+                data-text="Владимир Перов"
+              >
                 Владимир Перов
               </span>
             </span>

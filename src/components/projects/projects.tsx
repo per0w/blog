@@ -40,10 +40,16 @@ const TRENIKA_SLIDES: ProjectCardSlide[] = [
   },
 ];
 
-/** Ширина слайда как у карточек `Card variant="carousel"` — при добавлении проектов секция не растёт по высоте. */
-const impactSlideClass = "w-[min(17.5rem,calc(100vw-5rem))] shrink-0 snap-start sm:w-72";
+/**
+ * Мобилка: ширина слайда = ширина трека (flex-basis 100%), иначе calc(100vw−…) шире ленты
+ * из‑за стрелок и вложенных px — карточки выглядели обрезанными.
+ * sm+: фиксированная ширина как у карточек карусели.
+ */
+const impactSlideClass =
+  "w-full min-w-0 max-w-full shrink-0 grow-0 basis-full snap-start sm:w-72 sm:max-w-none sm:basis-72";
 
-const openProjectSlideClass = "w-[min(19rem,calc(100vw-5rem))] shrink-0 snap-start sm:w-80";
+const openProjectSlideClass =
+  "w-full min-w-0 max-w-full shrink-0 grow-0 basis-full snap-start sm:w-80 sm:max-w-none sm:basis-80";
 
 const OPEN_PROJECTS: Array<{
   title: string;
