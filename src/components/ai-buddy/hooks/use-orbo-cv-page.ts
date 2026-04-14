@@ -2,7 +2,6 @@ import { useEffect, type MutableRefObject } from "react";
 
 import type { OrbMood } from "@/components/ai-buddy/orb-avatar";
 import {
-  CV_ROLE_CHANGE_COMMENTS,
   CV_ROLE_DWELL_COMMENTS,
   CV_ROLE_FOCUS_SECTIONS,
   CV_ROLE_HIRE_NUDGES,
@@ -32,6 +31,8 @@ export function useOrboCvPage(
   cvHireNudgeShownRef: MutableRefObject<boolean>,
   cvDwellShownRef: MutableRefObject<Set<string>>,
   hireNudgeTimerRef: MutableRefObject<number | null>,
+  /** Смена «Смотреть CV глазами» — реплика и разворот виджета в `AiBuddy`. */
+  onReaderRoleSwitch?: (role: CvReaderRole) => void | Promise<void>,
 ) {
   useEffect(() => {
     if (!isCvPage) {
@@ -61,15 +62,15 @@ export function useOrboCvPage(
       cvDwellShownRef.current.clear();
       cvHireNudgeShownRef.current = false;
 
-      if (!dismissed) {
-        showComment(pickRandom(CV_ROLE_CHANGE_COMMENTS[nextRole]));
-      }
+      /* Реплику смены роли не показываем, если пользователь свернул Орбо — без сброса dismissed. */
+      if (!dismissed) void onReaderRoleSwitch?.(nextRole);
     };
 
     window.addEventListener(ORBO_CV_ROLE_CHANGE_EVENT, handleCvRoleChange);
     return () => window.removeEventListener(ORBO_CV_ROLE_CHANGE_EVENT, handleCvRoleChange);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- ref-объекты стабильны
-  }, [dismissed, isCvPage, showComment]);
+    // Ref-объекты стабильны; dismissed — актуальный флаг «свёрнут».
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- cvRoleRef, cvSeenSignalsRef, cvHireNudgeShownRef, cvDwellShownRef
+  }, [dismissed, isCvPage, onReaderRoleSwitch]);
 
   useEffect(() => {
     if (dismissed || !isCvPage) return;
@@ -144,14 +145,17 @@ export function useOrboCvPage(
           const key = el.dataset.orboCv;
           if (!key || seen.has(key)) continue;
 
-          seen.add(key);
           if (debounceTimer) clearTimeout(debounceTimer);
           debounceTimer = setTimeout(() => {
             if (getSectionVerticalVisibilityRatio(el) < MIN_SECTION_VISIBILITY_RATIO) {
               return;
             }
             const c = getCvSectionComment(key, cvRoleRef.current);
-            if (c) showComment(c);
+            if (c) {
+              showComment(c);
+              /* Как на главной: не помечаем блок «просмотренным», пока реплика реально не ушла. */
+              seen.add(key);
+            }
           }, 800);
         }
       },
