@@ -27,7 +27,7 @@ export function LivePlayground({
   const hintId = useId();
 
   return (
-    <figure className="not-prose my-8 overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
+    <figure className="not-prose shadow-elevation-panel my-8 overflow-hidden rounded-xl border border-border bg-surface">
       <figcaption className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3 text-sm">
         <span className="font-medium text-foreground">{title}</span>
         {editorUrl ? (
@@ -50,7 +50,7 @@ export function LivePlayground({
           </p>
           <button
             aria-describedby={hintId}
-            className="rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-[opacity,transform] hover:opacity-95 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface)] focus-visible:outline-none active:scale-[0.99] dark:focus-visible:ring-offset-[var(--color-surface)]"
+            className="focus-ring-accent shadow-elevation-panel rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white transition-[opacity,transform,box-shadow] hover:opacity-95 active:scale-[0.99]"
             type="button"
             onClick={() => setLoaded(true)}
           >

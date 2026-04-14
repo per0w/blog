@@ -28,7 +28,7 @@ export type OpenProjectShowcaseProps = {
 };
 
 const articleClass =
-  "overflow-hidden rounded-2xl border border-border bg-surface shadow-lg transition-[border-color,box-shadow] duration-300 hover:border-accent/40 hover:shadow-[0_12px_40px_-12px_color-mix(in_srgb,var(--color-accent)_20%,transparent)]";
+  "overflow-hidden rounded-2xl border border-border bg-surface shadow-elevation-card transition-[border-color,box-shadow] duration-300 hover:border-accent/40 hover:shadow-[0_12px_40px_-12px_color-mix(in_srgb,var(--color-accent)_20%,transparent)]";
 
 /**
  * Открытый проект: превью, смысл, стек, демо и ссылка на код — витрина для найма.
@@ -62,13 +62,13 @@ export function OpenProjectShowcase({
 
   const primaryBtnClass =
     variant === "carousel"
-      ? "inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_18px_-2px_color-mix(in_srgb,var(--color-accent)_45%,transparent)] transition-[transform,box-shadow,background-color] hover:bg-accent-light hover:shadow-[0_6px_24px_-4px_color-mix(in_srgb,var(--color-accent)_52%,transparent)] active:scale-[0.99] dark:text-white"
-      : "inline-flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-4 py-2.5 text-sm font-semibold text-accent transition-colors hover:border-accent/50 hover:bg-accent/15 dark:text-accent-light";
+      ? "focus-ring-accent inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_18px_-2px_color-mix(in_srgb,var(--color-accent)_45%,transparent)] transition-[transform,box-shadow,background-color] hover:bg-accent-light hover:shadow-[0_6px_24px_-4px_color-mix(in_srgb,var(--color-accent)_52%,transparent)] active:scale-[0.99] dark:text-white"
+      : "focus-ring-accent inline-flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-4 py-2.5 text-sm font-semibold text-accent transition-colors hover:border-accent/50 hover:bg-accent/15 dark:text-accent-light";
 
   const secondaryBtnClass =
     variant === "carousel"
-      ? "inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground shadow-sm transition-[border-color,background-color,box-shadow] hover:border-accent/40 hover:bg-surface-hover hover:shadow-md active:scale-[0.99]"
-      : "inline-flex items-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-accent/35 hover:bg-surface-hover";
+      ? "focus-ring-accent inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground shadow-elevation-panel transition-[border-color,background-color,box-shadow] hover:border-accent/40 hover:bg-surface-hover hover:shadow-elevation-card active:scale-[0.99]"
+      : "focus-ring-accent inline-flex items-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-accent/35 hover:bg-surface-hover";
 
   const body = (
     <div className={contentWrapperClass}>

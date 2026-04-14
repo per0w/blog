@@ -65,7 +65,7 @@ export function ServicesOffer() {
           {OFFER_PILLARS.map(({ icon: Icon, title, text }) => (
             <li
               key={title}
-              className="flex gap-3 rounded-2xl border border-border bg-surface p-4 text-left shadow-sm transition-shadow duration-200 hover:shadow-md"
+              className="shadow-elevation-panel hover:shadow-elevation-card flex gap-3 rounded-2xl border border-border bg-surface p-4 text-left transition-[box-shadow] duration-200"
             >
               <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
                 <Icon aria-hidden className="size-5" />
@@ -91,14 +91,14 @@ export function ServicesOffer() {
           </div>
           <div className="flex shrink-0 flex-col items-stretch gap-3 sm:flex-row sm:justify-center md:flex-col lg:flex-row">
             <Link
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-6 py-3 text-sm font-semibold text-white shadow-md transition-[filter,box-shadow] hover:shadow-lg hover:brightness-105"
+              className="focus-ring-accent shadow-elevation-panel hover:shadow-elevation-card inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-6 py-3 text-sm font-semibold text-white transition-[filter,box-shadow] hover:brightness-105"
               href={`/#${SECTIONS_IDS.contactUs}`}
             >
               Обсудить проект
               <ArrowRight aria-hidden className="size-4" />
             </Link>
             <a
-              className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-accent/50 px-6 py-3 text-sm font-semibold text-accent transition-colors hover:bg-accent/10"
+              className="focus-ring-accent inline-flex items-center justify-center gap-2 rounded-xl border-2 border-accent/50 px-6 py-3 text-sm font-semibold text-accent transition-colors hover:bg-accent/10"
               href={PROFILE_TELEGRAM_URL}
               rel="noopener noreferrer"
               target="_blank"

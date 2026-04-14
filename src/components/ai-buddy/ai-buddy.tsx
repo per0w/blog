@@ -50,6 +50,7 @@ import {
   ORBO_CONTACT_SPAM_EVENT,
   ORBO_CV_ROLE_CHANGE_EVENT,
   ORBO_EASTER_EGG_HINT_EVENT,
+  ORBO_HERO_GREETING_REPLY_EVENT,
   ORBO_MAX_HOVER_EVENT,
   SECTIONS_IDS,
   type CvReaderRole,
@@ -59,6 +60,7 @@ import {
   ORBO_OPENROUTER_COOLDOWN_MS,
   ORBO_OPENROUTER_MAX_FALLBACK_ATTEMPTS,
 } from "@/constants/contact-form";
+import { HERO_GREETING_BUBBLE_REPLY_FOCUS_MS } from "@/constants/hero-greeting";
 import { openRouterChatCompletion } from "@/utils/openrouter-client";
 
 /** Сериализация вызовов OpenRouter из Орбо (один за другим, без «return null»). */
@@ -309,6 +311,15 @@ export function AiBuddy() {
     };
   }, [dismissed, isMobile]);
 
+  const scheduleHideBubble = useCallback((ms: number) => {
+    if (displayTimerRef.current) clearTimeout(displayTimerRef.current);
+    displayTimerRef.current = setTimeout(() => {
+      setTooltipVisible(false);
+      setSpeaking(false);
+      setOrbMood("neutral");
+    }, ms);
+  }, []);
+
   const dismiss = useCallback(() => {
     if (displayTimerRef.current) clearTimeout(displayTimerRef.current);
     if (tapResetTimerRef.current) {
@@ -328,23 +339,22 @@ export function AiBuddy() {
     }
   }, []);
 
-  const showComment = useCallback((text: string, mood: OrbMood = "neutral") => {
-    if (displayTimerRef.current) clearTimeout(displayTimerRef.current);
+  const showComment = useCallback(
+    (text: string, mood: OrbMood = "neutral") => {
+      if (displayTimerRef.current) clearTimeout(displayTimerRef.current);
 
-    lastCommentRef.current = text;
-    setIsThinking(false);
-    setCommentSlideKey((k) => k + 1);
-    setComment(text);
-    setTooltipVisible(true);
-    setSpeaking(true);
-    setOrbMood(mood);
+      lastCommentRef.current = text;
+      setIsThinking(false);
+      setCommentSlideKey((k) => k + 1);
+      setComment(text);
+      setTooltipVisible(true);
+      setSpeaking(true);
+      setOrbMood(mood);
 
-    displayTimerRef.current = setTimeout(() => {
-      setTooltipVisible(false);
-      setSpeaking(false);
-      setOrbMood("neutral");
-    }, DISPLAY_DURATION);
-  }, []);
+      scheduleHideBubble(DISPLAY_DURATION);
+    },
+    [scheduleHideBubble],
+  );
 
   useEffect(() => {
     if (!isCvPage) return;
@@ -672,14 +682,13 @@ export function AiBuddy() {
       if (hoverTimer) clearTimeout(hoverTimer);
 
       if (target.closest("[data-orbo]")) return;
+      if (target.closest("[data-orbo-hero-greet]")) return;
+      if (target.closest("[data-orbo-bubble-reply]")) return;
       if (target.closest("[data-orbo-max]")) return;
 
       hoverTimer = setTimeout(() => {
         if (cursorCommented) return;
-        if (
-          orboSectionPipelineRef.current ||
-          Date.now() < orboSuppressAmbientUntilRef.current
-        ) {
+        if (orboSectionPipelineRef.current || Date.now() < orboSuppressAmbientUntilRef.current) {
           return;
         }
         cursorCommented = true;
@@ -765,6 +774,20 @@ export function AiBuddy() {
     window.addEventListener(ORBO_EASTER_EGG_HINT_EVENT, handleEasterEggHint);
     return () => window.removeEventListener(ORBO_EASTER_EGG_HINT_EVENT, handleEasterEggHint);
   }, [dismissed, showComment]);
+
+  /** Привет в hero: показываем пузырь даже если Орбо свернули — пользователь явно позвал. */
+  useEffect(() => {
+    const handleHeroGreetingReply = (event: Event) => {
+      const detail = (event as CustomEvent<{ message?: string }>).detail;
+      if (!detail?.message) return;
+      setDismissed(false);
+      showComment(detail.message, "easter");
+    };
+
+    window.addEventListener(ORBO_HERO_GREETING_REPLY_EVENT, handleHeroGreetingReply);
+    return () =>
+      window.removeEventListener(ORBO_HERO_GREETING_REPLY_EVENT, handleHeroGreetingReply);
+  }, [showComment]);
 
   useEffect(() => {
     if (dismissed) return;
@@ -944,7 +967,7 @@ export function AiBuddy() {
         <motion.button
           animate={peekDismissed ? { y: [0, -6, 0] } : { y: 0 }}
           aria-label="Вернуть Орбо"
-          className="group flex size-8 items-center justify-center rounded-full border border-accent/20 bg-surface/80 shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:border-accent/40 hover:shadow-[0_0_12px_color-mix(in_srgb,var(--color-accent)_25%,transparent)]"
+          className="focus-ring-accent group flex size-8 items-center justify-center rounded-full border border-accent/20 bg-surface/80 shadow-elevation-card backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:border-accent/40 hover:shadow-[0_0_12px_color-mix(in_srgb,var(--color-accent)_25%,transparent)]"
           transition={{ duration: 0.55, ease: "easeOut" }}
           type="button"
           onClick={revive}
@@ -969,7 +992,7 @@ export function AiBuddy() {
           >
             <motion.button
               aria-label="Орбо — нажми для комментария"
-              className="shrink-0 cursor-pointer rounded-none border-0 bg-transparent p-0 shadow-none ring-0 focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+              className="focus-ring-accent shrink-0 cursor-pointer rounded-md border-0 bg-transparent p-0.5 shadow-none"
               transition={{ type: "spring", stiffness: 520, damping: 18 }}
               type="button"
               whileHover={{ scale: 1.05 }}
@@ -991,6 +1014,11 @@ export function AiBuddy() {
           speaking={speaking && !isThinking}
           thinking={isThinking && tooltipVisible}
           visible={tooltipVisible}
+          bubbleReply={{
+            onOrboLine: (line) => showComment(line, "easter"),
+            onReplyBlur: () => scheduleHideBubble(DISPLAY_DURATION),
+            onReplyFocus: () => scheduleHideBubble(HERO_GREETING_BUBBLE_REPLY_FOCUS_MS),
+          }}
           onDismiss={dismiss}
         />
       </div>

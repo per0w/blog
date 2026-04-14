@@ -11,7 +11,7 @@ export function FooterMaxLink() {
   return (
     <a
       aria-label="MAX"
-      className="text-muted transition-colors hover:text-foreground"
+      className="focus-ring-accent rounded-md text-muted transition-colors hover:text-foreground"
       data-orbo-max=""
       href={MAX_MESSENGER_PROFILE_URL}
       rel="noopener noreferrer"

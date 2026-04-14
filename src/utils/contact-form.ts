@@ -23,14 +23,19 @@ export function normalizeEmailInput(raw: string): string {
 
 export function clampToLimits(
   name: string,
-  email: string,
+  contactDetail: string,
   subject: string,
   message: string,
-): { name: string; email: string; subject: string; message: string } {
-  const em = sanitizeContactText(normalizeEmailInput(email), CONTACT_FORM_LIMITS.emailMax).trim();
+  channelIsEmail: boolean,
+): { name: string; contactDetail: string; subject: string; message: string } {
+  const rawDetail = sanitizeContactText(
+    contactDetail,
+    channelIsEmail ? CONTACT_FORM_LIMITS.emailMax : CONTACT_FORM_LIMITS.contactDetailMax,
+  ).trim();
+  const detail = channelIsEmail ? normalizeEmailInput(rawDetail) : rawDetail;
   return {
     name: sanitizeContactText(name, CONTACT_FORM_LIMITS.nameMax).trim(),
-    email: em,
+    contactDetail: detail,
     subject: sanitizeContactText(subject, CONTACT_FORM_LIMITS.subjectMax).trim(),
     message: sanitizeContactText(message, CONTACT_FORM_LIMITS.messageMax).trim(),
   };

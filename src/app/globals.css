@@ -9,13 +9,16 @@
   --font-sans: "Geist Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
 
-  /* Light: чистый с лёгким фиолетовым оттенком */
-  --color-background: #fafbff;
+  /*
+   * Light: мягче дефолтного «ледяного» белого — холст чуть ниже по яркости,
+   * карточки светлее фона (канон светлой темы). Тёмная тема — только в .dark.
+   */
+  --color-background: #e9e8f2;
   --color-foreground: #0f0f23;
-  --color-surface: #ffffff;
-  --color-surface-hover: #f5f0ff;
-  --color-muted: #64748b;
-  --color-border: #e2ddf5;
+  --color-surface: #fafafe;
+  --color-surface-hover: #f0eff7;
+  --color-muted: #6c768a;
+  --color-border: #d2cce0;
 
   --color-accent: #7c3aed;
   --color-accent-light: #8b5cf6;
@@ -67,24 +70,46 @@
  */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Glitch Purple + Aurora: глубокий тёмный фиолет с neon-акцентами */
+/*
+ * Светлая тема по умолчанию в токенах; тёмная — основная в проде (см. defaultTheme в Providers).
+ * --elevation-*: глубина без смены оттенков палитры (только foreground/accent alpha).
+ */
+html {
+  color-scheme: light;
+  scroll-behavior: smooth;
+  overflow-x: clip;
+  --elevation-card:
+    0 1px 0 color-mix(in srgb, var(--color-foreground) 5%, transparent),
+    0 10px 32px -18px color-mix(in srgb, var(--color-foreground) 11%, transparent);
+  --elevation-panel:
+    0 1px 0 color-mix(in srgb, var(--color-foreground) 4%, transparent),
+    0 6px 22px -14px color-mix(in srgb, var(--color-foreground) 8%, transparent);
+}
+
+html.dark {
+  color-scheme: dark;
+  --elevation-card:
+    0 1px 0 color-mix(in srgb, var(--color-foreground) 9%, transparent),
+    0 14px 44px -22px color-mix(in srgb, var(--color-foreground) 28%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 8%, transparent);
+  --elevation-panel:
+    0 1px 0 color-mix(in srgb, var(--color-foreground) 7%, transparent),
+    0 8px 28px -16px color-mix(in srgb, var(--color-foreground) 20%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 5%, transparent);
+}
+
+/* Glitch Purple + Aurora: тёмный фиолетовый холст чуть светлее базового — карточки и фон не сливаются */
 .dark {
-  --color-background: #0f0f23;
+  --color-background: #12102c;
   --color-foreground: #e8e6f0;
-  --color-surface: #16142b;
-  --color-surface-hover: #1e1b3a;
-  --color-muted: #8b8fa3;
-  --color-border: #2a2545;
+  --color-surface: #1b1834;
+  --color-surface-hover: #252244;
+  --color-muted: #aeb2ca;
+  --color-border: #322d55;
 
   --color-accent: #8b5cf6;
   --color-accent-light: #a78bfa;
   --color-accent-secondary: #06b6d4;
-}
-
-html {
-  scroll-behavior: smooth;
-  /* Любой «вылет» на пару px не должен давать горизонтальный скролл всей страницы */
-  overflow-x: clip;
 }
 
 body {
@@ -124,6 +149,41 @@ body {
   font-family: var(--font-sans);
 }
 
+/* Карточки и панели: единая «воздушная» глубина */
+.shadow-elevation-card {
+  box-shadow: var(--elevation-card);
+}
+
+.shadow-elevation-panel {
+  box-shadow: var(--elevation-panel);
+}
+
+/* Оболочка формы контактов: в тёмной теме — наша глубина вместо тяжёлого shadow-2xl */
+.dark .contact-form-shell-elevated {
+  box-shadow: var(--elevation-card);
+}
+
+/* Поля ввода: одинаковый focus по всему сайту */
+.focus-ring-input {
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.focus-ring-input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 38%, transparent);
+}
+
+/* Кнопки и иконки: focus-visible с зазором в цвет фона */
+.focus-ring-accent:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--color-background),
+    0 0 0 4px color-mix(in srgb, var(--color-accent) 50%, transparent);
+}
+
 /* /cv: семейство задаётся next/font (переменная на обёртке из cv/layout.tsx) */
 .cv-page-root {
   font-family: var(--font-cv-serif), ui-serif, Georgia, "Times New Roman", serif;
@@ -159,10 +219,17 @@ body {
   }
 }
 
-/* Градиентный фон в тёмной теме — от тёмно-фиолетового к чёрно-синему */
+/* Градиентный фон в тёмной теме — чуть светлее краёв, в тон --color-background */
 .dark body {
-  background: linear-gradient(135deg, #0f0f23 0%, #1a0d2e 40%, #0c0c1e 70%, #0f0f23 100%);
-  background-attachment: fixed;
+  background: linear-gradient(135deg, #12102c 0%, #1f1438 40%, #14122a 70%, #12102c 100%);
+  /* На тач-скролле fixed даёт лишние перерисовки; на десктопе оставляем «парящий» фон */
+  background-attachment: scroll;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dark body {
+    background-attachment: fixed;
+  }
 }
 
 ::selection {
@@ -210,11 +277,16 @@ body {
 }
 
 .prose a {
-  @apply underline decoration-neutral-400 decoration-[0.1em] underline-offset-2 transition-all dark:decoration-neutral-600;
+  @apply underline decoration-[0.1em] underline-offset-2 transition-all;
+  text-decoration-color: color-mix(in srgb, var(--color-accent) 38%, var(--color-border));
+}
+
+.dark .prose a {
+  text-decoration-color: color-mix(in srgb, var(--color-accent) 42%, transparent);
 }
 
 .prose .anchor:after {
-  @apply text-neutral-300 dark:text-neutral-700;
+  @apply text-muted;
   content: "#";
 }
 
@@ -223,7 +295,13 @@ body {
 }
 
 .prose pre {
-  @apply overflow-x-auto rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm dark:border-neutral-800 dark:bg-neutral-900;
+  @apply overflow-x-auto rounded-lg border border-border bg-surface px-3 py-2 text-sm shadow-[0_1px_0_color-mix(in_srgb,var(--color-foreground)_6%,transparent)];
+}
+
+.dark .prose pre {
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--color-foreground) 8%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--color-accent) 6%, transparent);
 }
 
 .prose code {
@@ -245,23 +323,23 @@ body {
 }
 
 .prose p {
-  @apply my-4 text-neutral-800 dark:text-neutral-200;
+  @apply my-4 text-foreground;
 }
 
 .prose h1 {
-  @apply mt-6 mb-2 text-4xl font-medium tracking-tight;
+  @apply mt-6 mb-2 text-4xl font-medium tracking-tight text-foreground;
 }
 
 .prose h2 {
-  @apply mt-6 mb-2 text-xl font-medium tracking-tight;
+  @apply mt-6 mb-2 text-xl font-medium tracking-tight text-foreground;
 }
 
 .prose h3 {
-  @apply mt-6 mb-2 text-xl font-medium tracking-tight;
+  @apply mt-6 mb-2 text-xl font-medium tracking-tight text-foreground;
 }
 
 .prose h4 {
-  @apply mt-6 mb-2 text-lg font-medium tracking-tight;
+  @apply mt-6 mb-2 text-lg font-medium tracking-tight text-foreground;
 }
 
 .prose strong {
@@ -406,11 +484,12 @@ table {
   line-height: 1.05;
 }
 
+/* Верх рамки не уходит в минус — иначе линия HUD пересекает строку «Привет!» над h1 */
 .hero-cyber-hud {
   pointer-events: none;
   position: absolute;
   z-index: 0;
-  inset: -0.35em -0.5em;
+  inset: 0 -0.5em -0.35em -0.5em;
   border: 1px solid color-mix(in srgb, var(--color-accent) 28%, transparent);
   border-radius: 0.2em;
   opacity: 0.65;
@@ -618,7 +697,7 @@ table {
   .hero-cyber-hud {
     animation: none;
     opacity: 0.5;
-    inset: -0.15em -0.28em;
+    inset: 0 -0.28em -0.15em -0.28em;
   }
 
   .hero-cyber-title-main {
@@ -627,6 +706,63 @@ table {
     filter: drop-shadow(0 0 14px color-mix(in srgb, var(--color-accent) 35%, transparent))
       drop-shadow(0 0 28px color-mix(in srgb, var(--color-accent-secondary) 18%, transparent));
   }
+}
+
+/* Hero: приветствие — лёгкий «неон» (заметный, но без сдвига вёрстки) */
+@keyframes hero-greet-cyber-glow {
+  0%,
+  100% {
+    opacity: 0.88;
+    text-shadow:
+      0 0 1px transparent,
+      0 0 0 transparent;
+  }
+
+  50% {
+    opacity: 1;
+    text-shadow:
+      0 0 1px color-mix(in srgb, var(--color-accent-secondary) 45%, transparent),
+      0 0 14px color-mix(in srgb, var(--color-accent-secondary) 50%, transparent),
+      0 0 28px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  }
+}
+
+@keyframes hero-greet-cyber-btn-halo {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-accent-secondary) 35%, transparent),
+      0 0 14px color-mix(in srgb, var(--color-accent-secondary) 40%, transparent),
+      0 0 22px color-mix(in srgb, var(--color-accent) 18%, transparent);
+  }
+}
+
+.hero-greet-cyber-soft {
+  animation: hero-greet-cyber-glow 5.2s ease-in-out infinite;
+}
+
+.hero-greet-cyber-icon {
+  animation: hero-greet-cyber-btn-halo 5.8s ease-in-out infinite;
+}
+
+/*
+ * Пауза только у мыши: на тач hover часто «залипает» и анимация выглядит «сломанной».
+ * Focus-within — для клавиатуры и открытой формы.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .hero-greet-cyber-row:hover .hero-greet-cyber-soft,
+  .hero-greet-cyber-row:hover .hero-greet-cyber-icon {
+    animation-play-state: paused;
+  }
+}
+
+.hero-greet-cyber-row:focus-within .hero-greet-cyber-soft,
+.hero-greet-cyber-row:focus-within .hero-greet-cyber-icon {
+  animation-play-state: paused;
 }
 
 /* Hero: кнопка CV — пульс + редкие «сбои» (кибер-глич) */
@@ -1481,6 +1617,11 @@ table {
   .hero-cyber-title-r,
   .hero-cyber-title-c,
   .hero-cyber-scan {
+    animation: none !important;
+  }
+
+  .hero-greet-cyber-soft,
+  .hero-greet-cyber-icon {
     animation: none !important;
   }
 
