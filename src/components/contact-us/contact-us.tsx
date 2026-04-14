@@ -99,27 +99,6 @@ export const ContactUs = () => {
     },
   };
 
-  const linksContainerVariants = {
-    hidden: {},
-    visible: reduceMotion ? {} : { transition: { delayChildren: 0.02, staggerChildren: 0.052 } },
-  };
-
-  /**
-   * Только opacity на самой ссылке: без transform от Framer — иначе родительский
-   * translate + backdrop-filter на кнопке даёт артефакты в Chrome; отдельно
-   * полупрозрачная фаза «просвечивает» aurora/сетку и выглядит как баг.
-   * CSS hover (translateY) на `.contact-cta-link` не конфликтует, пока Motion не задаёт transform.
-   */
-  const linkVariants = {
-    hidden: { opacity: reduceMotion ? 1 : 0 },
-    visible: {
-      opacity: 1,
-      transition: reduceMotion
-        ? { duration: 0 }
-        : { duration: 0.38, ease: [0.22, 1, 0.36, 1] as const },
-    },
-  };
-
   return (
     <Section id={SECTIONS_IDS.contactUs}>
       <motion.div
@@ -159,34 +138,32 @@ export const ContactUs = () => {
             Или мессенджеры и соцсети
           </motion.p>
 
-          <motion.div
-            className="mx-auto mt-4 flex max-w-4xl flex-col flex-wrap items-center justify-center gap-3 sm:flex-row sm:gap-4"
-            variants={linksContainerVariants}
-          >
-            {CONTACTS.map(({ label, value, href, icon: Icon, external, ariaLabel }) => {
-              const isMax = label === "MAX";
-              const fireOrboMax = () => {
-                window.dispatchEvent(new CustomEvent(ORBO_MAX_HOVER_EVENT));
-              };
+          <motion.div className="mx-auto mt-4 w-full max-w-4xl" variants={fadeUp}>
+            <div className="flex flex-col flex-wrap items-center justify-center gap-3 sm:flex-row sm:gap-4">
+              {CONTACTS.map(({ label, value, href, icon: Icon, external, ariaLabel }) => {
+                const isMax = label === "MAX";
+                const fireOrboMax = () => {
+                  window.dispatchEvent(new CustomEvent(ORBO_MAX_HOVER_EVENT));
+                };
 
-              return (
-                <motion.a
-                  key={label}
-                  aria-label={ariaLabel ?? label}
-                  className="group/contact-cta contact-cta-link inline-flex items-center gap-3 rounded-xl px-5 py-3 text-sm font-medium md:px-6 md:text-base"
-                  href={href}
-                  variants={linkVariants}
-                  {...(isMax && { "data-orbo-max": "" })}
-                  {...(isMax && { onFocus: fireOrboMax, onMouseEnter: fireOrboMax })}
-                  {...(external
-                    ? { rel: "noopener noreferrer" as const, target: "_blank" as const }
-                    : {})}
-                >
-                  <Icon className="h-5 w-5 shrink-0 transition-transform duration-300 group-hover/contact-cta:scale-110" />
-                  <span>{value}</span>
-                </motion.a>
-              );
-            })}
+                return (
+                  <a
+                    key={label}
+                    aria-label={ariaLabel ?? label}
+                    className="group/contact-cta contact-cta-link contact-cta-link-row inline-flex items-center gap-3 rounded-xl px-5 py-3 text-sm font-medium motion-safe:transition-[box-shadow,filter] motion-safe:duration-300 md:px-6 md:text-base"
+                    href={href}
+                    {...(isMax && { "data-orbo-max": "" })}
+                    {...(isMax && { onFocus: fireOrboMax, onMouseEnter: fireOrboMax })}
+                    {...(external
+                      ? { rel: "noopener noreferrer" as const, target: "_blank" as const }
+                      : {})}
+                  >
+                    <Icon className="h-5 w-5 shrink-0 motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover/contact-cta:scale-110" />
+                    <span>{value}</span>
+                  </a>
+                );
+              })}
+            </div>
           </motion.div>
         </motion.div>
       </motion.div>

@@ -27,12 +27,12 @@ export const SECTION_COMMENTS: Record<string, string[]> = {
     "Посмотри на этот путь: сисадмин → DevOps → фронтенд-лид. Не каждый так может.",
   ],
   projects: [
-    "Сервис24 — акты в поле, 1С на связи, офлайн не страшен. Пока в разработке, но уже выглядит серьёзно.",
+    "Сверху карточки без имён заказчиков — уважение к NDA. Снизу Trenika — жми демо, трогай руками.",
     "Trenika — заставит тебя пойти в зал. Ну или хотя бы почувствовать вину.",
-    "GlassesUSA — подобрал очки всей Америке. Буквально.",
+    "EdTech, e-commerce США и банковские микрофронтенды в одной секции. Читай роль и стек — это для эйчаров.",
     "Каждый проект — маленький стартап. Только работающий. Почувствуй разницу.",
-    "Кликни на проект, посмотри вживую. Я разрешаю.",
-    "Три проекта тут, но ты бы видел, сколько он ещё не показал.",
+    "Детали коммерции — в резюме. Тут только то, что можно показать без нарушения договоров.",
+    "Открытый код и демо внизу. Остальное — осознанно без скринов продакшена.",
     "Он их ещё и с нуля делал. Не из шаблонов. Уважение.",
   ],
   services: [
@@ -161,13 +161,6 @@ export const CONTEXTUAL_HOVER: { pattern: RegExp; comments: string[] }[] = [
     comments: [
       "Газпромбанк! Это enterprise, тут без шуток.",
       "Банк — это надёжность, безопасность. Серьёзный опыт.",
-    ],
-  },
-  {
-    pattern: /сервис24|service\s*24|мобильн(ые|ых)\s+акт/i,
-    comments: [
-      "Сервис24 — механики, акты, 1С. Реальная полевая работа, не очередной TODO.",
-      "Офлайн-очередь и синхронизация — он любит, когда интернет пропадает не в самый подходящий момент.",
     ],
   },
   {
@@ -374,17 +367,14 @@ export const CV_ITEM_COMMENTS: Record<string, string[]> = {
   "fact-location": ["Локация прозрачная. Удалёнка или гибрид — без сюрпризов на финальном этапе."],
   "fact-format": ["Удалённо / гибрид — хороший диапазон. Кандидат гибкий, а это ускоряет найм."],
   "fact-english": ["B1 честно указан. Без инфляции уровня, и это вызывает доверие."],
-  "project-trenika": [
-    "Trenika особенно хорошо показывает ownership: не только код, но и продукт целиком.",
+  "work-personal-pwa-fitness": [
+    "Собственный PWA с offline-first — редкость: видно и продукт, и инженерную зрелость.",
   ],
-  "project-glassesusa": [
-    "GlassesUSA — сильный маркер международного e-commerce и живого production-опыта.",
+  "work-edtech-diary-scale": [
+    "Образовательный масштаб и кроссплатформа — сигнал, что не боялся сложной аудитории и регрессий.",
   ],
-  "project-mesh": [
-    "МЭШ — это масштаб и сложность. Хороший аргумент в пользу надёжности кандидата.",
-  ],
-  "project-service24": [
-    "PWA, офлайн-режим, интеграции. Люблю, когда проект решает реальные полевые задачи.",
+  "work-ecommerce-international": [
+    "Международный e-commerce в резюме без лишнего хайпа — маркер production-уровня и ответственности.",
   ],
   "expertise-react": ["React — база, но тут важно, что за ним ещё стоит архитектурное мышление."],
   "expertise-typescript": [
@@ -441,16 +431,6 @@ export const CV_ACTION_COMMENTS: Record<string, string[]> = {
   "contact-telegram": ["Жми в Telegram. Самый короткий путь от интереса к интервью."],
   "contact-github": ["Открывай GitHub и смотри код. Тут слова можно быстро проверить делом."],
   "contact-habr": ["Habr Career тоже хороший знак: кандидат открыт к адекватному найму."],
-  "project-service24": ["Смотри проект живьём. Живые ссылки в CV всегда повышают доверие."],
-  "project-trenika": [
-    "Кликни Trenika. Там хорошо видно, что человек умеет доводить идею до продукта.",
-  ],
-  "project-mesh": [
-    "МЭШ стоит открыть хотя бы ради масштаба. Не каждый кандидат может таким похвастаться.",
-  ],
-  "project-glassesusa": [
-    "GlassesUSA особенно хорошо продаёт международный опыт. Я бы точно заглянул.",
-  ],
 };
 
 export const CV_ROLE_SECTION_COMMENTS: Record<CvReaderRole, Partial<Record<string, string[]>>> = {
@@ -465,7 +445,9 @@ export const CV_ROLE_SECTION_COMMENTS: Record<CvReaderRole, Partial<Record<strin
     profile: [
       "Для HR этот блок идеален: быстро считывается, чем кандидат полезен и на какие роли реально подходит.",
     ],
-    projects: ["Проекты для HR важны как доказательство реальности опыта. Тут с этим всё хорошо."],
+    projects: [
+      "Кейсы без ссылок — нормально для HR: видно домены и зрелость, детали закрываются на интервью.",
+    ],
     languages: ["Языки указаны честно и без инфляции. Для рекрутера это обычно хороший сигнал."],
   },
   [CV_READER_ROLES.frontendLead]: {
@@ -501,7 +483,7 @@ export const CV_ROLE_SECTION_COMMENTS: Record<CvReaderRole, Partial<Record<strin
       "Для CTO важен не только стек, а то, что человек умеет брать ownership. Здесь это читается очень хорошо.",
     ],
     projects: [
-      "Проекты здесь полезны CTO как индикатор ownership: где кандидат просто писал код, а где реально вёл результат.",
+      "Абстрактные кейсы CTO читает как ownership и масштаб; конкретные имена обычно на закрытой встрече.",
     ],
     "job-gazprombank-senior-frontend": [
       "Банковский опыт плюс рефакторинг и mentoring. Для CTO это выглядит как надёжный senior с системным мышлением.",
@@ -545,8 +527,8 @@ export const CV_ROLE_ITEM_COMMENTS: Record<CvReaderRole, Partial<Record<string, 
     "persona-panel-cto": [
       "Для CTO этот ракурс удобен: видно, где кандидат сможет снять нагрузку с лидов и ускорить систему целиком.",
     ],
-    "project-trenika": [
-      "Для CTO Trenika интересен как сигнал ownership: человек умеет доводить продукт от идеи до реализации.",
+    "work-personal-pwa-fitness": [
+      "Для CTO собственный PWA — сильный маркер ownership: продукт не на слайдах, а в проде.",
     ],
     "skills-infra-delivery": [
       "Infra & Delivery для CTO особенно вкусный блок: меньше handoff, меньше организационного трения.",
@@ -569,9 +551,6 @@ export const CV_ROLE_ACTION_COMMENTS: Record<CvReaderRole, Partial<Record<string
     ],
     "contact-github": [
       "Если ты лид, GitHub сейчас самый честный следующий клик: код быстро подтверждает уровень.",
-    ],
-    "project-glassesusa": [
-      "GlassesUSA для лида хорош тем, что показывает production-уровень, а не просто pet-проектную романтику.",
     ],
   },
   [CV_READER_ROLES.cto]: {
@@ -967,6 +946,16 @@ export const AI_PROMPT_TEMPLATE = (sectionName: string) =>
 
 export function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
+}
+
+/** Реплики при наведении на impact-карточки в разделе «Проекты» (главная). */
+export const IMPACT_PROJECT_CARD_HOVER_COMMENTS = [
+  "Карточки описывают задачу и вклад, а не список фич — так удобнее нанимающим менеджерам за первые секунды.",
+  "Тут акцент на проблеме и роли, а не на перечислении фич — hiring manager за пару секунд понимает масштаб.",
+];
+
+export function getImpactProjectCardHoverComment(): string {
+  return pickRandom(IMPACT_PROJECT_CARD_HOVER_COMMENTS);
 }
 
 export function getRandomComment(sectionId: string): string {

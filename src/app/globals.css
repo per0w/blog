@@ -603,6 +603,32 @@ table {
   }
 }
 
+/*
+ * Мобильный hero: хроматика и скан — position absolute + nowrap в узком wrap при
+ * overflow-hidden на секции дают обрезанные «хвосты» (видно как чужой текст).
+ * На md+ оставляем полный cyber-HUD.
+ */
+@media (max-width: 767px) {
+  .hero-cyber-title-r,
+  .hero-cyber-title-c,
+  .hero-cyber-scan {
+    display: none !important;
+  }
+
+  .hero-cyber-hud {
+    animation: none;
+    opacity: 0.5;
+    inset: -0.15em -0.28em;
+  }
+
+  .hero-cyber-title-main {
+    animation: none;
+    /* drop-shadow работает с bg-clip-text; text-shadow у «прозрачной» заливки часто не виден */
+    filter: drop-shadow(0 0 14px color-mix(in srgb, var(--color-accent) 35%, transparent))
+      drop-shadow(0 0 28px color-mix(in srgb, var(--color-accent-secondary) 18%, transparent));
+  }
+}
+
 /* Hero: кнопка CV — пульс + редкие «сбои» (кибер-глич) */
 .hero-cv-cta {
   position: relative;
@@ -1064,6 +1090,11 @@ table {
 .contact-cta-link > * {
   position: relative;
   z-index: 1;
+}
+
+/* Ряд мессенджеров: без «блика» ::before — вместе с Framer на родителе давало мерцание в Chrome. */
+.contact-cta-link-row::before {
+  content: none;
 }
 
 /* Скрытый honeypot: не убирать с экрана иначе (доступность / автозаполнение) */

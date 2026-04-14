@@ -1,5 +1,5 @@
 export interface TagsProps {
-  tags?: string[];
+  tags?: readonly string[];
   /** Компактные чипы для карусели проектов */
   size?: "default" | "sm";
 }
