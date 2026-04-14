@@ -149,6 +149,8 @@ body {
   font-family: var(--font-sans);
 }
 
+/* Шрифты заголовков: className из next/font на hero/Section (см. display-font-classnames.ts). data-display-font на <html> — для отладки и localStorage. */
+
 /* Карточки и панели: единая «воздушная» глубина */
 .shadow-elevation-card {
   box-shadow: var(--elevation-card);
@@ -480,9 +482,43 @@ table {
 /* Hero: имя в стиле HUD / cyberpunk — те же accent-цвета, хроматика + лёгкий скан */
 .hero-cyber-title-wrap {
   position: relative;
-  display: inline-block;
+  /* block + 100%: рамка HUD и скан тянутся на всю ширину колонки заголовка, а не только по ширине текста */
+  display: block;
+  width: 100%;
   max-width: 100%;
   line-height: 1.05;
+  /* Одна строка: иначе псевдоэлементы с attr(data-text) расходятся с переносом строки */
+  white-space: nowrap;
+  /* Изолируем блендинг: иначе screen смешивается с фоном секции и даёт «второе» имя */
+  isolation: isolate;
+}
+
+/*
+ * Hero: трекинг и fluid-кегль по data-* с <html> (DisplayFontProvider),
+ * чтобы не плодить html:is([data-display-font=…]) на каждый новый шрифт.
+ */
+html[data-hero-title-tight="true"] #hero .hero-cyber-title-wrap {
+  letter-spacing: 0.03em;
+}
+
+@media (max-width: 639px) {
+  html[data-hero-title-fluid="true"] #hero .hero-display-title {
+    font-size: clamp(1.35rem, min(7vw, 10vmin), 2.5rem);
+    letter-spacing: 0.025em;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 767px) {
+  html[data-hero-title-fluid="true"] #hero .hero-display-title {
+    font-size: clamp(1.55rem, min(5.2vw, 8vmin), 3rem);
+  }
+}
+
+/* Press Start 2P: на мобилке ещё сильнее ужимаем трекинг */
+@media (max-width: 767px) {
+  html[data-hero-title-pixel="true"] #hero .hero-cyber-title-wrap {
+    letter-spacing: 0.01em;
+  }
 }
 
 /*
@@ -539,122 +575,138 @@ table {
 .hero-cyber-title-main {
   position: relative;
   z-index: 2;
-  animation: hero-cyber-main-glitch 6s ease-in-out infinite;
+  animation: hero-cyber-main-glitch 5s ease-in-out infinite;
+}
+
+.hero-cyber-title-main::before,
+.hero-cyber-title-main::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  mix-blend-mode: normal;
+  white-space: nowrap;
+  line-height: inherit;
+  font: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  background: none;
+  -webkit-text-fill-color: var(--color-accent);
+  color: var(--color-accent);
+  /* Псевдо-слои невидимы в покое; появляются только в момент глитч-анимации */
+  opacity: 0;
+}
+
+.hero-cyber-title-main::before {
+  animation: hero-cyber-chroma-r 4.8s ease-in-out infinite;
+}
+
+.hero-cyber-title-main::after {
+  -webkit-text-fill-color: var(--color-accent-secondary);
+  color: var(--color-accent-secondary);
+  animation: hero-cyber-chroma-c 5s ease-in-out infinite;
 }
 
 @keyframes hero-cyber-main-glitch {
   0%,
-  94%,
+  88%,
   100% {
     transform: translate(0);
     filter: none;
   }
 
-  95% {
-    transform: translate(-1px, 0.5px);
-    filter: drop-shadow(1px 0 0 color-mix(in srgb, var(--color-accent) 55%, transparent));
+  89% {
+    transform: translate(-2px, 1px);
+    filter: drop-shadow(2px 0 0 color-mix(in srgb, var(--color-accent) 72%, transparent))
+      drop-shadow(-1px 0 0 color-mix(in srgb, var(--color-accent-secondary) 45%, transparent));
   }
 
-  96.5% {
-    transform: translate(1px, -0.5px);
+  90.5% {
+    transform: translate(2px, -1px);
     filter: drop-shadow(
-      -1px 0 0 color-mix(in srgb, var(--color-accent-secondary) 55%, transparent)
+      -2px 0 0 color-mix(in srgb, var(--color-accent-secondary) 72%, transparent)
     );
   }
 
-  98% {
+  92% {
+    transform: translate(-1px, 0);
+    filter: drop-shadow(1px 0 0 color-mix(in srgb, var(--color-accent) 55%, transparent));
+  }
+
+  94% {
     transform: translate(0);
     filter: none;
   }
-}
-
-.hero-cyber-title-r,
-.hero-cyber-title-c {
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
-  font: inherit;
-  font-weight: inherit;
-  font-size: inherit;
-  letter-spacing: inherit;
-  line-height: inherit;
-  pointer-events: none;
-}
-
-.hero-cyber-title-r {
-  color: var(--color-accent);
-  opacity: 0.32;
-  mix-blend-mode: screen;
-  animation: hero-cyber-chroma-r 5.5s ease-in-out infinite;
-}
-
-.hero-cyber-title-c {
-  color: var(--color-accent-secondary);
-  opacity: 0.28;
-  mix-blend-mode: screen;
-  animation: hero-cyber-chroma-c 5.8s ease-in-out infinite;
-}
-
-.dark .hero-cyber-title-r {
-  opacity: 0.38;
-}
-
-.dark .hero-cyber-title-c {
-  opacity: 0.34;
 }
 
 @keyframes hero-cyber-chroma-r {
   0%,
-  90%,
+  86%,
+  93%,
   100% {
-    transform: translate(-1px, 0);
+    transform: translate(0, 0);
     clip-path: inset(0 0 0 0);
+    opacity: 0;
+  }
+
+  87% {
+    opacity: 0.45;
+  }
+
+  88% {
+    transform: translate(-3px, 1px);
+    clip-path: inset(0 10% 14% 0);
+    opacity: 0.45;
+  }
+
+  90% {
+    transform: translate(3px, -1px);
+    clip-path: inset(10% 0 0 12%);
+    opacity: 0.45;
   }
 
   92% {
-    transform: translate(-4px, 1px);
-    clip-path: inset(0 8% 12% 0);
-  }
-
-  94% {
-    transform: translate(3px, -1px);
-    clip-path: inset(8% 0 0 10%);
-  }
-
-  96% {
-    transform: translate(-1px, 0);
+    transform: translate(0, 0);
     clip-path: inset(0 0 0 0);
+    opacity: 0;
   }
 }
 
 @keyframes hero-cyber-chroma-c {
   0%,
-  91%,
+  87%,
+  94%,
   100% {
-    transform: translate(1px, 0);
+    transform: translate(0, 0);
     clip-path: inset(0 0 0 0);
+    opacity: 0;
+  }
+
+  88% {
+    opacity: 0.4;
+  }
+
+  89% {
+    transform: translate(3px, -1px);
+    clip-path: inset(12% 0 0 10%);
+    opacity: 0.4;
+  }
+
+  91% {
+    transform: translate(-3px, 1px);
+    clip-path: inset(0 12% 10% 0);
+    opacity: 0.4;
   }
 
   93% {
-    transform: translate(4px, -1px);
-    clip-path: inset(10% 0 0 8%);
-  }
-
-  95% {
-    transform: translate(-3px, 1px);
-    clip-path: inset(0 10% 8% 0);
-  }
-
-  97% {
-    transform: translate(1px, 0);
+    transform: translate(0, 0);
     clip-path: inset(0 0 0 0);
+    opacity: 0;
   }
 }
 
@@ -664,16 +716,16 @@ table {
   inset: 0;
   z-index: 1;
   border-radius: 0.08em;
-  opacity: 0.07;
+  opacity: 0.06;
   background: repeating-linear-gradient(
     0deg,
     transparent,
-    transparent 1px,
-    color-mix(in srgb, var(--color-foreground) 12%, transparent) 1px,
-    color-mix(in srgb, var(--color-foreground) 12%, transparent) 2px
+    transparent 2px,
+    color-mix(in srgb, var(--color-foreground) 10%, transparent) 2px,
+    color-mix(in srgb, var(--color-foreground) 10%, transparent) 3px
   );
   mix-blend-mode: overlay;
-  animation: hero-cyber-scan-move 7s linear infinite;
+  animation: hero-cyber-scan-move 8s linear infinite;
 }
 
 @keyframes hero-cyber-scan-move {
@@ -692,8 +744,8 @@ table {
  * На md+ оставляем полный cyber-HUD.
  */
 @media (max-width: 767px) {
-  .hero-cyber-title-r,
-  .hero-cyber-title-c,
+  .hero-cyber-title-main::before,
+  .hero-cyber-title-main::after,
   .hero-cyber-scan {
     display: none !important;
   }
@@ -706,9 +758,10 @@ table {
 
   .hero-cyber-title-main {
     animation: none;
-    /* drop-shadow работает с bg-clip-text; text-shadow у «прозрачной» заливки часто не виден */
-    filter: drop-shadow(0 0 14px color-mix(in srgb, var(--color-accent) 35%, transparent))
-      drop-shadow(0 0 28px color-mix(in srgb, var(--color-accent-secondary) 18%, transparent));
+    /* drop-shadow работает с bg-clip-text; усилено, т.к. хрома на мобилке отключена */
+    filter: drop-shadow(0 0 10px color-mix(in srgb, var(--color-accent) 55%, transparent))
+      drop-shadow(0 0 22px color-mix(in srgb, var(--color-accent-secondary) 35%, transparent))
+      drop-shadow(1px 0 0 color-mix(in srgb, var(--color-accent) 25%, transparent));
   }
 }
 
@@ -1620,8 +1673,8 @@ table {
 
   .hero-cyber-hud,
   .hero-cyber-title-main,
-  .hero-cyber-title-r,
-  .hero-cyber-title-c,
+  .hero-cyber-title-main::before,
+  .hero-cyber-title-main::after,
   .hero-cyber-scan {
     animation: none !important;
   }
@@ -1714,8 +1767,8 @@ table {
   }
 
   .hero-cyber-hud,
-  .hero-cyber-title-r,
-  .hero-cyber-title-c,
+  .hero-cyber-title-main::before,
+  .hero-cyber-title-main::after,
   .hero-cyber-scan {
     display: none !important;
   }

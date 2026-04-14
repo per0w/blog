@@ -113,7 +113,7 @@ export function OpenProjectShowcase({
 
   if (variant === "carousel") {
     return (
-      <article className={`${articleClass} flex h-full min-h-0 flex-col`}>
+      <article className={`${articleClass} flex h-full min-h-0 w-full min-w-0 flex-col`}>
         <ProjectCardMedia slides={slides} />
         {body}
       </article>
