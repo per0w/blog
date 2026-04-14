@@ -23,6 +23,14 @@ const MOUSE_RADIUS = 150;
 const MOUSE_FORCE = 1.2;
 const PARALLAX_STRENGTH = 0.15;
 
+/** Светлая тема: сетка и «узлы» на холсте заметнее; в `.dark` значения как раньше. */
+const LIGHT_LINE_OPACITY_MULT = 1.68;
+const LIGHT_LINE_THIN = 0.58;
+const LIGHT_LINE_THICK = 1.08;
+const LIGHT_DOT_ALPHA_BASE = 0.4;
+const LIGHT_DOT_ALPHA_DEPTH = 0.48;
+const LIGHT_GLOW_MULT = 1.38;
+
 function hexToRgb(hex: string): [number, number, number] {
   const clean = hex.replace("#", "");
   return [
@@ -69,11 +77,17 @@ export const ParticlesBackground = () => {
     let colors = getColors();
     let accentRgb = hexToRgb(colors.accent);
     let secondaryRgb = hexToRgb(colors.secondary);
+    let isDarkTheme = document.documentElement.classList.contains("dark");
 
-    const observer = new MutationObserver(() => {
+    const syncFromDocument = () => {
       colors = getColors();
       accentRgb = hexToRgb(colors.accent);
       secondaryRgb = hexToRgb(colors.secondary);
+      isDarkTheme = document.documentElement.classList.contains("dark");
+    };
+
+    const observer = new MutationObserver(() => {
+      syncFromDocument();
     });
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 
@@ -147,7 +161,11 @@ export const ParticlesBackground = () => {
 
           if (dist < LINE_DISTANCE) {
             const avgDepth = (pi.depth + pj.depth) / 2;
-            const opacity = (1 - dist / LINE_DISTANCE) * 0.35 * avgDepth;
+            const lightBoost = isDarkTheme ? 1 : LIGHT_LINE_OPACITY_MULT;
+            const opacity = Math.min(
+              1,
+              (1 - dist / LINE_DISTANCE) * 0.35 * avgDepth * lightBoost,
+            );
             const isMixed = pi.type !== pj.type;
             let rgb: [number, number, number];
             if (isMixed) {
@@ -160,7 +178,13 @@ export const ParticlesBackground = () => {
 
             ctx.beginPath();
             ctx.strokeStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${opacity})`;
-            ctx.lineWidth = isMixed ? 0.8 : 0.4;
+            let lineW = 0.4;
+            if (isDarkTheme) {
+              lineW = isMixed ? 0.8 : 0.4;
+            } else {
+              lineW = isMixed ? LIGHT_LINE_THICK : LIGHT_LINE_THIN;
+            }
+            ctx.lineWidth = lineW;
             ctx.moveTo(pi.x, drawYi);
             ctx.lineTo(pj.x, drawYj);
             ctx.stroke();
@@ -170,15 +194,19 @@ export const ParticlesBackground = () => {
 
       for (const p of particles) {
         const rgb = p.type === "accent" ? accentRgb : secondaryRgb;
-        const glowIntensity = (4 + Math.sin(t * 3 + p.phase) * 3) * p.depth;
+        const glowMult = isDarkTheme ? 1 : LIGHT_GLOW_MULT;
+        const glowIntensity = (4 + Math.sin(t * 3 + p.phase) * 3) * p.depth * glowMult;
         const parallaxY = -scrollY * PARALLAX_STRENGTH * (1 - p.depth);
         const drawY = p.y + parallaxY;
-        const alpha = 0.3 + 0.4 * p.depth;
+        const alpha = isDarkTheme
+          ? 0.3 + 0.4 * p.depth
+          : LIGHT_DOT_ALPHA_BASE + LIGHT_DOT_ALPHA_DEPTH * p.depth;
+        const shadowAlpha = Math.min(1, alpha + (isDarkTheme ? 0.2 : 0.28));
 
         ctx.beginPath();
         ctx.arc(p.x, drawY, p.radius, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha})`;
-        ctx.shadowColor = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha + 0.2})`;
+        ctx.shadowColor = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${shadowAlpha})`;
         ctx.shadowBlur = glowIntensity;
         ctx.fill();
         ctx.shadowBlur = 0;

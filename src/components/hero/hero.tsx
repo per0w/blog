@@ -20,6 +20,7 @@ import { SECTIONS_IDS } from "@/constants/common";
 import { ScrambleRevealText } from "@/ui/scramble-reveal/scramble-reveal";
 
 import { AvatarFrame } from "./avatar-frame";
+import { HeroGreetingReply } from "./hero-greeting-reply";
 import photo from "./photo-main.png";
 
 /** Дисплейный шрифт с кириллицей — «игровой» HUD, без смены палитры сайта */
@@ -79,7 +80,7 @@ function HeroMentorCta() {
       whileTap={{ scale: 0.97 }}
     >
       <a
-        className="neon-glow group/mentor relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-linear-to-r from-accent via-accent-light to-accent-secondary px-7 py-3.5 text-base font-semibold text-white shadow-[0_4px_24px_-4px_color-mix(in_srgb,var(--color-accent)_45%,transparent)] transition-[box-shadow,filter] duration-300 hover:shadow-[0_8px_32px_-6px_color-mix(in_srgb,var(--color-accent)_50%,transparent)] hover:brightness-[1.05]"
+        className="focus-ring-accent neon-glow group/mentor relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-linear-to-r from-accent via-accent-light to-accent-secondary px-7 py-3.5 text-base font-semibold text-white shadow-[0_4px_24px_-4px_color-mix(in_srgb,var(--color-accent)_45%,transparent)] transition-[box-shadow,filter] duration-300 hover:shadow-[0_8px_32px_-6px_color-mix(in_srgb,var(--color-accent)_50%,transparent)] hover:brightness-[1.05]"
         href={`#${SECTIONS_IDS.mentorship}`}
       >
         {!reduceMotion ? (
@@ -119,7 +120,7 @@ function HeroServicesCta() {
       whileTap={{ scale: 0.97 }}
     >
       <a
-        className="group/order inline-flex items-center justify-center gap-2 rounded-lg border-2 border-accent-secondary/55 bg-surface/40 px-6 py-3 text-base font-semibold text-accent-secondary backdrop-blur-sm transition-colors hover:border-accent-secondary hover:bg-accent-secondary/10 sm:px-7"
+        className="focus-ring-accent group/order inline-flex items-center justify-center gap-2 rounded-lg border-2 border-accent-secondary/55 bg-surface/40 px-6 py-3 text-base font-semibold text-accent-secondary backdrop-blur-sm transition-colors hover:border-accent-secondary hover:bg-accent-secondary/10 sm:px-7"
         href={`#${SECTIONS_IDS.services}`}
       >
         <Briefcase
@@ -155,15 +156,12 @@ export const Hero = () => {
           initial="hidden"
           variants={containerVariants}
         >
-          <motion.p
-            className="text-sm font-semibold tracking-[0.2em] text-accent-secondary uppercase"
-            variants={itemVariants}
-          >
-            Привет! Меня зовут
-          </motion.p>
+          <motion.div className="w-full" variants={itemVariants}>
+            <HeroGreetingReply />
+          </motion.div>
 
           <motion.h1
-            className={`mt-3 w-full text-center text-5xl font-extrabold tracking-[0.04em] sm:text-6xl md:w-auto md:text-left lg:text-7xl ${heroDisplay.className}`}
+            className={`relative z-0 mt-3 w-full text-center text-5xl font-extrabold tracking-[0.04em] sm:text-6xl md:w-auto md:text-left lg:text-7xl ${heroDisplay.className}`}
             variants={itemVariants}
           >
             <span className="hero-cyber-title-wrap">
@@ -215,7 +213,10 @@ export const Hero = () => {
             ))}
           </motion.div>
 
-          <motion.div className="mt-8 flex flex-wrap justify-center gap-4 md:justify-start" variants={itemVariants}>
+          <motion.div
+            className="mt-8 flex flex-wrap justify-center gap-4 md:justify-start"
+            variants={itemVariants}
+          >
             <HeroMentorCta />
             <HeroServicesCta />
             <motion.span
@@ -225,7 +226,7 @@ export const Hero = () => {
               whileTap={{ scale: 0.97 }}
             >
               <Link
-                className="hero-cv-cta group/cv relative inline-flex items-center justify-center gap-2 rounded-lg border-2 border-accent/65 px-6 py-3 text-base font-semibold text-accent transition-colors hover:bg-accent/12 sm:px-7"
+                className="focus-ring-accent hero-cv-cta group/cv relative inline-flex items-center justify-center gap-2 rounded-lg border-2 border-accent/65 px-6 py-3 text-base font-semibold text-accent transition-colors hover:bg-accent/12 sm:px-7"
                 href="/cv"
               >
                 <span className="relative z-10 inline-flex items-center gap-2">

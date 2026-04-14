@@ -530,7 +530,7 @@ export const CvContent = () => {
         </Link>
         <button
           aria-label="Открыть диалог печати браузера для сохранения резюме в PDF"
-          className="neon-glow inline-flex items-center gap-2 rounded-lg border border-accent/60 px-5 py-2.5 text-[15px] font-medium text-accent transition-all hover:border-accent hover:bg-accent/10 md:text-base"
+          className="focus-ring-accent neon-glow inline-flex items-center gap-2 rounded-lg border border-accent/60 px-5 py-2.5 text-[15px] font-medium text-accent transition-all hover:border-accent hover:bg-accent/10 md:text-base"
           data-orbo-cv-action="download"
           type="button"
           onClick={handlePrint}
@@ -635,7 +635,7 @@ export const CvContent = () => {
                   data-orbo-cv-action={`persona-${persona.id}`}
                   data-orbo-cv-item={`persona-${persona.id}`}
                   type="button"
-                  className={`min-h-11 rounded-xl border px-4 py-3 text-left transition-all duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-95 ${
+                  className={`focus-ring-accent min-h-11 rounded-xl border px-4 py-3 text-left transition-all duration-150 active:scale-95 ${
                     isActive
                       ? "border-accent/60 bg-accent/10 text-foreground shadow-[0_0_18px_color-mix(in_srgb,var(--color-accent)_12%,transparent)]"
                       : "border-border bg-background/40 text-foreground/80 hover:border-accent/30 hover:bg-accent/5"

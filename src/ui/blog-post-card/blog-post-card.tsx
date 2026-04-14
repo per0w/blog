@@ -34,7 +34,7 @@ export function BlogPostCard({
 
   return (
     <Link
-      className="group block rounded-xl border border-t-2 border-border/50 border-t-accent bg-[var(--color-surface)] p-5 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_20px_color-mix(in_srgb,var(--color-accent)_15%,transparent)] sm:p-6"
+      className="group shadow-elevation-card block rounded-xl border border-t-2 border-border/50 border-t-accent bg-[var(--color-surface)] p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_20px_color-mix(in_srgb,var(--color-accent)_15%,transparent)] sm:p-6"
       href={href}
     >
       <article>

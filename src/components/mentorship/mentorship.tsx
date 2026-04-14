@@ -81,7 +81,7 @@ export function Mentorship() {
           {FORMATS.map(({ icon: Icon, title, text }) => (
             <li
               key={title}
-              className="flex gap-3 rounded-2xl border border-border bg-surface p-4 text-left shadow-sm transition-shadow duration-200 hover:shadow-md"
+              className="shadow-elevation-panel hover:shadow-elevation-card flex gap-3 rounded-2xl border border-border bg-surface p-4 text-left transition-[box-shadow] duration-200"
             >
               <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
                 <Icon aria-hidden className="size-5" />
@@ -101,13 +101,13 @@ export function Mentorship() {
           </p>
           <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
             <Link
-              className="inline-flex items-center justify-center rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="focus-ring-accent shadow-elevation-panel hover:shadow-elevation-card inline-flex items-center justify-center rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-white transition-[opacity,box-shadow] hover:opacity-90"
               href={`/#${SECTIONS_IDS.contactUs}`}
             >
               Форма на сайте
             </Link>
             <a
-              className="inline-flex items-center justify-center rounded-xl border border-border bg-surface px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-accent/40 hover:text-accent"
+              className="focus-ring-accent shadow-elevation-panel hover:shadow-elevation-card inline-flex items-center justify-center rounded-xl border border-border bg-surface px-5 py-2.5 text-sm font-semibold text-foreground transition-[border-color,box-shadow,color] hover:border-accent/40 hover:text-accent"
               href={PROFILE_TELEGRAM_URL}
               rel="noopener noreferrer"
               target="_blank"

@@ -33,7 +33,7 @@ export const Footer = () => {
           {NAV_LINKS.map(({ label, href }) => (
             <Link
               key={href}
-              className="text-sm text-muted transition-colors hover:text-foreground"
+              className="focus-ring-accent rounded-sm text-sm text-muted transition-colors hover:text-foreground"
               href={href}
             >
               {label}
@@ -47,7 +47,7 @@ export const Footer = () => {
         >
           <a
             aria-label="GitHub"
-            className="text-muted transition-colors hover:text-foreground"
+            className="focus-ring-accent rounded-md text-muted transition-colors hover:text-foreground"
             href={PROFILE_GITHUB_URL}
             rel="noopener noreferrer"
             target="_blank"
@@ -56,7 +56,7 @@ export const Footer = () => {
           </a>
           <a
             aria-label="Telegram"
-            className="text-muted transition-colors hover:text-foreground"
+            className="focus-ring-accent rounded-md text-muted transition-colors hover:text-foreground"
             href={PROFILE_TELEGRAM_URL}
             rel="noopener noreferrer"
             target="_blank"
@@ -65,7 +65,7 @@ export const Footer = () => {
           </a>
           <a
             aria-label="ВКонтакте"
-            className="text-muted transition-colors hover:text-foreground"
+            className="focus-ring-accent rounded-md text-muted transition-colors hover:text-foreground"
             href={PROFILE_VK_URL}
             rel="noopener noreferrer"
             target="_blank"

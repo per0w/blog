@@ -49,8 +49,7 @@ ${safe}`;
         let msg = "AI временно недоступен или сработал лимит. Попробуй позже.";
         if (result.hint) {
           msg = `AI: ${result.hint}`;
-        }
-        else if (result.network) {
+        } else if (result.network) {
           msg = result.aborted
             ? "Запрос прерван (таймаут или переход со страницы). Попробуй ещё раз."
             : "Браузер не дошёл до OpenRouter. Часто мешают блокировщик рекламы, VPN, режим «только HTTPS» или фильтр сети. Отключи расширения для этого сайта или проверь доступ к openrouter.ai.";
@@ -70,7 +69,7 @@ ${safe}`;
     <div className="contact-form-ai-root flex flex-col items-end gap-1">
       <button
         aria-label="Подправить текст сообщения с помощью AI"
-        className="contact-form-ai-badge group/ai neon-glow flex items-center gap-2 rounded-xl border-2 border-white/35 bg-linear-to-r from-accent via-accent-light to-accent-secondary px-3 py-2 text-sm font-black tracking-tight text-white shadow-[0_4px_22px_color-mix(in_srgb,var(--color-accent)_50%,transparent),0_0_0_1px_color-mix(in_srgb,var(--color-accent-secondary)_35%,transparent)] transition-[filter,box-shadow,transform] hover:brightness-105 hover:shadow-[0_6px_28px_color-mix(in_srgb,var(--color-accent)_58%,transparent),0_0_24px_color-mix(in_srgb,var(--color-accent-secondary)_28%,transparent)] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 dark:border-white/20"
+        className="contact-form-ai-badge focus-ring-accent group/ai neon-glow flex items-center gap-2 rounded-xl border-2 border-white/35 bg-linear-to-r from-accent via-accent-light to-accent-secondary px-3 py-2 text-sm font-black tracking-tight text-white shadow-[0_4px_22px_color-mix(in_srgb,var(--color-accent)_50%,transparent),0_0_0_1px_color-mix(in_srgb,var(--color-accent-secondary)_35%,transparent)] transition-[filter,box-shadow,transform] hover:shadow-[0_6px_28px_color-mix(in_srgb,var(--color-accent)_58%,transparent),0_0_24px_color-mix(in_srgb,var(--color-accent-secondary)_28%,transparent)] hover:brightness-105 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 dark:border-white/20"
         disabled={disabled || loading}
         type="button"
         onClick={() => void run()}

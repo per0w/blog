@@ -43,7 +43,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Владимир Перов — Senior Frontend Developer",
-    description: "8+ лет опыта. React, TypeScript, Next.js, Redux, Docker, K8s. Портфолио и заметки.",
+    description:
+      "8+ лет опыта. React, TypeScript, Next.js, Redux, Docker, K8s. Портфолио и заметки.",
   },
   alternates: {
     canonical: "https://per0w.space",

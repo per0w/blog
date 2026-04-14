@@ -38,6 +38,9 @@ export const ORBO_CONTACT_SPAM_EVENT = "orbo:contact-spam";
 /** Пасхалки в опыте: Орбо подсказывает, сколько кликов осталось до открытия */
 export const ORBO_EASTER_EGG_HINT_EVENT = "orbo:easter-egg-hint";
 
+/** Ответ Орбо на пользовательское приветствие в hero (detail.message — текст шутки). */
+export const ORBO_HERO_GREETING_REPLY_EVENT = "orbo:hero-greeting-reply";
+
 /** Переключение ролевого режима Орбо на CV-странице */
 export const ORBO_CV_ROLE_CHANGE_EVENT = "orbo:cv-role-change";
 

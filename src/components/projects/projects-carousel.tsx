@@ -144,7 +144,7 @@ export const ProjectsCarousel = ({
         <button
           aria-controls={`${regionId}-track`}
           aria-label="Предыдущий проект"
-          className="flex size-10 shrink-0 items-center justify-center self-center rounded-xl border border-border bg-surface text-muted shadow-sm transition-colors hover:border-accent/40 hover:text-accent disabled:pointer-events-none disabled:opacity-35 sm:size-11"
+          className="focus-ring-accent shadow-elevation-panel flex size-10 shrink-0 items-center justify-center self-center rounded-xl border border-border bg-surface text-muted transition-colors hover:border-accent/40 hover:text-accent disabled:pointer-events-none disabled:opacity-35 sm:size-11"
           disabled={atStart}
           type="button"
           onClick={goPrev}
@@ -176,7 +176,7 @@ export const ProjectsCarousel = ({
         <button
           aria-controls={`${regionId}-track`}
           aria-label="Следующий проект"
-          className="flex size-10 shrink-0 items-center justify-center self-center rounded-xl border border-border bg-surface text-muted shadow-sm transition-colors hover:border-accent/40 hover:text-accent disabled:pointer-events-none disabled:opacity-35 sm:size-11"
+          className="focus-ring-accent shadow-elevation-panel flex size-10 shrink-0 items-center justify-center self-center rounded-xl border border-border bg-surface text-muted transition-colors hover:border-accent/40 hover:text-accent disabled:pointer-events-none disabled:opacity-35 sm:size-11"
           disabled={atEnd}
           type="button"
           onClick={goNext}
@@ -193,7 +193,7 @@ export const ProjectsCarousel = ({
               aria-current={i === activeDot ? true : undefined}
               aria-label={`Показать проект ${i + 1} из ${itemCount}`}
               type="button"
-              className={`h-2 rounded-full transition-all duration-200 ${
+              className={`focus-ring-accent h-2 rounded-full transition-all duration-200 ${
                 i === activeDot ? "w-6 bg-accent" : "w-2 bg-border hover:bg-muted"
               }`}
               onClick={() => scrollToIndex(i)}

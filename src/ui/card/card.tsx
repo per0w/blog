@@ -51,7 +51,7 @@ export const Card = ({
       <motion.article
         transition={{ duration: 0.3, ease: "easeOut" as const }}
         whileHover={isCarousel ? undefined : { scale: 1.02, y: -3 }}
-        className={`group/project-card flex h-full flex-col rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-lg transition-[border-color,box-shadow] duration-300 ease-out hover:border-[var(--color-accent)]/55 ${
+        className={`group/project-card shadow-elevation-card flex h-full flex-col rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] transition-[border-color,box-shadow] duration-300 ease-out hover:border-[var(--color-accent)]/55 ${
           isCarousel
             ? "hover:shadow-[0_12px_32px_-8px_color-mix(in_srgb,var(--color-accent)_18%,transparent)]"
             : ""

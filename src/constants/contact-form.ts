@@ -40,10 +40,28 @@ export const ORBO_OPENROUTER_COOLDOWN_MS = 3_500;
 export const CONTACT_FORM_LIMITS = {
   nameMax: 120,
   emailMax: 254,
+  /** Ник, @username или ссылка на профиль (не email). */
+  contactDetailMax: 500,
   subjectMax: 180,
   messageMin: 12,
   messageMax: 4000,
 } as const;
+
+/** Способ обратной связи: уходит в письмо как отдельное поле (Web3Forms). */
+export const CONTACT_FORM_CHANNEL_IDS = ["email", "telegram", "max", "vk", "github"] as const;
+
+export type ContactFormChannelId = (typeof CONTACT_FORM_CHANNEL_IDS)[number];
+
+export const CONTACT_FORM_CHANNELS: ReadonlyArray<{
+  id: ContactFormChannelId;
+  label: string;
+}> = [
+  { id: "email", label: "Почта" },
+  { id: "telegram", label: "Telegram" },
+  { id: "max", label: "MAX" },
+  { id: "vk", label: "ВКонтакте" },
+  { id: "github", label: "GitHub" },
+];
 
 /** Минимальный интервал между успешными попытками POST с одной вкладки. */
 export const CONTACT_FORM_CLIENT_COOLDOWN_MS = 8_000;

@@ -61,7 +61,7 @@ function IconLink({
   return (
     <a
       aria-label={label}
-      className={`group/icon flex size-8 shrink-0 items-center justify-center rounded-xl text-muted transition-all duration-200 hover:bg-accent/10 hover:text-foreground sm:size-9 ${className}`}
+      className={`focus-ring-accent group/icon flex size-8 shrink-0 items-center justify-center rounded-xl text-muted transition-all duration-200 hover:bg-accent/10 hover:text-foreground sm:size-9 ${className}`}
       href={href}
       rel={external ? "noopener noreferrer" : undefined}
       target={external ? "_blank" : undefined}
@@ -83,7 +83,7 @@ function AllContactsLink({
   return (
     <Link
       aria-label="Все контакты — перейти к блоку на главной"
-      className={`group/allcontacts flex size-8 shrink-0 items-center justify-center rounded-xl text-muted transition-all duration-200 hover:bg-accent/10 hover:text-foreground sm:size-9 ${className}`}
+      className={`focus-ring-accent group/allcontacts flex size-8 shrink-0 items-center justify-center rounded-xl text-muted transition-all duration-200 hover:bg-accent/10 hover:text-foreground sm:size-9 ${className}`}
       href={`/#${SECTIONS_IDS.contactUs}`}
       title="Все способы связи на главной"
       onClick={onNavigate}
@@ -139,7 +139,7 @@ export const Header = () => {
               {NAV_LINKS.map(({ label, href }) => (
                 <Link
                   key={href}
-                  className="text-lg font-medium text-foreground/90 transition-colors hover:text-accent"
+                  className="focus-ring-accent rounded-md text-lg font-medium text-foreground/90 transition-colors hover:text-accent"
                   href={href}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -175,16 +175,14 @@ export const Header = () => {
         <div className="mx-auto flex h-16 max-w-screen-xl items-center gap-2 px-3 sm:gap-3 sm:px-5">
           <Link
             aria-label="На главную, per0w.space"
-            className="min-w-0 shrink-0 bg-linear-to-r from-accent to-accent-secondary bg-clip-text text-lg font-bold tracking-tighter text-transparent sm:text-xl"
+            className="focus-ring-accent min-w-0 shrink-0 rounded-md bg-linear-to-r from-accent to-accent-secondary bg-clip-text text-lg font-bold tracking-tighter text-transparent sm:text-xl"
             href="/"
           >
             PER0W.SPACE
           </Link>
 
           {/* На широких экранах много пунктов — даём flex-1 и горизонтальный скролл без полосы, чтобы не ломать вёрстку */}
-          <div
-            className="hidden min-h-0 min-w-0 flex-1 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] lg:block [&::-webkit-scrollbar]:hidden"
-          >
+          <div className="hidden min-h-0 min-w-0 flex-1 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] lg:block [&::-webkit-scrollbar]:hidden">
             <nav
               aria-label="Основная навигация"
               className="flex h-16 w-max items-center gap-x-2.5 pr-1 pl-0.5 sm:gap-x-3 lg:mx-auto lg:justify-center"
@@ -192,7 +190,7 @@ export const Header = () => {
               {NAV_LINKS.map(({ label, href }) => (
                 <Link
                   key={href}
-                  className="group relative shrink-0 whitespace-nowrap text-xs font-medium text-muted transition-colors hover:text-foreground sm:text-sm"
+                  className="focus-ring-accent group relative shrink-0 rounded-md text-xs font-medium whitespace-nowrap text-muted transition-colors hover:text-foreground sm:text-sm"
                   href={href}
                 >
                   {label}
@@ -228,7 +226,7 @@ export const Header = () => {
               aria-controls={isMobileMenuOpen ? MOBILE_NAV_ID : undefined}
               aria-expanded={isMobileMenuOpen}
               aria-label={isMobileMenuOpen ? "Закрыть меню" : "Открыть меню"}
-              className="flex size-9 shrink-0 items-center justify-center rounded-xl text-muted transition-all duration-200 hover:bg-accent/10 hover:text-foreground lg:hidden"
+              className="focus-ring-accent flex size-9 shrink-0 items-center justify-center rounded-xl text-muted transition-all duration-200 hover:bg-accent/10 hover:text-foreground lg:hidden"
               type="button"
               onClick={() => setIsMobileMenuOpen((prev) => !prev)}
             >

@@ -40,7 +40,7 @@ export const About = () => {
             aria-describedby={showTooltip ? tipId : undefined}
             aria-expanded={showTooltip}
             aria-label="Пояснение к формулировке «8+ лет в IT»"
-            className="inline cursor-help border-b border-dashed border-accent/50 bg-transparent font-semibold text-foreground transition-colors hover:text-accent"
+            className="focus-ring-accent inline cursor-help rounded-sm border-b border-dashed border-accent/50 bg-transparent font-semibold text-foreground transition-colors hover:text-accent"
             type="button"
             onBlur={() => setShowTooltip(false)}
             onClick={toggleTooltip}
@@ -56,7 +56,7 @@ export const About = () => {
             {showTooltip ? (
               <motion.span
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                className="absolute left-1/2 z-[60] w-[min(20rem,calc(100vw-2rem))] max-w-none -translate-x-1/2 rounded-xl border border-accent/20 bg-surface p-3 text-left text-sm leading-relaxed font-normal text-foreground shadow-lg shadow-accent/5 max-sm:top-full max-sm:mt-2 max-sm:max-h-[min(55vh,22rem)] max-sm:overflow-y-auto sm:top-auto sm:bottom-full sm:mt-0 sm:mb-3 sm:max-w-[22rem] sm:p-4"
+                className="shadow-elevation-card absolute left-1/2 z-[60] w-[min(20rem,calc(100vw-2rem))] max-w-none -translate-x-1/2 rounded-xl border border-accent/20 bg-surface p-3 text-left text-sm leading-relaxed font-normal text-foreground max-sm:top-full max-sm:mt-2 max-sm:max-h-[min(55vh,22rem)] max-sm:overflow-y-auto sm:top-auto sm:bottom-full sm:mt-0 sm:mb-3 sm:max-w-[22rem] sm:p-4"
                 exit={{ opacity: 0, y: 8, scale: 0.95 }}
                 id={tipId}
                 initial={{ opacity: 0, y: 8, scale: 0.95 }}
@@ -83,9 +83,9 @@ export const About = () => {
             ) : null}
           </AnimatePresence>
         </span>
-        {" — "}от DevOps до Senior Frontend в&nbsp;Газпромбанке. Строю сложные веб-приложения на
-        React и TypeScript, понимаю весь стек от серверного железа до пиксель-перфект UI. Активно
-        применяю AI-инструменты для ускорения разработки.
+        {" — "}от DevOps до Senior Frontend в&nbsp;Газпромбанке. Строю сложные веб-приложения для
+        высоконагруженных продуктов, понимаю весь стек от серверного железа до пиксель-перфект UI.
+        Активно применяю AI-инструменты для ускорения разработки.
       </div>
       <Skills />
     </Section>

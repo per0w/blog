@@ -5,8 +5,16 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, X } from "lucide-react";
 
+import { OrboBubbleReply } from "@/components/ai-buddy/orbo-bubble-reply";
+
 const TYPEWRITER_MS_PER_CHAR = 16;
 const TYPEWRITER_MIN_STEP_MS = 8;
+
+type BubbleReplyHandlers = {
+  onOrboLine: (line: string) => void;
+  onReplyFocus: () => void;
+  onReplyBlur: () => void;
+};
 
 type CommentTooltipProps = {
   comment: string | null;
@@ -16,6 +24,8 @@ type CommentTooltipProps = {
   /** Пока идёт «речь» — лёгкое свечение карточки. */
   speaking?: boolean;
   onDismiss: () => void;
+  /** Ответ в том же пузыре (после текста комментария). */
+  bubbleReply?: BubbleReplyHandlers;
 };
 
 export function CommentTooltip({
@@ -25,6 +35,7 @@ export function CommentTooltip({
   commentKey,
   speaking = false,
   onDismiss,
+  bubbleReply,
 }: CommentTooltipProps) {
   const showBubble = visible && (thinking || !!comment);
   const [typed, setTyped] = useState("");
@@ -117,6 +128,14 @@ export function CommentTooltip({
                   </motion.p>
                 )}
               </AnimatePresence>
+
+              {!thinking && comment && bubbleReply ? (
+                <OrboBubbleReply
+                  onFieldBlur={bubbleReply.onReplyBlur}
+                  onFieldFocus={bubbleReply.onReplyFocus}
+                  onOrboLine={bubbleReply.onOrboLine}
+                />
+              ) : null}
             </div>
           </div>
           <div

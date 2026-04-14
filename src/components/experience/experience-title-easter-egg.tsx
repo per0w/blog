@@ -125,7 +125,7 @@ export const ExperienceTitleEasterEgg = ({
       <h3 className="text-lg font-bold">
         <motion.button
           aria-label={`${title}. Скрытая пасхалка откроется после десяти нажатий.`}
-          className="cursor-pointer rounded-md text-left transition-colors duration-200 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+          className="focus-ring-accent cursor-pointer rounded-md text-left transition-colors duration-200 hover:text-accent"
           transition={{ duration: 0.18, ease: "easeOut" }}
           type="button"
           whileTap={reduceMotion ? undefined : { scale: 0.98 }}
@@ -179,7 +179,7 @@ export const ExperienceTitleEasterEgg = ({
                 <button
                   ref={closeButtonRef}
                   aria-label="Закрыть пасхалку"
-                  className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border/80 bg-background/65 text-muted transition-colors duration-200 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  className="focus-ring-accent inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border/80 bg-background/65 text-muted transition-colors duration-200 hover:text-foreground"
                   type="button"
                   onClick={() => setIsOpen(false)}
                 >

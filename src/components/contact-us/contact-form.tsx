@@ -7,6 +7,7 @@ import { AlertCircle, CheckCircle2, Loader2, Send, X } from "lucide-react";
 
 import { ORBO_CONTACT_SPAM_EVENT, PROFILE_EMAIL } from "@/constants/common";
 import {
+  CONTACT_FORM_CHANNELS,
   CONTACT_FORM_CLIENT_COOLDOWN_MS,
   CONTACT_FORM_DOUBLE_SUBMIT_GUARD_MS,
   CONTACT_FORM_FLOOD_THRESHOLD,
@@ -14,6 +15,7 @@ import {
   CONTACT_FORM_LIMITS,
   CONTACT_FORM_ORBO_SPAM_COOLDOWN_MS,
   CONTACT_FORM_SESSION_MAX_SENDS,
+  type ContactFormChannelId,
   WEB3FORMS_SUBMIT_URL,
   bumpContactFormSessionSendCount,
   getContactFormSessionSendCount,
@@ -23,7 +25,20 @@ import { clampToLimits, normalizeEmailInput } from "@/utils/contact-form";
 
 import { ContactFormAiAssist } from "./contact-form-ai-assist";
 
-type FieldErrors = Partial<Record<"name" | "email" | "subject" | "message", string>>;
+type FieldErrors = Partial<Record<"name" | "contactDetail" | "subject" | "message", string>>;
+
+function channelLabel(id: ContactFormChannelId): string {
+  return CONTACT_FORM_CHANNELS.find((c) => c.id === id)?.label ?? id;
+}
+
+/** Плейсхолдеры без вложенных тернарников (правило eslint no-nested-ternary). */
+const CONTACT_DETAIL_PLACEHOLDERS: Record<ContactFormChannelId, string> = {
+  email: "you@example.com",
+  telegram: "@username или https://t.me/…",
+  max: "Ник или ссылка на профиль в MAX",
+  vk: "Ссылка vk.com/… или короткое имя",
+  github: "username или https://github.com/…",
+};
 
 type FormFeedback = { kind: "success" | "error"; text: string };
 
@@ -48,7 +63,13 @@ function normalizeLine(s: string) {
   return s.replace(/\r\n/g, "\n").replace(/\r/g, "\n").trim();
 }
 
-function validate(name: string, email: string, subject: string, message: string): FieldErrors {
+function validate(
+  name: string,
+  contactDetail: string,
+  subject: string,
+  message: string,
+  channel: ContactFormChannelId,
+): FieldErrors {
   const e: FieldErrors = {};
   const n = normalizeLine(name);
   if (n.length < 2) {
@@ -57,10 +78,24 @@ function validate(name: string, email: string, subject: string, message: string)
     e.name = `Не длиннее ${CONTACT_FORM_LIMITS.nameMax} символов.`;
   }
 
-  const em = email.trim();
-  if (!em) e.email = "Укажите email.";
-  else if (em.length > CONTACT_FORM_LIMITS.emailMax) e.email = "Слишком длинный email.";
-  else if (!EMAIL_RE.test(em)) e.email = "Похоже на неверный формат email.";
+  const cd = contactDetail.trim();
+  if (channel === "email") {
+    if (!cd) {
+      e.contactDetail = "Укажите email.";
+    } else if (cd.length > CONTACT_FORM_LIMITS.emailMax) {
+      e.contactDetail = "Слишком длинный email.";
+    } else if (!EMAIL_RE.test(cd)) {
+      e.contactDetail = "Похоже на неверный формат email.";
+    }
+  } else {
+    if (!cd) {
+      e.contactDetail = "Укажите ник или ссылку на профиль.";
+    } else if (cd.length < 2) {
+      e.contactDetail = "Минимум 2 символа.";
+    } else if (cd.length > CONTACT_FORM_LIMITS.contactDetailMax) {
+      e.contactDetail = `Не длиннее ${CONTACT_FORM_LIMITS.contactDetailMax} символов.`;
+    }
+  }
 
   const sub = normalizeLine(subject);
   if (sub.length > CONTACT_FORM_LIMITS.subjectMax) {
@@ -84,17 +119,19 @@ export const ContactForm = () => {
 
   const baseId = useId();
   const nameId = `${baseId}-name`;
-  const emailId = `${baseId}-email`;
+  const channelId = `${baseId}-channel`;
+  const contactDetailId = `${baseId}-contact`;
   const subjectId = `${baseId}-subject`;
   const messageId = `${baseId}-message`;
   const nameErrId = `${baseId}-err-name`;
-  const emailErrId = `${baseId}-err-email`;
+  const contactErrId = `${baseId}-err-contact`;
   const subjectErrId = `${baseId}-err-subject`;
   const messageErrId = `${baseId}-err-message`;
   const messageLenId = `${baseId}-msg-length`;
 
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [contactChannel, setContactChannel] = useState<ContactFormChannelId>("email");
+  const [contactDetail, setContactDetail] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   /** Honeypot: заполняют боты — не отправляем и не показываем ошибку (тишина). */
@@ -140,20 +177,27 @@ export const ContactForm = () => {
       }
     }
 
-    const cleaned = clampToLimits(name, email, subject, message);
+    const channelIsEmail = contactChannel === "email";
+    const cleaned = clampToLimits(name, contactDetail, subject, message, channelIsEmail);
     if (
       cleaned.name !== name ||
-      cleaned.email !== email ||
+      cleaned.contactDetail !== contactDetail ||
       cleaned.subject !== subject ||
       cleaned.message !== message
     ) {
       setName(cleaned.name);
-      setEmail(cleaned.email);
+      setContactDetail(cleaned.contactDetail);
       setSubject(cleaned.subject);
       setMessage(cleaned.message);
     }
 
-    const v = validate(cleaned.name, cleaned.email, cleaned.subject, cleaned.message);
+    const v = validate(
+      cleaned.name,
+      cleaned.contactDetail,
+      cleaned.subject,
+      cleaned.message,
+      contactChannel,
+    );
     if (Object.keys(v).length > 0) {
       setErrors(v);
       return;
@@ -185,16 +229,21 @@ export const ContactForm = () => {
     lastSubmitRef.current = now;
     setSubmitting(true);
 
-    const payload = {
+    const methodLabel = channelLabel(contactChannel);
+    const payload: Record<string, string | boolean> = {
       access_key: accessKey,
       botcheck: false,
       subject: normalizeLine(cleaned.subject)
         ? `[per0w.space] ${normalizeLine(cleaned.subject)}`
         : `[per0w.space] Сообщение от ${normalizeLine(cleaned.name)}`,
       from_name: normalizeLine(cleaned.name),
-      email: cleaned.email.trim(),
+      contact_method: methodLabel,
+      contact_detail: cleaned.contactDetail,
       message: cleaned.message.replace(/\r\n/g, "\n").replace(/\r/g, "\n").trim(),
     };
+    if (channelIsEmail) {
+      payload.email = cleaned.contactDetail;
+    }
 
     try {
       const res = await fetch(WEB3FORMS_SUBMIT_URL, {
@@ -217,11 +266,16 @@ export const ContactForm = () => {
       if (ok) {
         bumpContactFormSessionSendCount();
         setName("");
-        setEmail("");
+        setContactDetail("");
         setSubject("");
         setMessage("");
         setFloodWarning(null);
-        setFeedback({ kind: "success", text: "Сообщение отправлено. Отвечу на указанный email." });
+        setFeedback({
+          kind: "success",
+          text: channelIsEmail
+            ? "Сообщение отправлено. Отвечу на указанный email."
+            : "Сообщение отправлено. Свяжусь с вами через выбранный способ.",
+        });
       } else {
         setFeedback({
           kind: "error",
@@ -240,14 +294,14 @@ export const ContactForm = () => {
   };
 
   const inputClass =
-    "rounded-xl border border-slate-300 bg-white px-4 py-3 text-[15px] text-slate-900 shadow-sm outline-none transition-[border-color,box-shadow] duration-200 placeholder:text-slate-400 focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-accent)_35%,transparent)] dark:border-slate-600 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-[var(--color-accent-light)]";
+    "focus-ring-input rounded-xl border border-border bg-surface px-4 py-3 text-[15px] text-foreground shadow-elevation-panel placeholder:text-muted";
 
   return (
     <div className="mx-auto w-full max-w-2xl text-left">
       <motion.form
         noValidate
         aria-label="Форма обратной связи"
-        className="relative rounded-2xl border border-white/40 bg-white/98 p-5 text-foreground shadow-2xl ring-1 shadow-black/20 ring-black/5 sm:p-6 dark:border-white/15 dark:bg-[var(--color-surface)] dark:ring-white/10"
+        className="contact-form-shell-elevated relative rounded-2xl border border-white/40 bg-white/98 p-5 text-foreground shadow-2xl ring-1 shadow-black/20 ring-black/5 sm:p-6 dark:border-white/15 dark:bg-[var(--color-surface)] dark:ring-white/10"
         onSubmit={onSubmit}
         {...(reduceMotion
           ? {}
@@ -257,17 +311,13 @@ export const ContactForm = () => {
               transition: { duration: 0.45, ease: "easeOut" as const },
             })}
       >
-        <div className="mb-5 flex items-start justify-between gap-3 border-b border-slate-200 pb-4 dark:border-border">
+        <div className="mb-5 flex items-start justify-between gap-3 border-b border-border pb-4">
           <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-bold tracking-tight text-slate-900 dark:text-foreground">
-              Связаться со мной
-            </h3>
-            <p className="mt-1 text-sm text-slate-600 dark:text-muted">
-              Я получу письмо на{" "}
-              <span className="font-medium text-slate-800 dark:text-foreground">
-                {PROFILE_EMAIL}
-              </span>{" "}
-              и отвечу вам на указанный email.
+            <h3 className="text-lg font-bold tracking-tight text-foreground">Связаться со мной</h3>
+            <p className="mt-1 text-sm text-muted">
+              Сообщение приходит мне на{" "}
+              <span className="font-medium text-foreground">{PROFILE_EMAIL}</span>. Выберите удобный
+              способ связи — так я пойму, куда вам ответить.
             </p>
           </div>
           <ContactFormAiAssist
@@ -283,8 +333,11 @@ export const ContactForm = () => {
         {!formEnabled ? (
           <p className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-950 dark:border-amber-500/40 dark:bg-amber-500/15 dark:text-amber-100">
             Для отправки с сайта добавьте в{" "}
-            <code className="rounded bg-slate-200 px-1 dark:bg-white/15">.env.local</code> ключ{" "}
-            <code className="rounded bg-slate-200 px-1 dark:bg-white/15">
+            <code className="rounded bg-surface-hover px-1 py-0.5 text-foreground dark:bg-white/12">
+              .env.local
+            </code>{" "}
+            ключ{" "}
+            <code className="rounded bg-surface-hover px-1 py-0.5 text-foreground dark:bg-white/12">
               NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY
             </code>{" "}
             (см.{" "}
@@ -302,13 +355,13 @@ export const ContactForm = () => {
 
         {floodWarning ? (
           <div
-            className="contact-form-flood-banner mb-4 flex items-start gap-2 rounded-xl border border-fuchsia-500/45 bg-linear-to-r from-fuchsia-950/15 via-cyan-950/10 to-violet-950/15 px-3 py-2.5 text-sm text-slate-800 shadow-[0_0_24px_color-mix(in_srgb,var(--color-accent-secondary)_22%,transparent)] dark:border-fuchsia-400/35 dark:from-fuchsia-500/12 dark:via-cyan-500/8 dark:to-violet-500/12 dark:text-fuchsia-100/95"
+            className="contact-form-flood-banner mb-4 flex items-start gap-2 rounded-xl border border-fuchsia-500/45 bg-linear-to-r from-fuchsia-950/15 via-cyan-950/10 to-violet-950/15 px-3 py-2.5 text-sm text-foreground shadow-[0_0_24px_color-mix(in_srgb,var(--color-accent-secondary)_22%,transparent)] dark:border-fuchsia-400/35 dark:from-fuchsia-500/12 dark:via-cyan-500/8 dark:to-violet-500/12 dark:text-fuchsia-100/95"
             role="status"
           >
             <p className="min-w-0 flex-1 leading-snug">{floodWarning}</p>
             <button
               aria-label="Скрыть подсказку"
-              className="shrink-0 rounded-md p-1 text-slate-500 transition-colors hover:bg-white/20 hover:text-slate-800 dark:text-fuchsia-200/80 dark:hover:text-white"
+              className="focus-ring-accent shrink-0 rounded-md p-1 text-muted transition-colors hover:bg-white/20 hover:text-foreground dark:text-fuchsia-200/80 dark:hover:text-white"
               type="button"
               onClick={() => setFloodWarning(null)}
             >
@@ -352,7 +405,7 @@ export const ContactForm = () => {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="min-w-0">
             <label
-              className="mb-1.5 block text-xs font-semibold tracking-wide text-slate-600 uppercase dark:text-muted"
+              className="mb-1.5 block text-xs font-semibold tracking-wide text-muted uppercase"
               htmlFor={nameId}
             >
               Имя
@@ -384,50 +437,83 @@ export const ContactForm = () => {
 
           <div className="min-w-0">
             <label
-              className="mb-1.5 block text-xs font-semibold tracking-wide text-slate-600 uppercase dark:text-muted"
-              htmlFor={emailId}
+              className="mb-1.5 block text-xs font-semibold tracking-wide text-muted uppercase"
+              htmlFor={channelId}
             >
-              Email
+              Способ связи
+            </label>
+            <select
+              className={`${inputClass} w-full cursor-pointer`}
+              id={channelId}
+              name="contact_channel"
+              value={contactChannel}
+              onChange={(e) => {
+                const next = e.target.value as ContactFormChannelId;
+                setContactChannel(next);
+                setErrors((prev) => ({ ...prev, contactDetail: undefined }));
+              }}
+            >
+              {CONTACT_FORM_CHANNELS.map((ch) => (
+                <option key={ch.id} value={ch.id}>
+                  {ch.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="min-w-0 md:col-span-2">
+            <label
+              className="mb-1.5 block text-xs font-semibold tracking-wide text-muted uppercase"
+              htmlFor={contactDetailId}
+            >
+              {contactChannel === "email"
+                ? "Email"
+                : `${channelLabel(contactChannel)} — ник или ссылка на профиль`}
             </label>
             <input
               required
-              aria-describedby={errors.email ? emailErrId : undefined}
-              aria-invalid={Boolean(errors.email)}
+              aria-describedby={errors.contactDetail ? contactErrId : undefined}
+              aria-invalid={Boolean(errors.contactDetail)}
               autoCapitalize="none"
-              autoComplete="email"
+              autoComplete={contactChannel === "email" ? "email" : "off"}
               autoCorrect="off"
               className={`${inputClass} w-full`}
-              id={emailId}
-              inputMode="email"
-              maxLength={CONTACT_FORM_LIMITS.emailMax}
-              name="email"
-              placeholder="you@example.com"
+              id={contactDetailId}
+              inputMode={contactChannel === "email" ? "email" : "text"}
+              name={contactChannel === "email" ? "email" : "contact_detail"}
+              placeholder={CONTACT_DETAIL_PLACEHOLDERS[contactChannel]}
               spellCheck={false}
-              type="email"
-              value={email}
-              onBlur={() => setEmail((prev) => normalizeEmailInput(prev))}
-              onChange={(e) => setEmail(e.target.value)}
+              type={contactChannel === "email" ? "email" : "text"}
+              value={contactDetail}
+              maxLength={
+                contactChannel === "email"
+                  ? CONTACT_FORM_LIMITS.emailMax
+                  : CONTACT_FORM_LIMITS.contactDetailMax
+              }
+              onChange={(e) => setContactDetail(e.target.value)}
+              onBlur={() => {
+                if (contactChannel === "email") {
+                  setContactDetail((prev) => normalizeEmailInput(prev));
+                }
+              }}
             />
-            {errors.email ? (
+            {errors.contactDetail ? (
               <p
                 className="mt-1.5 text-xs text-red-600 dark:text-red-300"
-                id={emailErrId}
+                id={contactErrId}
                 role="alert"
               >
-                {errors.email}
+                {errors.contactDetail}
               </p>
             ) : null}
           </div>
 
           <div className="min-w-0 md:col-span-2">
             <label
-              className="mb-1.5 block text-xs font-semibold tracking-wide text-slate-600 uppercase dark:text-muted"
+              className="mb-1.5 block text-xs font-semibold tracking-wide text-muted uppercase"
               htmlFor={subjectId}
             >
-              Тема{" "}
-              <span className="font-normal text-slate-400 normal-case dark:text-muted">
-                (необязательно)
-              </span>
+              Тема <span className="font-normal text-muted/90 normal-case">(необязательно)</span>
             </label>
             <input
               aria-describedby={errors.subject ? subjectErrId : undefined}
@@ -454,7 +540,7 @@ export const ContactForm = () => {
 
           <div className="relative min-w-0 md:col-span-2">
             <label
-              className="mb-1.5 block text-xs font-semibold tracking-wide text-slate-600 uppercase dark:text-muted"
+              className="mb-1.5 block text-xs font-semibold tracking-wide text-muted uppercase"
               htmlFor={messageId}
             >
               Сообщение
@@ -476,10 +562,7 @@ export const ContactForm = () => {
               }
               onChange={(e) => setMessage(e.target.value)}
             />
-            <p
-              className="mt-1 text-right font-mono text-[11px] text-slate-400 dark:text-muted"
-              id={messageLenId}
-            >
+            <p className="mt-1 text-right font-mono text-[11px] text-muted" id={messageLenId}>
               {message.length}/{CONTACT_FORM_LIMITS.messageMax}
             </p>
             {errors.message ? (
@@ -496,7 +579,7 @@ export const ContactForm = () => {
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <motion.button
-            className="contact-form-submit-cyber group/submit inline-flex items-center justify-center gap-2 rounded-xl border-2 border-accent/60 bg-linear-to-r from-[var(--color-accent)] to-[var(--color-accent-secondary)] px-6 py-3 text-sm font-semibold text-white transition-[filter] disabled:cursor-not-allowed disabled:opacity-55"
+            className="contact-form-submit-cyber focus-ring-accent group/submit inline-flex items-center justify-center gap-2 rounded-xl border-2 border-accent/60 bg-linear-to-r from-[var(--color-accent)] to-[var(--color-accent-secondary)] px-6 py-3 text-sm font-semibold text-white transition-[filter] disabled:cursor-not-allowed disabled:opacity-55"
             disabled={submitting}
             type="submit"
             whileTap={reduceMotion ? undefined : { scale: 0.98 }}
@@ -519,7 +602,7 @@ export const ContactForm = () => {
             </span>
           </motion.button>
           <a
-            className="text-center text-sm text-slate-600 underline decoration-slate-300 underline-offset-2 transition-colors hover:text-[var(--color-accent)] hover:decoration-[var(--color-accent)] sm:text-right dark:text-muted dark:decoration-border dark:hover:text-accent"
+            className="focus-ring-accent rounded-sm text-center text-sm text-muted underline decoration-border underline-offset-2 transition-colors hover:text-accent hover:decoration-accent sm:text-right"
             href={`mailto:${PROFILE_EMAIL}`}
           >
             Открыть почтовый клиент
