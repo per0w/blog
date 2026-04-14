@@ -148,7 +148,7 @@ export function OrboBubbleReply({ onOrboLine, onFieldFocus, onFieldBlur }: OrboB
     "min-w-0 flex-1 rounded-lg border border-border/45 bg-background/35 py-1.5 pr-2 pl-2 text-xs text-foreground outline-none placeholder:text-muted/75 focus:border-accent/50 focus:ring-1 focus:ring-accent/20 dark:bg-surface/30";
 
   return (
-    <div data-orbo-bubble-reply className="mt-3 border-border/35 border-t pt-3">
+    <div data-orbo-bubble-reply className="mt-3 border-t border-border/35 pt-3">
       <p className="mb-1.5 text-[10px] font-medium tracking-wide text-muted">Ответить Орбо</p>
       <form className="relative" onSubmit={onSubmit}>
         <div aria-hidden="true" className="contact-form-honeypot-text">
